@@ -2,31 +2,34 @@ package ua.ihromant.learning;
 
 import java.util.Comparator;
 
-public final class MinimaxTemplate {
-
-    private MinimaxTemplate() {
+public final class MinimaxTemplate implements AITemplate {
+    private final Player player;
+    public MinimaxTemplate(Player player) {
+        this.player = player;
     }
 
-    public static State minimaxDecision(State state) {
-        return state.getActions().stream()
-                .max(Comparator.comparing(MinimaxTemplate::minValue)).get();
+    public Action decision(State state) {
+        return new Action(state, state.getActions().map(Action::getTo)
+                .max(Comparator.comparing(this::minValue)).get());
     }
 
-    private static double maxValue(State state) {
+    private double maxValue(State state) {
         if (state.isTerminal()) {
-            return state.getUtility();
+            return state.getUtility(player);
         }
-        return state.getActions().stream()
-                .map(MinimaxTemplate::minValue)
+        return state.getActions()
+                .map(Action::getTo)
+                .map(this::minValue)
                 .max(Comparator.comparing(Double::valueOf)).get();
     }
 
-    private static double minValue(State state) {
+    private double minValue(State state) {
         if (state.isTerminal()) {
-            return state.getUtility();
+            return state.getUtility(player);
         }
-        return state.getActions().stream()
-                .map(MinimaxTemplate::maxValue)
+        return state.getActions()
+                .map(Action::getTo)
+                .map(this::maxValue)
                 .min(Comparator.comparing(Double::valueOf)).get();
     }
 }

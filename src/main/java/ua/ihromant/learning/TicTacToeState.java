@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class TicTacToeState implements State {
     private static final int[][] WIN_COMBINATIONS = {
@@ -38,7 +39,7 @@ public class TicTacToeState implements State {
     }
 
     @Override
-    public Collection<State> getActions() {
+    public Stream<Action> getActions() {
         List<Integer> notAssigned = IntStream.range(0, 9)
                 .filter(i -> players[i] == null)
                 .boxed()
@@ -47,8 +48,8 @@ public class TicTacToeState implements State {
         return notAssigned.stream().map(i -> {
             TicTacToeState next = new TicTacToeState(this);
             next.players[i] = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-            return next;
-        }).collect(Collectors.toList());
+            return new Action(this, next);
+        });
     }
 
     private Player won() {
@@ -63,13 +64,13 @@ public class TicTacToeState implements State {
     }
 
     @Override
-    public double getUtility() {
+    public double getUtility(Player player) {
         Player won = won();
         if (won == null) {
             return 0;
         }
 
-        return won == Player.X ? -1 : 1;
+        return player == won ? 1 : -1;
     }
 
     @Override
@@ -89,7 +90,20 @@ public class TicTacToeState implements State {
         return builder.toString();
     }
 
-    public enum Player {
-        X, O
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TicTacToeState that = (TicTacToeState) o;
+        return Arrays.equals(players, that.players);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(players);
     }
 }

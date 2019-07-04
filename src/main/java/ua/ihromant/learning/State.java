@@ -1,11 +1,11 @@
 package ua.ihromant.learning;
 
-import java.util.Collection;
+import java.util.stream.Stream;
 
 public interface State {
-    Collection<State> getActions();
+    Stream<Action> getActions();
 
     boolean isTerminal();
 
-    double getUtility();
+    double getUtility(Player player);
 }
