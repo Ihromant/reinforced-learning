@@ -39,7 +39,18 @@ public class TicTacToeState implements State {
     }
 
     @Override
+    public Player getCurrent() {
+        return IntStream.range(0, 9)
+                .filter(i -> players[i] == null)
+                .count() % 2 == 1 ? Player.X : Player.O;
+    }
+
+    @Override
     public Stream<Action> getActions() {
+        if (isTerminal()) {
+            return Stream.empty();
+        }
+
         List<Integer> notAssigned = IntStream.range(0, 9)
                 .filter(i -> players[i] == null)
                 .boxed()
@@ -47,8 +58,9 @@ public class TicTacToeState implements State {
         Collections.shuffle(notAssigned);
         return notAssigned.stream().map(i -> {
             TicTacToeState next = new TicTacToeState(this);
-            next.players[i] = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-            return new Action(this, next);
+            Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
+            next.players[i] = player;
+            return new Action(player, this, next);
         });
     }
 

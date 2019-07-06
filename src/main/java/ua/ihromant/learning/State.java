@@ -8,4 +8,6 @@ public interface State {
     boolean isTerminal();
 
     double getUtility(Player player);
+
+    Player getCurrent();
 }

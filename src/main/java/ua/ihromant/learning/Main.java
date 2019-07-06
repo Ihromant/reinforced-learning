@@ -3,7 +3,8 @@ package ua.ihromant.learning;
 import java.util.Scanner;
 
 public class Main {
-    private static AITemplate template = new MinimaxTemplate(Player.O);
+    // private static AITemplate template = new MinimaxTemplate(Player.O);
+    private static AITemplate template = new QLearningTemplate(new TicTacToeState(), 100000);
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         TicTacToeState state = new TicTacToeState();

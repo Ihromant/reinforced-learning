@@ -9,7 +9,7 @@ public final class MinimaxTemplate implements AITemplate {
     }
 
     public Action decision(State state) {
-        return new Action(state, state.getActions().map(Action::getTo)
+        return new Action(player, state, state.getActions().map(Action::getTo)
                 .max(Comparator.comparing(this::minValue)).get());
     }
 
