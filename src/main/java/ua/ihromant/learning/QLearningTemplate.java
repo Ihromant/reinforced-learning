@@ -25,7 +25,13 @@ public class QLearningTemplate implements AITemplate {
 	}
 
 	private void init() {
+		int percentage = 0;
 		for (int i = 0; i < episodes; i++) {
+			if (i == episodes / 100 * percentage) {
+				percentage++;
+				System.out.println("Learning " + percentage + "% complete");
+			}
+
 			State state = baseState;
 			while (!state.isTerminal()) {
 				Action act = policy.apply(state.getActions());
