@@ -29,12 +29,10 @@ public class QLearningTemplate implements AITemplate {
 			State state = baseState;
 			while (!state.isTerminal()) {
 				Action act = policy.apply(state.getActions());
-				Player currPlayer = act.getPlayer();
 				double reward = act.getReward();
 				State next = act.getTo();
-				BiFunction<Stream<Action>, Comparator, Optional<Action>> choiseFunction = Stream::max;
-				Optional<Action> nextBest = choiseFunction.apply(next.getActions(),
-						Comparator.comparingDouble(a -> qStates.getOrDefault(a, 0.0)));
+				Optional<Action> nextBest = next.getActions()
+						.max(Comparator.comparingDouble(a -> qStates.getOrDefault(a, 0.0)));
 				double previousQ = qStates.getOrDefault(act, 0.0);
 				double newQ = previousQ + ALPHA * (reward - GAMMA * qStates.getOrDefault(nextBest.orElse(null), 0.0) - previousQ);
 				qStates.put(act, newQ);
