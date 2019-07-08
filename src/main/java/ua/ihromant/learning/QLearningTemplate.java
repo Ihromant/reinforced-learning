@@ -36,7 +36,7 @@ public class QLearningTemplate implements AITemplate {
 				Optional<Action> nextBest = choiseFunction.apply(next.getActions(),
 						Comparator.comparingDouble(a -> qStates.getOrDefault(a, 0.0)));
 				double previousQ = qStates.getOrDefault(act, 0.0);
-				double newQ = previousQ + ALPHA * (reward - GAMMA * qStates.getOrDefault(nextBest.orElse(null), 0.0) + previousQ);
+				double newQ = previousQ + ALPHA * (reward - GAMMA * qStates.getOrDefault(nextBest.orElse(null), 0.0) - previousQ);
 				qStates.put(act, newQ);
 				state = next;
 			}
