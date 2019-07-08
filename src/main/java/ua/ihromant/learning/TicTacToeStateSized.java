@@ -1,9 +1,6 @@
 package ua.ihromant.learning;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -35,23 +32,55 @@ public class TicTacToeStateSized implements State {
 				.count() % 2 == 1 ? Player.X : Player.O;
 	}
 
+	private static final int[] noTop = {0, 1};
+	private static final int[] noBot = {-1, 0};
+	private static final int[] all = {-1, 0, 1};
+
+	private IntStream neighbors(int position) {
+		int[] hor;
+		int[] ver;
+		if (position / SIZE == 0) {
+			hor = noTop;
+		} else if (position / SIZE == SIZE - 1) {
+			hor = noBot;
+		} else {
+			hor = all;
+		}
+		if (position % SIZE == 0) {
+			ver = noTop;
+		} else if (position % SIZE == SIZE - 1) {
+			ver = noBot;
+		} else {
+			ver = all;
+		}
+		return Arrays.stream(hor).flatMap(i -> Arrays.stream(ver).map(j -> position + i * 5 + j));
+	}
+
 	@Override
 	public Stream<Action> getActions() {
 		if (isTerminal()) {
 			return Stream.empty();
 		}
 
-		List<Integer> notAssigned = IntStream.range(0, SIZE * SIZE)
-				.filter(i -> players[i] == null)
+		Set<Integer> assigned = IntStream.range(0, SIZE * SIZE)
+				.filter(i -> players[i] != null)
 				.boxed()
-				.collect(Collectors.toList());
-		Collections.shuffle(notAssigned);
-		return notAssigned.stream().map(i -> {
-			TicTacToeStateSized next = new TicTacToeStateSized(this);
-			Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-			next.players[i] = player;
-			return new Action(player, this, next);
-		});
+				.collect(Collectors.toSet());
+
+		if (assigned.isEmpty()) {
+			return Stream.of(new Action(Player.X, this, new TicTacToeStateSized(this, 12, Player.X)));
+		}
+
+		return assigned.stream()
+				.mapToInt(Integer::intValue)
+				.flatMap(this::neighbors)
+				.filter(i -> !assigned.contains(i))
+				.mapToObj(i -> {
+					TicTacToeStateSized next = new TicTacToeStateSized(this);
+					Player player = assigned.size() % 2 == 0 ? Player.X : Player.O;
+					next.players[i] = player;
+					return new Action(player, this, next);
+				});
 	}
 
 	private Player won() {

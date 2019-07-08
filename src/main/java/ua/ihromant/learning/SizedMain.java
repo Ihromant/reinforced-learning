@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class SizedMain {
 	// private static AITemplate template = new MinimaxTemplate(Player.O);
-	private static AITemplate template = new QLearningTemplate(new TicTacToeStateSized(), 1000000);
+	private static AITemplate template = new QLearningTemplate(new TicTacToeStateSized(), 300000);
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		TicTacToeStateSized state = new TicTacToeStateSized();
