@@ -1,9 +1,8 @@
 package ua.ihromant.learning;
 
-import java.util.BitSet;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -11,13 +10,27 @@ import java.util.stream.Stream;
 public class TicTacToeStateSized implements State {
 	private static final int SIZE = 5;
 	private static final int WON = 4;
-	private final BitSet players = new BitSet(2 * SIZE * SIZE);
+	private long plrz;
+
+	// ABCDE
+	// FGHIJ
+	// KLMNO
+	// PQRST
+	// UVWXY
+	private static final char[][] WIN__DIRECTIONS = {
+			"ABFGKLPQUV".toCharArray(), // 1
+			"ABCDEFGHIJ".toCharArray(), // 5
+			"ABFG".toCharArray(), // 6
+			"DEIJ".toCharArray() // 4
+	};
+
+	//private static final long[] WINNING_MASKS = Arrays.stream(WIN__DIRECTIONS)
 
 	public TicTacToeStateSized() {
 	}
 
 	private TicTacToeStateSized(TicTacToeStateSized prev) {
-		players.or(prev.players);
+		this.plrz = prev.plrz;
 	}
 
 	public TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
@@ -41,23 +54,33 @@ public class TicTacToeStateSized implements State {
 		return state;
 	}
 
+	private boolean get(int index) {
+		return (plrz & (1L << index)) != 0;
+	}
+
+	private void set(int index) {
+		plrz |= (1L << index);
+	}
+
 	private boolean isAssigned(int position) {
-		return players.get(position * 2);
+		return get(position * 2);
 	}
 
 	private void assign(int position, Player pl) {
-		if (players.get(position * 2)) {
+		if (get(position * 2)) {
 			throw new IllegalStateException("Can't assign to already assigned field");
 		}
-		players.set(position * 2);
-		players.set(position * 2 + 1, pl == Player.X);
+		set(position * 2);
+		if (pl == Player.X) {
+			set(position * 2 + 1);
+		}
 	}
 
 	private Player getPlayer(int position) {
-		if (!players.get(position * 2)) {
+		if (!get(position * 2)) {
 			return null;
 		}
-		return players.get(position * 2 + 1) ? Player.X : Player.O;
+		return get(position * 2 + 1) ? Player.X : Player.O;
 	}
 
 	@Override
@@ -88,7 +111,7 @@ public class TicTacToeStateSized implements State {
 
 	private Player won() {
 		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0 ;j < SIZE; j++) {
+			for (int j = 0; j < SIZE; j++) {
 				Player pl = getPlayer(i * SIZE + j);
 				if (pl == null) {
 					continue;
@@ -191,11 +214,11 @@ public class TicTacToeStateSized implements State {
 			return false;
 		}
 		TicTacToeStateSized that = (TicTacToeStateSized) o;
-		return players.equals(that.players);
+		return this.plrz == that.plrz;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(players);
+		return (int) plrz;
 	}
 }
