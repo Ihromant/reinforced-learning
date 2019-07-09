@@ -20,6 +20,27 @@ public class TicTacToeStateSized implements State {
 		players.or(prev.players);
 	}
 
+	public TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
+		this(prev);
+		if (isAssigned(nextMove)) {
+			throw new IllegalArgumentException();
+		}
+		assign(nextMove, pl);
+	}
+
+	public static TicTacToeStateSized from(Player[] players) {
+		if (players.length != SIZE * SIZE) {
+			throw new IllegalArgumentException("Please provide " + SIZE * SIZE + " size of the array");
+		}
+		TicTacToeStateSized state = new TicTacToeStateSized();
+		for (int i = 0; i < players.length; i++) {
+			if (players[i] != null) {
+				state.assign(i, players[i]);
+			}
+		}
+		return state;
+	}
+
 	private boolean isAssigned(int position) {
 		return players.get(position * 2);
 	}
@@ -39,19 +60,11 @@ public class TicTacToeStateSized implements State {
 		return players.get(position * 2 + 1) ? Player.X : Player.O;
 	}
 
-	public TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
-		this(prev);
-		if (isAssigned(nextMove)) {
-			throw new IllegalArgumentException();
-		}
-		assign(nextMove, pl);
-	}
-
 	@Override
 	public Player getCurrent() {
 		return IntStream.range(0, SIZE * SIZE)
-				.filter(i -> !isAssigned(i))
-				.count() % 2 == 1 ? Player.X : Player.O;
+				.filter(this::isAssigned)
+				.count() % 2 == 0 ? Player.X : Player.O;
 	}
 
 	@Override
