@@ -1,9 +1,6 @@
 package ua.ihromant.learning;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -11,20 +8,6 @@ public class TicTacToeStateSized implements State {
 	private static final int SIZE = 5;
 	private static final int WON = 4;
 	private long plrz;
-
-	// ABCDE
-	// FGHIJ
-	// KLMNO
-	// PQRST
-	// UVWXY
-	private static final char[][] WIN__DIRECTIONS = {
-			"ABFGKLPQUV".toCharArray(), // 1
-			"ABCDEFGHIJ".toCharArray(), // 5
-			"ABFG".toCharArray(), // 6
-			"DEIJ".toCharArray() // 4
-	};
-
-	//private static final long[] WINNING_MASKS = Arrays.stream(WIN__DIRECTIONS)
 
 	public TicTacToeStateSized() {
 	}
@@ -96,69 +79,39 @@ public class TicTacToeStateSized implements State {
 			return Stream.empty();
 		}
 
-		List<Integer> notAssigned = IntStream.range(0, SIZE * SIZE)
+		int[] notAssigned = IntStream.range(0, SIZE * SIZE)
 				.filter(i -> !isAssigned(i))
-				.boxed()
-				.collect(Collectors.toList());
-		Collections.shuffle(notAssigned);
-		return notAssigned.stream().map(i -> {
-			TicTacToeStateSized next = new TicTacToeStateSized(this);
-			Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-			next.assign(i, player);
-			return new Action(player, this, next);
-		});
+				.toArray();
+		shuffleArray(notAssigned);
+		return Arrays.stream(notAssigned)
+				.mapToObj(i -> {
+					TicTacToeStateSized next = new TicTacToeStateSized(this);
+					Player player = notAssigned.length % 2 == 1 ? Player.X : Player.O;
+					next.assign(i, player);
+					return new Action(player, this, next);
+				});
+	}
+
+	private static void shuffleArray(int[] array)
+	{
+		int index;
+		Random random = new Random();
+		for (int i = array.length - 1; i > 0; i--)
+		{
+			index = random.nextInt(i + 1);
+			if (index != i)
+			{
+				array[index] ^= array[i];
+				array[i] ^= array[index];
+				array[index] ^= array[i];
+			}
+		}
 	}
 
 	private Player won() {
-		for (int i = 0; i < SIZE; i++) {
-			for (int j = 0; j < SIZE; j++) {
-				Player pl = getPlayer(i * SIZE + j);
-				if (pl == null) {
-					continue;
-				}
-
-				if (i <= SIZE - WON && j <= SIZE - WON) {
-					boolean line = true;
-					for (int k = 0; k < WON; k++) {
-						if (pl != getPlayer((i + k) * SIZE + (j + k))) {
-							line = false;
-							break;
-						}
-					}
-					if (line) return pl;
-				}
-
-				if (j <= SIZE - WON) {
-					boolean line = true;
-					for (int k = 0; k < WON; k++) {
-						if (pl != getPlayer(i * SIZE + (j + k))) {
-							line = false;
-							break;
-						}
-					}
-					if (line) return pl;
-				}
-
-				if (i <= SIZE - WON) {
-					boolean line = true;
-					for (int k = 0; k < WON; k++) {
-						if (pl != getPlayer((i + k) * SIZE + j)) {
-							line = false;
-							break;
-						}
-					}
-					if (line) return pl;
-				}
-				if (i <= SIZE - WON && j >= WON - 1) {
-					boolean line = true;
-					for (int k = 0; k < WON; k++) {
-						if (pl != getPlayer((i + k) * SIZE + (j - k))) {
-							line = false;
-							break;
-						}
-					}
-					if (line) return pl;
-				}
+		for (int i = 0; i < WINNING_MASKS.length / 2; i++) {
+			if ((plrz & WINNING_MASKS[2 * i]) == WINNING_MASKS[2 * i + 1]) {
+				return i % 2 == 0 ? Player.X : Player.O;
 			}
 		}
 		return null;
@@ -220,5 +173,40 @@ public class TicTacToeStateSized implements State {
 	@Override
 	public int hashCode() {
 		return (int) plrz;
+	}
+
+	// ABCDE
+	// FGHIJ
+	// KLMNO
+	// PQRST
+	// UVWXY
+	private static final Map<Integer, char[]> POSSIBLE_SHIFTS = new HashMap<Integer, char[]>() {
+		{
+			put(1, "ABFGKLPQUV".toCharArray()); // 1
+			put(SIZE, "ABCDEFGHIJ".toCharArray()); // 5
+			put(SIZE + 1, "ABFG".toCharArray()); // 6
+			put(SIZE - 1, "DEIJ".toCharArray()); // 4
+		}
+	};
+
+	private static final long[] WINNING_MASKS = POSSIBLE_SHIFTS.entrySet().stream()
+			.flatMapToLong(e -> {
+				long[] result = new long[e.getValue().length * 4];
+				for (int i = 0; i < e.getValue().length; i++) {
+					int start = e.getValue()[i] - 'A';
+					result[4 * i] = encodeLine(start, e.getKey(), Player.X); // mask
+					result[4 * i + 1] = encodeLine(start, e.getKey(), Player.X);
+					result[4 * i + 2] = encodeLine(start, e.getKey(), Player.X); // mask
+					result[4 * i + 3] = encodeLine(start, e.getKey(), Player.O);
+				}
+				return Arrays.stream(result);
+			}).toArray();
+
+	private static long encodeLine(int start, int shift, Player player) {
+		TicTacToeStateSized state = new TicTacToeStateSized();
+		for (int i = 0; i < WON; i++) {
+			state.assign(start + i * shift, player);
+		}
+		return state.plrz;
 	}
 }
