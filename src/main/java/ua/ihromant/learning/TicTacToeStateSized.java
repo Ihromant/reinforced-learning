@@ -1,6 +1,6 @@
 package ua.ihromant.learning;
 
-import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -11,27 +11,46 @@ import java.util.stream.Stream;
 public class TicTacToeStateSized implements State {
 	private static final int SIZE = 5;
 	private static final int WON = 4;
-	private final Player[] players = new Player[25];
+	private final BitSet players = new BitSet(2 * SIZE * SIZE);
 
 	public TicTacToeStateSized() {
 	}
 
 	private TicTacToeStateSized(TicTacToeStateSized prev) {
-		System.arraycopy(prev.players, 0, this.players, 0, players.length);
+		players.or(prev.players);
+	}
+
+	private boolean isAssigned(int position) {
+		return players.get(position * 2);
+	}
+
+	private void assign(int position, Player pl) {
+		if (players.get(position * 2)) {
+			throw new IllegalStateException("Can't assign to already assigned field");
+		}
+		players.set(position * 2);
+		players.set(position * 2 + 1, pl == Player.X);
+	}
+
+	private Player getPlayer(int position) {
+		if (!players.get(position * 2)) {
+			return null;
+		}
+		return players.get(position * 2 + 1) ? Player.X : Player.O;
 	}
 
 	public TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
 		this(prev);
-		if (players[nextMove] != null) {
+		if (isAssigned(nextMove)) {
 			throw new IllegalArgumentException();
 		}
-		players[nextMove] = pl;
+		assign(nextMove, pl);
 	}
 
 	@Override
 	public Player getCurrent() {
 		return IntStream.range(0, SIZE * SIZE)
-				.filter(i -> players[i] == null)
+				.filter(i -> !isAssigned(i))
 				.count() % 2 == 1 ? Player.X : Player.O;
 	}
 
@@ -42,14 +61,14 @@ public class TicTacToeStateSized implements State {
 		}
 
 		List<Integer> notAssigned = IntStream.range(0, SIZE * SIZE)
-				.filter(i -> players[i] == null)
+				.filter(i -> !isAssigned(i))
 				.boxed()
 				.collect(Collectors.toList());
 		Collections.shuffle(notAssigned);
 		return notAssigned.stream().map(i -> {
 			TicTacToeStateSized next = new TicTacToeStateSized(this);
 			Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-			next.players[i] = player;
+			next.assign(i, player);
 			return new Action(player, this, next);
 		});
 	}
@@ -57,7 +76,7 @@ public class TicTacToeStateSized implements State {
 	private Player won() {
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0 ;j < SIZE; j++) {
-				Player pl = players[i * SIZE + j];
+				Player pl = getPlayer(i * SIZE + j);
 				if (pl == null) {
 					continue;
 				}
@@ -65,7 +84,7 @@ public class TicTacToeStateSized implements State {
 				if (i <= SIZE - WON && j <= SIZE - WON) {
 					boolean line = true;
 					for (int k = 0; k < WON; k++) {
-						if (pl != players[(i + k) * SIZE + (j + k)]) {
+						if (pl != getPlayer((i + k) * SIZE + (j + k))) {
 							line = false;
 							break;
 						}
@@ -76,7 +95,7 @@ public class TicTacToeStateSized implements State {
 				if (j <= SIZE - WON) {
 					boolean line = true;
 					for (int k = 0; k < WON; k++) {
-						if (pl != players[i * SIZE + (j + k)]) {
+						if (pl != getPlayer(i * SIZE + (j + k))) {
 							line = false;
 							break;
 						}
@@ -87,7 +106,7 @@ public class TicTacToeStateSized implements State {
 				if (i <= SIZE - WON) {
 					boolean line = true;
 					for (int k = 0; k < WON; k++) {
-						if (pl != players[(i + k) * SIZE + j]) {
+						if (pl != getPlayer((i + k) * SIZE + j)) {
 							line = false;
 							break;
 						}
@@ -97,7 +116,7 @@ public class TicTacToeStateSized implements State {
 				if (i <= SIZE - WON && j >= WON - 1) {
 					boolean line = true;
 					for (int k = 0; k < WON; k++) {
-						if (pl != players[(i + k) * SIZE + (j - k)]) {
+						if (pl != getPlayer((i + k) * SIZE + (j - k))) {
 							line = false;
 							break;
 						}
@@ -111,7 +130,7 @@ public class TicTacToeStateSized implements State {
 
 	@Override
 	public boolean isTerminal() {
-		return Arrays.stream(players).filter(Objects::nonNull).count() == SIZE * SIZE || won() != null;
+		return IntStream.range(0, SIZE * SIZE).allMatch(this::isAssigned) || won() != null;
 	}
 
 	@Override
@@ -135,8 +154,8 @@ public class TicTacToeStateSized implements State {
 			builder.append('|');
 			for (int j = 0; j < SIZE; j++) {
 				int coef = i * SIZE + j;
-				if (players[coef] != null) {
-					builder.append(players[coef].toString());
+				if (isAssigned(coef)) {
+					builder.append(getPlayer(coef).toString());
 				} else {
 					builder.append(' ');
 				}
@@ -159,11 +178,11 @@ public class TicTacToeStateSized implements State {
 			return false;
 		}
 		TicTacToeStateSized that = (TicTacToeStateSized) o;
-		return Arrays.equals(players, that.players);
+		return players.equals(that.players);
 	}
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(players);
+		return Objects.hash(players);
 	}
 }
