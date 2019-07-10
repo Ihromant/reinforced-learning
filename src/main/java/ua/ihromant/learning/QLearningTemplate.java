@@ -25,6 +25,7 @@ public class QLearningTemplate implements AITemplate {
 
 	private void init() {
 		int percentage = 0;
+		long time = System.currentTimeMillis();
 		for (int i = 0; i < episodes; i++) {
 			if (i == episodes / 100 * percentage) {
 				percentage++;
@@ -44,6 +45,7 @@ public class QLearningTemplate implements AITemplate {
 				state = next;
 			}
 		}
+		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}
 
 	@Override
