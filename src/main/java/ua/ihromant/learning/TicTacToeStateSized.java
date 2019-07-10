@@ -158,7 +158,7 @@ public class TicTacToeStateSized implements State {
 
 	@Override
 	public int hashCode() {
-		return (int) plrz;
+		return Long.hashCode(plrz);
 	}
 
 	// ABCDE
