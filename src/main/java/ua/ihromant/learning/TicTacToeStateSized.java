@@ -80,33 +80,15 @@ public class TicTacToeStateSized implements State {
 			return Stream.empty();
 		}
 
-		int[] notAssigned = IntStream.range(0, SIZE * SIZE)
+		int assignedSize = Long.bitCount(plrz & TERMINAL_MASK);
+		return IntStream.range(0, SIZE * SIZE)
 				.filter(i -> !isAssigned(i))
-				.toArray();
-		shuffleArray(notAssigned);
-		return Arrays.stream(notAssigned)
 				.mapToObj(i -> {
 					TicTacToeStateSized next = new TicTacToeStateSized(this);
-					Player player = notAssigned.length % 2 == 1 ? Player.X : Player.O;
+					Player player = assignedSize % 2 == 0 ? Player.X : Player.O;
 					next.assign(i, player);
 					return new Action(player, this, next);
 				});
-	}
-
-	private static void shuffleArray(int[] array)
-	{
-		int index;
-		Random random = new Random();
-		for (int i = array.length - 1; i > 0; i--)
-		{
-			index = random.nextInt(i + 1);
-			if (index != i)
-			{
-				array[index] ^= array[i];
-				array[i] ^= array[index];
-				array[index] ^= array[i];
-			}
-		}
 	}
 
 	private Player won() {

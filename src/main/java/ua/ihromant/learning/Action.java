@@ -35,13 +35,13 @@ public class Action {
 		if (o == null || getClass() != o.getClass()) return false;
 		Action action = (Action) o;
 		return player == action.player &&
-				Objects.equals(from, action.from) &&
-				Objects.equals(to, action.to);
+				from.equals(action.from) &&
+				to.equals(action.to);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(player, from, to);
+		return (from.hashCode() * 31 + to.hashCode()) * 31 + player.hashCode();
 	}
 
 	@Override

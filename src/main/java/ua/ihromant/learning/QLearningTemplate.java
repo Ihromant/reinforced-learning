@@ -1,9 +1,8 @@
 package ua.ihromant.learning;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -37,10 +36,10 @@ public class QLearningTemplate implements AITemplate {
 				Action act = policy.apply(state.getActions());
 				double reward = act.getReward();
 				State next = act.getTo();
-				Optional<Action> nextBest = next.getActions()
-						.max(Comparator.comparingDouble(a -> qStates.getOrDefault(a, 0.0)));
+				OptionalDouble nextBest = next.getActions()
+						.mapToDouble(a -> qStates.getOrDefault(a, 0.0)).max();
 				double previousQ = qStates.getOrDefault(act, 0.0);
-				double newQ = previousQ + ALPHA * (reward - GAMMA * qStates.getOrDefault(nextBest.orElse(null), 0.0) - previousQ);
+				double newQ = previousQ + ALPHA * (reward - GAMMA * nextBest.orElse(0.0) - previousQ);
 				qStates.put(act, newQ);
 				state = next;
 			}
