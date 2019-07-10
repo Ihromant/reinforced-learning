@@ -80,15 +80,18 @@ public class TicTacToeStateSized implements State {
 			return Stream.empty();
 		}
 
+		if (plrz == 0) {
+			return Stream.of(new Action(Player.X, this, FIRST_MOVE));
+		}
+
 		int assignedSize = Long.bitCount(plrz & TERMINAL_MASK);
 		return IntStream.range(0, SIZE * SIZE)
 				.filter(i -> !isAssigned(i))
-				.mapToObj(i -> {
-					TicTacToeStateSized next = new TicTacToeStateSized(this);
-					Player player = assignedSize % 2 == 0 ? Player.X : Player.O;
-					next.assign(i, player);
-					return new Action(player, this, next);
-				});
+				.mapToObj(i -> new Action(
+						assignedSize % 2 == 0 ? Player.X : Player.O,
+						this,
+						new TicTacToeStateSized(this, i,
+								assignedSize % 2 == 0 ?	Player.X : Player.O)));
 	}
 
 	private Player won() {
@@ -192,6 +195,8 @@ public class TicTacToeStateSized implements State {
 		}
 		return state.plrz;
 	}
+
+	private static final TicTacToeStateSized FIRST_MOVE = new TicTacToeStateSized(new TicTacToeStateSized(), 12, Player.X);
 
 	private static final long TERMINAL_MASK =
 			IntStream.range(0, 25).boxed().collect(Collector.of(TicTacToeStateSized::new,
