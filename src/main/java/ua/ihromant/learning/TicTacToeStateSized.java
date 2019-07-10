@@ -1,6 +1,7 @@
 package ua.ihromant.learning;
 
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -119,7 +120,7 @@ public class TicTacToeStateSized implements State {
 
 	@Override
 	public boolean isTerminal() {
-		return IntStream.range(0, SIZE * SIZE).allMatch(this::isAssigned) || won() != null;
+		return (plrz & TERMINAL_MASK) == TERMINAL_MASK || won() != null;
 	}
 
 	@Override
@@ -209,4 +210,13 @@ public class TicTacToeStateSized implements State {
 		}
 		return state.plrz;
 	}
+
+	private static final long TERMINAL_MASK =
+			IntStream.range(0, 25).boxed().collect(Collector.of(TicTacToeStateSized::new,
+					(state, numb) -> state.assign(numb, Player.O),
+					(state1, state2) -> {
+						TicTacToeStateSized newState = new TicTacToeStateSized(state1);
+						newState.plrz |= state2.plrz;
+						return newState;
+					})).plrz;
 }
