@@ -1,6 +1,8 @@
 package ua.ihromant.learning;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -158,7 +160,13 @@ public class TicTacToeStateSized implements State {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(plrz);
+		long res = 0;
+		for (int i = 0; i < SIZE * SIZE; i++) {
+			long rest = (plrz >>> (2 * i)) % 4;
+			rest = rest == 3 ? 2 : rest;
+			res = res * 3 + rest;
+		}
+		return Long.hashCode(res);
 	}
 
 	// ABCDE

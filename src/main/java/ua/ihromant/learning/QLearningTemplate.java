@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class QLearningTemplate implements AITemplate {
     private static final double ALPHA = 0.3;
     private static final double GAMMA = 1.0;
-	private final Map<Action, Double> qStates = new HashMap<>();
+	private final Map<Action, Double> qStates = new HashMap<>(10000000);
 	private final State baseState;
 	private final int episodes;
 
@@ -25,10 +25,12 @@ public class QLearningTemplate implements AITemplate {
 	private void init() {
 		int percentage = 0;
 		long time = System.currentTimeMillis();
+		long micro = time;
 		for (int i = 0; i < episodes; i++) {
 			if (i == episodes / 100 * percentage) {
 				percentage++;
-				System.out.println("Learning " + percentage + "% complete");
+				System.out.println("Learning " + percentage + "% complete, elapsed: " + (System.currentTimeMillis() - micro) + " ms");
+				micro = System.currentTimeMillis();
 			}
 
 			State state = baseState;
