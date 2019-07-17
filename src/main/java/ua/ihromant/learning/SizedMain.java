@@ -2,6 +2,11 @@ package ua.ihromant.learning;
 
 import java.util.Scanner;
 
+import ua.ihromant.learning.ai.AITemplate;
+import ua.ihromant.learning.ai.QLearningTemplate;
+import ua.ihromant.learning.state.Player;
+import ua.ihromant.learning.state.TicTacToeStateSized;
+
 public class SizedMain {
 	// private static AITemplate template = new MinimaxTemplate(Player.O);
 	private static AITemplate template = new QLearningTemplate(new TicTacToeStateSized(), 1000000);

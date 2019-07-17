@@ -1,10 +1,10 @@
-package ua.ihromant.learning;
+package ua.ihromant.learning.state;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static ua.ihromant.learning.Player.O;
-import static ua.ihromant.learning.Player.X;
+import static ua.ihromant.learning.state.Player.O;
+import static ua.ihromant.learning.state.Player.X;
 
 public class TicTacToeSizedTest {
     private static Player[] RAND = new Player[]{

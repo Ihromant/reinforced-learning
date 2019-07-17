@@ -1,20 +1,25 @@
-package ua.ihromant.learning;
+package ua.ihromant.learning.ai;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import ua.ihromant.learning.ai.qtable.MapQTable;
+import ua.ihromant.learning.ai.qtable.QTable;
+import ua.ihromant.learning.state.Action;
+import ua.ihromant.learning.ai.qtable.EGreedyPolicy;
+import ua.ihromant.learning.ai.qtable.GreedyPolicy;
+import ua.ihromant.learning.state.State;
+
 public class QLearningTemplate implements AITemplate {
     private static final double ALPHA = 0.3;
     private static final double GAMMA = 1.0;
-	private final Map<Action, Double> qStates = new HashMap<>(10000000);
+    private QTable qTable = new MapQTable();
 	private final State baseState;
 	private final int episodes;
 
-	private final Function<Stream<Action>, Action> policy = new EGreedyPolicy(qStates, 0.7);
-	private final Function<Stream<Action>, Action> greedyPolicy = new GreedyPolicy(qStates);
+	private final Function<Stream<Action>, Action> policy = new EGreedyPolicy(qTable, 0.7);
+	private final Function<Stream<Action>, Action> greedyPolicy = new GreedyPolicy(qTable);
 
 	public QLearningTemplate(State baseState, int episodes) {
 		this.baseState = baseState;
@@ -39,10 +44,10 @@ public class QLearningTemplate implements AITemplate {
 				double reward = act.getReward();
 				State next = act.getTo();
 				OptionalDouble nextBest = next.getActions()
-						.mapToDouble(a -> qStates.getOrDefault(a, 0.0)).max();
-				double previousQ = qStates.getOrDefault(act, 0.0);
+						.mapToDouble(a -> qTable.get(a)).max();
+				double previousQ = qTable.get(act);
 				double newQ = previousQ + ALPHA * (reward - GAMMA * nextBest.orElse(0.0) - previousQ);
-				qStates.put(act, newQ);
+				qTable.set(act, newQ);
 				state = next;
 			}
 		}

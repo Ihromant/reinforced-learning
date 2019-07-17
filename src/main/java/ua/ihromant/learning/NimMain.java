@@ -3,6 +3,11 @@ package ua.ihromant.learning;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import ua.ihromant.learning.ai.AITemplate;
+import ua.ihromant.learning.ai.QLearningTemplate;
+import ua.ihromant.learning.state.NimState;
+import ua.ihromant.learning.state.Player;
+
 public class NimMain {
 	// private static AITemplate template = new MinimaxTemplate(Player.O);
 	private static AITemplate template = new QLearningTemplate(new NimState(new int[] {1, 3, 5, 7}), 100000);

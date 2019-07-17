@@ -1,4 +1,4 @@
-package ua.ihromant.learning;
+package ua.ihromant.learning.state;
 
 import java.util.Arrays;
 import java.util.HashMap;

@@ -1,18 +1,20 @@
-package ua.ihromant.learning;
+package ua.ihromant.learning.ai.qtable;
 
 import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import ua.ihromant.learning.state.Action;
+
 public class GreedyPolicy implements Function<Stream<Action>, Action> {
-    protected final Map<Action, Double> qStates;
-    public GreedyPolicy(Map<Action, Double> qStates) {
-        this.qStates = qStates;
+    private final QTable qTable;
+    public GreedyPolicy(QTable qTable) {
+        this.qTable = qTable;
     }
 
     @Override
     public Action apply(Stream<Action> actionStream) {
-        return actionStream.max(Comparator.comparingDouble(act -> qStates.getOrDefault(act, 0.0))).get();
+        return actionStream.max(Comparator.comparingDouble(qTable::get)).get();
     }
 }

@@ -1,16 +1,17 @@
-package ua.ihromant.learning;
+package ua.ihromant.learning.ai.qtable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import ua.ihromant.learning.state.Action;
+
 public class EGreedyPolicy extends GreedyPolicy {
     private final Random rand = new Random();
     private final double conservativeRate;
-    public EGreedyPolicy(Map<Action, Double> qStates, double conservativeRate) {
-        super(qStates);
+    public EGreedyPolicy(QTable qTable, double conservativeRate) {
+        super(qTable);
         this.conservativeRate = conservativeRate;
     }
 

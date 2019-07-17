@@ -1,6 +1,4 @@
-package ua.ihromant.learning;
-
-import java.util.Objects;
+package ua.ihromant.learning.state;
 
 public class Action {
 	private final Player player;

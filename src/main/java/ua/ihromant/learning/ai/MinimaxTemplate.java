@@ -1,6 +1,10 @@
-package ua.ihromant.learning;
+package ua.ihromant.learning.ai;
 
 import java.util.Comparator;
+
+import ua.ihromant.learning.state.Action;
+import ua.ihromant.learning.state.Player;
+import ua.ihromant.learning.state.State;
 
 public final class MinimaxTemplate implements AITemplate {
     private final Player player;
