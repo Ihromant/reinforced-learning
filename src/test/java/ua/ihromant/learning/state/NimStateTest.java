@@ -2,7 +2,6 @@ package ua.ihromant.learning.state;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ua.ihromant.learning.state.NimState;
 
 public class NimStateTest {
 	@Test
