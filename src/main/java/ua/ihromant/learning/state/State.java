@@ -10,4 +10,6 @@ public interface State {
     double getUtility(Player player);
 
     Player getCurrent();
+
+    double[] toModel();
 }

@@ -1,14 +1,40 @@
 package ua.ihromant.learning.ai.qtable;
 
-import org.bytedeco.javacpp.DoublePointer;
-import org.bytedeco.javacpp.FloatPointer;
-import org.bytedeco.javacpp.tensorflow;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.learning.config.Adam;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
+
+import java.util.Random;
 
 public class TF {
-	public void buildGraph() {
-		tensorflow.Placeholder holder = new tensorflow.Placeholder(new tensorflow.Scope(new FloatPointer(0.0f, 2.0f,
-				3.0f,	3.0f)), tensorflow.DT_FLOAT);
-		holder = new tensorflow.Placeholder(new DoublePointer(0.0, 2.0, 3.0, 3.0));
-		//tensorflow.Transpose
+	private static final MultiLayerConfiguration config = buildGraph();
+
+	private static MultiLayerConfiguration buildGraph() {
+		Adam adam = new Adam();
+		adam.setLearningRate(0.001);
+		return new NeuralNetConfiguration.Builder()
+				.seed(new Random().nextLong())
+				.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+				.updater(adam)
+				.list()
+				.layer(0, new DenseLayer.Builder().nIn(9).nOut(50)
+						.weightInit(WeightInit.ZERO)
+						.activation(Activation.RELU)
+						.build())
+				.layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS)
+						.activation(Activation.IDENTITY)
+						.nIn(50).nOut(1).build())
+				.build();
+	}
+
+	public static MultiLayerNetwork createNetwork() {
+		return new MultiLayerNetwork(config);
 	}
 }

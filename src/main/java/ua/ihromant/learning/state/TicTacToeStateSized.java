@@ -77,6 +77,21 @@ public class TicTacToeStateSized implements State {
 	}
 
 	@Override
+	public double[] toModel() {
+		return IntStream.range(0, 25)
+				.mapToDouble(i -> {
+					Player pl = getPlayer(i);
+					if (pl == Player.X) {
+						return 1;
+					}
+					if (pl == Player.O) {
+						return -1;
+					}
+					return 0;
+				}).toArray();
+	}
+
+	@Override
 	public Stream<Action> getActions() {
 		if (isTerminal()) {
 			return Stream.empty();

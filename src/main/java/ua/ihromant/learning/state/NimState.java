@@ -89,6 +89,16 @@ public class NimState implements State {
 	}
 
 	@Override
+	public double[] toModel() {
+		double[] result = new double[10];
+		result[0] = getCurrent() == Player.X ? 1 : -1;
+		for (int i = 0; i < piles.length; i++) {
+			result[i + 1] = piles[i];
+		}
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;

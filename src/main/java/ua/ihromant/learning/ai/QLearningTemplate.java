@@ -4,17 +4,14 @@ import java.util.OptionalDouble;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import ua.ihromant.learning.ai.qtable.MapQTable;
-import ua.ihromant.learning.ai.qtable.QTable;
+import ua.ihromant.learning.ai.qtable.*;
 import ua.ihromant.learning.state.Action;
-import ua.ihromant.learning.ai.qtable.EGreedyPolicy;
-import ua.ihromant.learning.ai.qtable.GreedyPolicy;
 import ua.ihromant.learning.state.State;
 
 public class QLearningTemplate implements AITemplate {
     private static final double ALPHA = 0.3;
     private static final double GAMMA = 1.0;
-    private QTable qTable = new MapQTable();
+    private QTable qTable = new NetworkQTable();
 	private final State baseState;
 	private final int episodes;
 
