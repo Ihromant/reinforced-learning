@@ -2,7 +2,6 @@ package ua.ihromant.learning.ai.qtable;
 
 import org.deeplearning4j.datasets.iterator.DoublesDataSetIterator;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.primitives.Pair;
 import ua.ihromant.learning.state.Action;
@@ -16,8 +15,9 @@ public class NetworkQTable implements QTable {
     public double get(Action action) {
         Pair<double[], double[]> pair = Pair.create(action.getTo().toModel(),
                 new double[]{0});
-        Evaluation eval = net.evaluate(new DoublesDataSetIterator(Collections.singletonList(pair), 1));
-        return pair.getSecond()[0];
+        double result = net.output(new DoublesDataSetIterator(Collections.singletonList(
+                pair), 1)).getDouble(0);
+        return result;
     }
 
     @Override

@@ -18,7 +18,7 @@ public class TF {
 
 	private static MultiLayerConfiguration buildGraph() {
 		Adam adam = new Adam();
-		adam.setLearningRate(0.001);
+		adam.setLearningRate(0.1);
 		return new NeuralNetConfiguration.Builder()
 				.seed(new Random().nextLong())
 				.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -35,6 +35,8 @@ public class TF {
 	}
 
 	public static MultiLayerNetwork createNetwork() {
-		return new MultiLayerNetwork(config);
+	    MultiLayerNetwork net = new MultiLayerNetwork(config);
+	    net.init();
+	    return net;
 	}
 }
