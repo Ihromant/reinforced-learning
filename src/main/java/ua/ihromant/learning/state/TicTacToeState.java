@@ -46,16 +46,20 @@ public class TicTacToeState implements State {
 
     @Override
     public double[] toModel() {
-        return Arrays.stream(players)
-                .mapToDouble(i -> {
-                    if (i == Player.X) {
-                        return 1;
+        double[] result = new double[3 * 9];
+        IntStream.range(0, 9)
+                .forEach(i -> {
+                    if (players[i] == Player.X) {
+                        result[i] = 1;
                     }
-                    if (i == Player.O) {
-                        return -1;
+                    if (players[i] == Player.O) {
+                        result[i + 9] = 1;
                     }
-                    return 0;
-                }).toArray();
+                    if (players[i] == null) {
+                        result[i + 18] = 1;
+                    }
+                });
+        return result;
     }
 
     @Override
