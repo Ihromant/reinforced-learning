@@ -1,22 +1,15 @@
 package ua.ihromant.learning.ai.qtable;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 
 import org.deeplearning4j.datasets.iterator.DoublesDataSetIterator;
-import org.deeplearning4j.datasets.iterator.INDArrayDataSetIterator;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.primitives.Pair;
 import ua.ihromant.learning.state.Action;
 

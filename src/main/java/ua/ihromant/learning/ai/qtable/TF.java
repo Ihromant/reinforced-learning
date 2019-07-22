@@ -25,10 +25,10 @@ public class TF {
 				.list()
 				.layer(0, new DenseLayer.Builder().nIn(27).nOut(1000)
 						.weightInit(WeightInit.ZERO)
-						.activation(Activation.RELU)
+						.activation(Activation.IDENTITY)
 						.build())
 				.layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS)
-						.activation(Activation.IDENTITY)
+						.activation(Activation.TANH)
 						.nIn(1000).nOut(1).build())
 				.build();
 	}
