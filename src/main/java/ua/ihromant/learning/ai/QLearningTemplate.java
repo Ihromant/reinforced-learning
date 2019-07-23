@@ -1,9 +1,7 @@
 package ua.ihromant.learning.ai;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,6 +9,8 @@ import java.util.stream.Stream;
 
 import ua.ihromant.learning.ai.qtable.EGreedyPolicy;
 import ua.ihromant.learning.ai.qtable.GreedyPolicy;
+import ua.ihromant.learning.ai.qtable.MapNetworkBackedTable;
+import ua.ihromant.learning.ai.qtable.MonteCarloSearchThree;
 import ua.ihromant.learning.ai.qtable.NetworkQTable;
 import ua.ihromant.learning.ai.qtable.QTable;
 import ua.ihromant.learning.state.Action;
@@ -22,13 +22,15 @@ public class QLearningTemplate implements AITemplate {
     private QTable qTable = new NetworkQTable();
 	private final State baseState;
 	private final int episodes;
+	private final int mtstGames;
 
 	private final Function<Stream<Action>, Action> policy = new EGreedyPolicy(qTable, 0.7);
 	private final Function<Stream<Action>, Action> greedyPolicy = new GreedyPolicy(qTable);
 
-	public QLearningTemplate(State baseState, int episodes) {
+	public QLearningTemplate(State baseState, int episodes, int mtstGames) {
 		this.baseState = baseState;
 		this.episodes = episodes;
+		this.mtstGames = mtstGames;
 		init();
 	}
 
@@ -41,27 +43,28 @@ public class QLearningTemplate implements AITemplate {
 				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System.currentTimeMillis() - micro) + " ms");
 				micro = System.currentTimeMillis();
 			}
-
-			State state = baseState;
-			Map<Action, Double> updates = new HashMap<>();
-			while (!state.isTerminal()) {
-				Action act = policy.apply(state.getActions());
-				double reward = act.getReward();
-				State next = act.getTo();
-				List<Action> toEvaluate = new ArrayList<>();
-				toEvaluate.add(act);
-				next.getActions().forEach(toEvaluate::add);
-				double[] evals = qTable.getMultiple(toEvaluate);
-				int maxIndex = IntStream.range(1, evals.length)
-						.reduce((a, b) -> evals[a] < evals[b] ? b : a)
-						.orElse(0);
-				double nextBest = maxIndex == 0 ? 0.0 : evals[maxIndex];
-				double previousQ = evals[0];
-				double newQ = previousQ + ALPHA * (reward - GAMMA * nextBest - previousQ);
-				updates.put(act, newQ);
-				state = next;
+			MonteCarloSearchThree tree = new MapNetworkBackedTable(qTable);
+			for (int j = 0; j < mtstGames; j++) {
+				State state = baseState;
+				while (!state.isTerminal()) {
+					Action act = policy.apply(state.getActions());
+					double reward = act.getReward();
+					State next = act.getTo();
+					List<Action> toEvaluate = new ArrayList<>();
+					toEvaluate.add(act);
+					next.getActions().forEach(toEvaluate::add);
+					double[] evals = tree.getMultiple(toEvaluate);
+					int maxIndex = IntStream.range(1, evals.length)
+							.reduce((a, b) -> evals[a] < evals[b] ? b : a)
+							.orElse(0);
+					double nextBest = maxIndex == 0 ? 0.0 : evals[maxIndex];
+					double previousQ = evals[0];
+					double newQ = previousQ + ALPHA * (reward - GAMMA * nextBest - previousQ);
+					tree.set(act, newQ);
+					state = next;
+				}
 			}
-			qTable.setMultiple(updates);
+			qTable.setMultiple(tree.getTree());
 		}
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}

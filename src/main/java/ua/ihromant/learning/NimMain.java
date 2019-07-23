@@ -1,6 +1,5 @@
 package ua.ihromant.learning;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 import ua.ihromant.learning.ai.AITemplate;
@@ -10,7 +9,7 @@ import ua.ihromant.learning.state.Player;
 
 public class NimMain {
 	// private static AITemplate template = new MinimaxTemplate(Player.O);
-	private static AITemplate template = new QLearningTemplate(new NimLineState(new int[] {1, 3, 5, 7}), 100000);
+	private static AITemplate template = new QLearningTemplate(new NimLineState(new int[] {1, 3, 5, 7}), 100, 100);
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		NimLineState state = new NimLineState(new int[] {1, 3, 5, 7});
