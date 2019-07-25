@@ -13,4 +13,8 @@ public interface QTable {
 	void set(Action action, double newValue);
 
 	void setMultiple(Map<Action, Double> newValues);
+
+	double getMax(List<Action> actions);
+
+	Action getMaxAction(List<Action> actions);
 }

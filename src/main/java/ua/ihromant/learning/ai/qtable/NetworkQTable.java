@@ -52,4 +52,24 @@ public class NetworkQTable implements QTable {
                         new double[]{e.getValue()})).collect(Collectors.toList()), newValues.size());
         net.fit(iter);
     }
+
+	@Override
+	public double getMax(List<Action> actions) {
+		double rewardMax = actions.stream().mapToDouble(act -> act.getTo().getUtility()).max().orElse(0.0);
+		if (rewardMax > 0.0) {
+			return rewardMax;
+		}
+		double[] evals = getMultiple(actions);
+		int maxIndex = IntStream.range(0, evals.length)
+				.reduce((a, b) -> evals[a] < evals[b] ? b : a)
+				.orElse(-1);
+		return maxIndex == -1 ? 0.0 : evals[maxIndex];
+	}
+
+	@Override
+	public Action getMaxAction(List<Action> actions) {
+		double[] results = getMultiple(actions);
+		return actions.get(IntStream.range(0, results.length)
+				.reduce((a, b) -> results[a] < results[b] ? b : a).orElse(0));
+	}
 }

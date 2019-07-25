@@ -12,4 +12,6 @@ public interface State {
     Player getCurrent();
 
     double[] toModel();
+
+    default double getUtility() { return getUtility(getCurrent()); }
 }

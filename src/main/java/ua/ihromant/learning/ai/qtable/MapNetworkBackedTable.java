@@ -13,9 +13,11 @@ import ua.ihromant.learning.state.Action;
 public class MapNetworkBackedTable implements MonteCarloSearchThree {
 	private final Map<Action, Double> qStates = new HashMap<>();
 	private final QTable backed;
+	private final double alpha;
 
-	public MapNetworkBackedTable(QTable backed) {
+	public MapNetworkBackedTable(QTable backed, double alpha) {
 		this.backed = backed;
+		this.alpha = alpha;
 	}
 
 	@Override
@@ -44,12 +46,35 @@ public class MapNetworkBackedTable implements MonteCarloSearchThree {
 
 	@Override
 	public void set(Action action, double newValue) {
-		qStates.put(action, newValue);
+		qStates.compute(action, (act, oldVal) -> {
+			oldVal = oldVal != null ? oldVal : 0.0;
+			return (1 - alpha) * oldVal + alpha * newValue;
+		});
 	}
 
 	@Override
 	public void setMultiple(Map<Action, Double> newValues) {
-		qStates.putAll(newValues);
+		newValues.forEach(this::set);
+	}
+
+	@Override
+	public double getMax(List<Action> actions) {
+		double rewardMax = actions.stream().mapToDouble(act -> act.getTo().getUtility()).max().orElse(0.0);
+		if (rewardMax > 0.0) {
+			return rewardMax;
+		}
+		double[] evals = getMultiple(actions);
+		int maxIndex = IntStream.range(0, evals.length)
+				.reduce((a, b) -> evals[a] < evals[b] ? b : a)
+				.orElse(-1);
+		return maxIndex == -1 ? 0.0 : evals[maxIndex];
+	}
+
+	@Override
+	public Action getMaxAction(List<Action> actions) {
+		double[] results = getMultiple(actions);
+		return actions.get(IntStream.range(0, results.length)
+				.reduce((a, b) -> results[a] < results[b] ? b : a).orElse(0));
 	}
 
 	@Override

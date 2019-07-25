@@ -9,7 +9,7 @@ import ua.ihromant.learning.state.TicTacToeState;
 
 public class Main {
     // private static AITemplate template = new MinimaxTemplate(Player.O);
-    private static AITemplate template = new QLearningTemplate(new TicTacToeState(), 100000, 10);
+    private static AITemplate template = new QLearningTemplate(new TicTacToeState(), 1000000, 1);
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         TicTacToeState state = new TicTacToeState();

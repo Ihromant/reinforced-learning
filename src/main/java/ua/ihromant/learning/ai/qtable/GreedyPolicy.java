@@ -18,9 +18,6 @@ public class GreedyPolicy implements Function<Stream<Action>, Action> {
 
     @Override
     public Action apply(Stream<Action> actionStream) {
-        List<Action> actionList = actionStream.collect(Collectors.toList());
-        double[] results = qTable.getMultiple(actionList);
-        return actionList.get(IntStream.range(0, results.length)
-                .reduce((a, b) -> results[a] < results[b] ? b : a).orElse(0));
+        return qTable.getMaxAction(actionStream.collect(Collectors.toList()));
     }
 }
