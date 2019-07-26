@@ -78,7 +78,7 @@ public class TicTacToeStateSized implements State {
 
 	@Override
 	public double[] toModel() {
-		return IntStream.range(0, 25)
+		return IntStream.range(0, SIZE * SIZE)
 				.mapToDouble(i -> {
 					Player pl = getPlayer(i);
 					if (pl == Player.X) {
@@ -222,7 +222,7 @@ public class TicTacToeStateSized implements State {
 	private static final TicTacToeStateSized FIRST_MOVE = new TicTacToeStateSized(new TicTacToeStateSized(), 12, Player.X);
 
 	private static final long TERMINAL_MASK =
-			IntStream.range(0, 25).boxed().collect(Collector.of(TicTacToeStateSized::new,
+			IntStream.range(0, SIZE * SIZE).boxed().collect(Collector.of(TicTacToeStateSized::new,
 					(state, numb) -> state.assign(numb, Player.O),
 					(state1, state2) -> {
 						TicTacToeStateSized newState = new TicTacToeStateSized(state1);

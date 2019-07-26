@@ -51,7 +51,7 @@ public class MapNetworkBackedTable implements MonteCarloSearchThree {
 
 	@Override
 	public void setMultiple(Map<Action, Double> newValues) {
-		newValues.putAll(newValues);
+		qStates.putAll(newValues);
 	}
 
 	@Override
