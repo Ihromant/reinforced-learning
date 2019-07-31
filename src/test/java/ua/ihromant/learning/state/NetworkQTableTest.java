@@ -1,80 +1,70 @@
 package ua.ihromant.learning.state;
 
+import org.junit.jupiter.api.Test;
+import ua.ihromant.learning.ai.qtable.NetworkQTable;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-import ua.ihromant.learning.ai.qtable.NetworkQTable;
-
 public class NetworkQTableTest {
-	private NetworkQTable net = new NetworkQTable();
-
-	@Test
-	public void testQNetwork() {
-		State baseState = new TicTacToeState();
-		Action act = baseState.getActions().toArray(Action[]::new)[0];
-		System.out.println(act);
-		System.out.println(net.get(act));
-		net.set(act, 0.3);
-		System.out.println(net.get(act));
-		net.set(act, 0.5);
-		System.out.println(net.get(act));
-		net.set(act, -0.5);
-		System.out.println(net.get(act));
-		net.set(act, -0.5);
-		System.out.println(net.get(act));
-	}
+	private NetworkQTable<TTTAction> net = new NetworkQTable<>();
 
 	@Test
 	public void testQNetworkBatch() {
-		State baseState = new TicTacToeState();
-		Action act = baseState.getActions().toArray(Action[]::new)[0];
-		Action next = act.getTo().getActions().toArray(Action[]::new)[0];
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(act, 0.3);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(next, -0.4);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(act, 0.5);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(next, -0.4);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(act, -0.5);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(next, 0.4);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(act, -0.5);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
-		net.set(next, 0.4);
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
+		State<TTTAction> baseState = new TicTacToeState();
+		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
+		State<TTTAction> nextState = baseState.apply(act);
+		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
+		State<TTTAction> nextNextState = nextState.apply(next);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextState, 0.3);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextNextState, -0.4);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextState, 0.5);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextNextState, -0.4);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextState, -0.5);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextNextState, 0.4);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextState, -0.5);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
+		net.set(nextNextState, 0.4);
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
 	}
 
 	@Test
 	public void testQNetworkMultiple() {
-		State baseState = new TicTacToeState();
-		Action act = baseState.getActions().toArray(Action[]::new)[0];
-		Action next = act.getTo().getActions().toArray(Action[]::new)[0];
+		State<TTTAction> baseState = new TicTacToeState();
+		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
+		State<TTTAction> nextState = baseState.apply(act);
+		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
+		State<TTTAction> nextNextState = nextState.apply(next);
 		for (int i = 0; i < 200; i++) {
-			net.set(act, 0.3);
-			net.set(next, -0.4);
-			System.out.println(i + " " + Arrays.toString(net.getMultiple(Arrays.asList(act, next))));
+			net.set(nextState, 0.3);
+			net.set(nextNextState, -0.4);
+			System.out.println(i + " " + Arrays.toString(net.getMultiple(Arrays.asList(nextState, nextNextState))));
 		}
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
 	}
 
 	@Test
 	public void testQNetworkMultiple1() {
-		State baseState = new TicTacToeState();
-		Action act = baseState.getActions().toArray(Action[]::new)[0];
-		Action next = act.getTo().getActions().toArray(Action[]::new)[0];
-		Map<Action, Double> valuesMap = new HashMap<>();
-		valuesMap.put(act, 0.3);
-		valuesMap.put(next, -0.4);
+		State<TTTAction> baseState = new TicTacToeState();
+		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
+		State<TTTAction> nextState = baseState.apply(act);
+		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
+		State<TTTAction> nextNextState = nextState.apply(next);
+		Map<State<TTTAction>, Double> valuesMap = new HashMap<>();
+		valuesMap.put(nextState, 0.3);
+		valuesMap.put(nextNextState, -0.4);
 		for (int i = 0; i < 200; i++) {
 			net.setMultiple(valuesMap);
-			System.out.println(i + " " + Arrays.toString(net.getMultiple(Arrays.asList(act, next))));
+			System.out.println(i + " " + Arrays.toString(net.getMultiple(Arrays.asList(nextState, nextNextState))));
 		}
-		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(act, next)))));
+		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
 	}
 }

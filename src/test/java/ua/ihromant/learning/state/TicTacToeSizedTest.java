@@ -58,11 +58,11 @@ public class TicTacToeSizedTest {
 
     @Test
     public void testActions() {
-        Assertions.assertEquals(15, TicTacToeStateSized.from(RAND).getActions().count());
-        Assertions.assertEquals(0, TicTacToeStateSized.from(HOR_WIN).getActions().count());
-        Assertions.assertEquals(0, TicTacToeStateSized.from(VER_WIN).getActions().count());
-        Assertions.assertEquals(0, TicTacToeStateSized.from(NORD_WEST_WIN).getActions().count());
-        Assertions.assertEquals(0, TicTacToeStateSized.from(NORD_EAST_WIN).getActions().count());
+        Assertions.assertEquals(15, TicTacToeStateSized.from(RAND).getActs().count());
+        Assertions.assertEquals(0, TicTacToeStateSized.from(HOR_WIN).getActs().count());
+        Assertions.assertEquals(0, TicTacToeStateSized.from(VER_WIN).getActs().count());
+        Assertions.assertEquals(0, TicTacToeStateSized.from(NORD_WEST_WIN).getActs().count());
+        Assertions.assertEquals(0, TicTacToeStateSized.from(NORD_EAST_WIN).getActs().count());
     }
 
     @Test

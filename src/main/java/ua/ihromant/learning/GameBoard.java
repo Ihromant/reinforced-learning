@@ -1,15 +1,17 @@
 package ua.ihromant.learning;
 
-import java.util.Scanner;
-
 import ua.ihromant.learning.ai.AITemplate;
 import ua.ihromant.learning.state.Player;
+import ua.ihromant.learning.state.State;
+import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;
 
-public class GameBoard {
-	private final AITemplate ai;
+import java.util.Scanner;
 
-	public GameBoard(AITemplate ai) {
+public class GameBoard {
+	private final AITemplate<TTTAction> ai;
+
+	public GameBoard(AITemplate<TTTAction> ai) {
 		this.ai = ai;
 	}
 
@@ -29,17 +31,17 @@ public class GameBoard {
 	}
 
 	public void playFirst(Scanner scan) {
-		TicTacToeState state = new TicTacToeState();
+		State<TTTAction> state = new TicTacToeState();
 		while (!state.isTerminal()) {
 			System.out.println("Enter your move, 1-9");
 			System.out.println("123\n456\n789");
 			int next = Integer.parseInt(scan.nextLine()) - 1;
-			state = new TicTacToeState(state, next, Player.X);
+			state = state.apply(new TTTAction(Player.X, next));
 			System.out.println(state.toString());
 			if (state.isTerminal()) {
 				break;
 			}
-			state = (TicTacToeState) ai.decision(state).getTo();
+			state = ai.decision(state);
 			System.out.println(state.toString());
 		}
 		switch ((int) state.getUtility(Player.X)) {
@@ -56,9 +58,9 @@ public class GameBoard {
 	}
 
 	public void playSecond(Scanner scan) {
-		TicTacToeState state = new TicTacToeState();
+		State<TTTAction> state = new TicTacToeState();
 		while (!state.isTerminal()) {
-			state = (TicTacToeState) ai.decision(state).getTo();
+			state = ai.decision(state);
 			System.out.println(state.toString());
 			if (state.isTerminal()) {
 				break;
@@ -66,7 +68,7 @@ public class GameBoard {
 			System.out.println("Enter your move, 1-9");
 			System.out.println("123\n456\n789");
 			int next = Integer.parseInt(scan.nextLine()) - 1;
-			state = new TicTacToeState(state, next, Player.O);
+			state = state.apply(new TTTAction(Player.O, next));
 			System.out.println(state.toString());
 		}
 		switch ((int) state.getUtility(Player.O)) {

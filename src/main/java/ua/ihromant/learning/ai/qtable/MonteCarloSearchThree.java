@@ -1,9 +1,9 @@
 package ua.ihromant.learning.ai.qtable;
 
+import ua.ihromant.learning.state.State;
+
 import java.util.Map;
 
-import ua.ihromant.learning.state.Action;
-
-public interface MonteCarloSearchThree extends QTable {
-	Map<Action, Double> getTree();
+public interface MonteCarloSearchThree<A> extends QTable<A> {
+	Map<State<A>, Double> getTree();
 }

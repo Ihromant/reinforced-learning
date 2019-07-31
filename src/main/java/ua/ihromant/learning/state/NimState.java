@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class NimState implements State {
+public class NimState implements State<NimAction> {
 	private final int[] piles;
 	private final Player current;
 
@@ -18,30 +18,25 @@ public class NimState implements State {
 		this.current = player;
 	}
 
-	public NimState(NimState state, int[] coeffs, int red) {
-		this(take(state.piles, coeffs, red),
-				state.current == Player.X ? Player.O : Player.X);
-	}
-
 	@Override
-	public Stream<Action> getActions() {
+	public Stream<NimAction> getActs() {
 		if (isTerminal()) {
 			return Stream.empty();
 		}
-
-		Player next = current == Player.X ? Player.O: Player.X;
 
 		return IntStream.rangeClosed(1, Arrays.stream(piles).max().orElse(0))
 				.boxed()
 				.flatMap(red -> {
 					int[] coeffsBigger = IntStream.range(0, piles.length)
 							.filter(i -> piles[i] >= red).toArray();
-					return powerSetNotEpmty(coeffsBigger).map(coeffs -> {
-						int[] newPiles = take(piles, coeffs, red);
-						NimState newState = new NimState(newPiles, next);
-						return new Action(current, this, newState);
-					});
+					return powerSetNotEpmty(coeffsBigger).map(coeffs -> new NimAction(coeffs, red));
 				});
+	}
+
+	@Override
+	public State<NimAction> apply(NimAction action) {
+		return new NimState(take(this.piles, action.getCoeffs(), action.getReduce()),
+						this.current == Player.X ? Player.O : Player.X);
 	}
 
 	private static int[] take(int[] from, int[] indices, int reduce) {
