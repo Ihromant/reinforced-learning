@@ -44,6 +44,11 @@ public class NimState implements State {
 				});
 	}
 
+	@Override
+	public State apply(Object o) {
+		return null;
+	}
+
 	private static int[] take(int[] from, int[] indices, int reduce) {
 		int[] result = Arrays.copyOf(from, from.length);
 		for (int i : indices) {

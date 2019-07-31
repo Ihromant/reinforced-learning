@@ -8,7 +8,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class TicTacToeState implements State {
+import ua.ihromant.learning.action.TTTAction;
+
+public class TicTacToeState implements State<TTTAction> {
     private static final int[][] WIN_COMBINATIONS = {
             {1, 2, 3},
             {1, 4, 7},
@@ -62,23 +64,41 @@ public class TicTacToeState implements State {
         return result;
     }
 
+//    @Override
+//    public Stream<Action> getActions() {
+//        if (isTerminal()) {
+//            return Stream.empty();
+//        }
+//
+//        List<Integer> notAssigned = IntStream.range(0, 9)
+//                .filter(i -> players[i] == null)
+//                .boxed()
+//                .collect(Collectors.toList());
+//        Collections.shuffle(notAssigned);
+//        return notAssigned.stream().map(i -> {
+//            TicTacToeState next = new TicTacToeState(this);
+//            Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
+//            next.players[i] = player;
+//            return new Action(player, this, next);
+//        });
+//    }
+
     @Override
-    public Stream<Action> getActions() {
+    public Stream<TTTAction> getActions() {
         if (isTerminal()) {
             return Stream.empty();
         }
 
-        List<Integer> notAssigned = IntStream.range(0, 9)
+        return IntStream.range(0, 9)
                 .filter(i -> players[i] == null)
-                .boxed()
-                .collect(Collectors.toList());
-        Collections.shuffle(notAssigned);
-        return notAssigned.stream().map(i -> {
-            TicTacToeState next = new TicTacToeState(this);
-            Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-            next.players[i] = player;
-            return new Action(player, this, next);
-        });
+                .mapToObj(TTTAction::new);
+    }
+
+    @Override
+    public State apply(TTTAction tttAction) {
+        Player pl = IntStream.range(0, players.length)
+                .filter(i -> players[i] != null).count() % 2 == 0 ? Player.X : Player.O;
+        return new TicTacToeState(this, tttAction.getCoordinate(), pl);
     }
 
     private Player won() {

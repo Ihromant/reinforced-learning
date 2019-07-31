@@ -12,28 +12,26 @@ public final class MinimaxTemplate implements AITemplate {
         this.player = player;
     }
 
-    public Action decision(State state) {
-        return new Action(player, state, state.getActions().map(Action::getTo)
-                .max(Comparator.comparing(this::minValue)).get());
+    public <A> State<A> decision(State<A> state) {
+        return state.getActions().map(act -> state.apply(act))
+                .max(Comparator.comparing(this::minValue)).get();
     }
 
-    private double maxValue(State state) {
+    private <A> double maxValue(State<A> state) {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
         return state.getActions()
-                .map(Action::getTo)
-                .map(this::minValue)
-                .max(Comparator.comparing(Double::valueOf)).get();
+                .mapToDouble(act -> minValue(state.apply(act)))
+                .max().orElseThrow(IllegalStateException::new);
     }
 
-    private double minValue(State state) {
+    private <A> double minValue(State<A> state) {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
         return state.getActions()
-                .map(Action::getTo)
-                .map(this::maxValue)
-                .min(Comparator.comparing(Double::valueOf)).get();
+                .mapToDouble(act -> maxValue(state.apply(act)))
+                .min().orElseThrow(IllegalStateException::new);
     }
 }
