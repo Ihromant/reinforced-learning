@@ -1,33 +1,26 @@
 package ua.ihromant.learning.ai;
 
-import java.util.ArrayList;
+import ua.ihromant.learning.ai.qtable.*;
+import ua.ihromant.learning.state.State;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ua.ihromant.learning.ai.qtable.EGreedyPolicy;
-import ua.ihromant.learning.ai.qtable.GreedyPolicy;
-import ua.ihromant.learning.ai.qtable.MapNetworkBackedTable;
-import ua.ihromant.learning.ai.qtable.MonteCarloSearchThree;
-import ua.ihromant.learning.ai.qtable.NetworkQTable;
-import ua.ihromant.learning.ai.qtable.QTable;
-import ua.ihromant.learning.state.Action;
-import ua.ihromant.learning.state.State;
-
-public class QLearningTemplate implements AITemplate {
+public class QLearningTemplate<A> implements AITemplate<A> {
     private static final double ALPHA = 0.3;
     private static final double GAMMA = 1.0;
-    private QTable qTable = new NetworkQTable();
-	private final State baseState;
+    private QTable<A> qTable = new NetworkQTable<A>();
+	private final State<A> baseState;
 	private final int episodes;
 	private final int mtstGames;
 
-	private final Function<Stream<Action>, Action> policy = new EGreedyPolicy(qTable, 0.7);
-	private final Function<Stream<Action>, Action> greedyPolicy = new GreedyPolicy(qTable);
+	private final Function<Stream<State<A>>, State<A>> policy = new EGreedyPolicy<A>(qTable, 0.7);
+	private final Function<Stream<State<A>>, State<A>> greedyPolicy = new GreedyPolicy<A>(qTable);
 
-	public QLearningTemplate(State baseState, int episodes, int mtstGames) {
+	public QLearningTemplate(State<A> baseState, int episodes, int mtstGames) {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.mtstGames = mtstGames;
@@ -43,16 +36,15 @@ public class QLearningTemplate implements AITemplate {
 				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System.currentTimeMillis() - micro) + " ms");
 				micro = System.currentTimeMillis();
 			}
-			MonteCarloSearchThree tree = new MapNetworkBackedTable(qTable, ALPHA);
+			MonteCarloSearchThree<A> tree = new MapNetworkBackedTable<A>(qTable, ALPHA);
 			for (int j = 0; j < mtstGames; j++) {
-				State state = baseState;
+				State<A> state = baseState;
 				while (!state.isTerminal()) {
-					Action act = policy.apply(state.getActions());
-					double reward = act.getReward();
-					State next = act.getTo();
-					double nextBest = tree.getMax(next.getActions().collect(Collectors.toList()));
+					State<A> next = policy.apply(state.getStates());
+					double reward = next.getUtility();
+					double nextBest = tree.getMax(next.getStates().collect(Collectors.toList()));
 					double newQ = reward - GAMMA * nextBest;
-					tree.set(act, newQ);
+					tree.set(next, newQ);
 					state = next;
 				}
 			}
@@ -62,13 +54,13 @@ public class QLearningTemplate implements AITemplate {
 	}
 
 	@Override
-	public Action decision(State state) {
-		List<Action> possibleActions = state.getActions().collect(Collectors.toList());
+	public State<A> decision(State<A> state) {
+		List<State<A>> possibleActions = state.getStates().collect(Collectors.toList());
 		double[] values = qTable.getMultiple(possibleActions);
 		IntStream.range(0, possibleActions.size())
 				.forEach(i -> {
 					System.out.println(possibleActions.get(i) + " " + values[i]);
 				});
-		return greedyPolicy.apply(state.getActions());
+		return greedyPolicy.apply(state.getStates());
 	}
 }

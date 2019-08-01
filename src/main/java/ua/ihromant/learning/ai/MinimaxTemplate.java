@@ -1,39 +1,34 @@
 package ua.ihromant.learning.ai;
 
-import java.util.Comparator;
-
-import ua.ihromant.learning.state.Action;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
-public final class MinimaxTemplate implements AITemplate {
+import java.util.Comparator;
+
+public final class MinimaxTemplate<A> implements AITemplate<A> {
     private final Player player;
     public MinimaxTemplate(Player player) {
         this.player = player;
     }
 
-    public Action decision(State state) {
-        return new Action(player, state, state.getActions().map(Action::getTo)
-                .max(Comparator.comparing(this::minValue)).get());
+    public State<A> decision(State<A> state) {
+        return state.getStates()
+                .max(Comparator.comparing(this::minValue)).orElseThrow(IllegalStateException::new);
     }
 
-    private double maxValue(State state) {
+    private double maxValue(State<A> state) {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
-        return state.getActions()
-                .map(Action::getTo)
-                .map(this::minValue)
-                .max(Comparator.comparing(Double::valueOf)).get();
+        return state.getStates()
+                .mapToDouble(this::minValue).max().orElseThrow(IllegalStateException::new);
     }
 
-    private double minValue(State state) {
+    private double minValue(State<A> state) {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
-        return state.getActions()
-                .map(Action::getTo)
-                .map(this::maxValue)
-                .min(Comparator.comparing(Double::valueOf)).get();
+        return state.getStates()
+                .mapToDouble(this::maxValue).max().orElseThrow(IllegalStateException::new);
     }
 }

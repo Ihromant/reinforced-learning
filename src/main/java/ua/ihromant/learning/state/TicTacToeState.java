@@ -1,14 +1,11 @@
 package ua.ihromant.learning.state;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class TicTacToeState implements State {
+public class TicTacToeState implements State<TTTAction> {
     private static final int[][] WIN_COMBINATIONS = {
             {1, 2, 3},
             {1, 4, 7},
@@ -29,7 +26,7 @@ public class TicTacToeState implements State {
         System.arraycopy(prev.players, 0, this.players, 0, players.length);
     }
 
-    public TicTacToeState(TicTacToeState prev, int nextMove, Player pl) {
+    private TicTacToeState(TicTacToeState prev, int nextMove, Player pl) {
         this(prev);
         if (players[nextMove] != null) {
             throw new IllegalArgumentException();
@@ -63,22 +60,20 @@ public class TicTacToeState implements State {
     }
 
     @Override
-    public Stream<Action> getActions() {
+    public Stream<TTTAction> getActs() {
         if (isTerminal()) {
             return Stream.empty();
         }
 
-        List<Integer> notAssigned = IntStream.range(0, 9)
+        Player pl = getCurrent();
+        return IntStream.range(0, players.length)
                 .filter(i -> players[i] == null)
-                .boxed()
-                .collect(Collectors.toList());
-        Collections.shuffle(notAssigned);
-        return notAssigned.stream().map(i -> {
-            TicTacToeState next = new TicTacToeState(this);
-            Player player = notAssigned.size() % 2 == 1 ? Player.X : Player.O;
-            next.players[i] = player;
-            return new Action(player, this, next);
-        });
+                .mapToObj(i -> new TTTAction(pl, i));
+    }
+
+    @Override
+    public State<TTTAction> apply(TTTAction action) {
+        return new TicTacToeState(this, action.getCoordinate(), action.getPlayer());
     }
 
     private Player won() {

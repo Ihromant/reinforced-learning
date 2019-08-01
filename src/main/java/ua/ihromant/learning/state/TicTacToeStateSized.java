@@ -7,7 +7,7 @@ import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class TicTacToeStateSized implements State {
+public class TicTacToeStateSized implements State<TTTAction> {
 	private static final int SIZE = 5;
 	private static final int WON = 4;
 	private long plrz;
@@ -19,7 +19,7 @@ public class TicTacToeStateSized implements State {
 		this.plrz = prev.plrz;
 	}
 
-	public TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
+	private TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
 		this(prev);
 		if (isAssigned(nextMove)) {
 			throw new IllegalArgumentException();
@@ -71,9 +71,7 @@ public class TicTacToeStateSized implements State {
 
 	@Override
 	public Player getCurrent() {
-		return IntStream.range(0, SIZE * SIZE)
-				.filter(this::isAssigned)
-				.count() % 2 == 0 ? Player.X : Player.O;
+		return Long.bitCount(plrz & TERMINAL_MASK) % 2 == 0 ? Player.X : Player.O;
 	}
 
 	@Override
@@ -92,23 +90,21 @@ public class TicTacToeStateSized implements State {
 	}
 
 	@Override
-	public Stream<Action> getActions() {
+	public Stream<TTTAction> getActs() {
 		if (isTerminal()) {
 			return Stream.empty();
 		}
 
-		if (plrz == 0) {
-			return Stream.of(new Action(Player.X, this, FIRST_MOVE));
-		}
+		Player current = getCurrent();
 
-		int assignedSize = Long.bitCount(plrz & TERMINAL_MASK);
 		return IntStream.range(0, SIZE * SIZE)
 				.filter(i -> !isAssigned(i))
-				.mapToObj(i -> new Action(
-						assignedSize % 2 == 0 ? Player.X : Player.O,
-						this,
-						new TicTacToeStateSized(this, i,
-								assignedSize % 2 == 0 ?	Player.X : Player.O)));
+				.mapToObj(i -> new TTTAction(current, i));
+	}
+
+	@Override
+	public State<TTTAction> apply(TTTAction action) {
+		return new TicTacToeStateSized(this, action.getCoordinate(), action.getPlayer());
 	}
 
 	private Player won() {
@@ -218,8 +214,6 @@ public class TicTacToeStateSized implements State {
 		}
 		return state.plrz;
 	}
-
-	private static final TicTacToeStateSized FIRST_MOVE = new TicTacToeStateSized(new TicTacToeStateSized(), 12, Player.X);
 
 	private static final long TERMINAL_MASK =
 			IntStream.range(0, SIZE * SIZE).boxed().collect(Collector.of(TicTacToeStateSized::new,

@@ -1,20 +1,20 @@
 package ua.ihromant.learning.ai.qtable;
 
+import ua.ihromant.learning.state.State;
+
 import java.util.List;
 import java.util.Map;
 
-import ua.ihromant.learning.state.Action;
+public interface QTable<A> {
+	double get(State<A> state);
 
-public interface QTable {
-	double get(Action action);
+	double[] getMultiple(List<State<A>> state);
 
-	double[] getMultiple(List<Action> actions);
+	void set(State<A> state, double newValue);
 
-	void set(Action action, double newValue);
+	void setMultiple(Map<State<A>, Double> newValues);
 
-	void setMultiple(Map<Action, Double> newValues);
+	double getMax(List<State<A>> states);
 
-	double getMax(List<Action> actions);
-
-	Action getMaxAction(List<Action> actions);
+	State<A> getMaxAction(List<State<A>> states);
 }

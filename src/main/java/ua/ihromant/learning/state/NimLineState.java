@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class NimLineState implements State {
+public class NimLineState implements State<NimAction> {
 	private final int[] piles;
 	private final Player current;
 
@@ -18,13 +18,8 @@ public class NimLineState implements State {
 		this.current = player;
 	}
 
-	public NimLineState(NimLineState state, int coeff, int red) {
-		this(take(state.piles, coeff, red),
-				state.current == Player.X ? Player.O : Player.X);
-	}
-
 	@Override
-	public Stream<Action> getActions() {
+	public Stream<NimAction> getActs() {
 		if (isTerminal()) {
 			return Stream.empty();
 		}
@@ -35,8 +30,14 @@ public class NimLineState implements State {
 					int[] coeffsBigger = IntStream.range(0, piles.length)
 							.filter(i -> piles[i] >= red).toArray();
 					return Arrays.stream(coeffsBigger)
-							.mapToObj(coeff -> new Action(current, this, new NimLineState(this, coeff, red)));
+							.mapToObj(coeff -> new NimAction(coeff, red));
 				});
+	}
+
+	@Override
+	public State<NimAction> apply(NimAction action) {
+		return new NimLineState(take(this.piles, action.getCoeffs()[0], action.getReduce()),
+						this.current == Player.X ? Player.O : Player.X);
 	}
 
 	private static int[] take(int[] from, int idx, int reduce) {
