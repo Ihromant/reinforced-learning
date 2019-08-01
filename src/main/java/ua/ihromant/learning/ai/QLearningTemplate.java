@@ -62,9 +62,13 @@ public class QLearningTemplate implements AITemplate {
 	}
 
 	@Override
-	public <A> State<A> decision(State<A> state) {
+	public Action decision(State state) {
 		List<Action> possibleActions = state.getActions().collect(Collectors.toList());
 		double[] values = qTable.getMultiple(possibleActions);
-		return state.apply(greedyPolicy.apply(state.getActions()));
+		IntStream.range(0, possibleActions.size())
+				.forEach(i -> {
+					System.out.println(possibleActions.get(i) + " " + values[i]);
+				});
+		return greedyPolicy.apply(state.getActions());
 	}
 }

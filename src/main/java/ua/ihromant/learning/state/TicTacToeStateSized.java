@@ -7,9 +7,7 @@ import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import ua.ihromant.learning.action.TTTAction;
-
-public class TicTacToeStateSized implements State<TTTAction> {
+public class TicTacToeStateSized implements State {
 	private static final int SIZE = 5;
 	private static final int WON = 4;
 	private long plrz;
@@ -93,25 +91,25 @@ public class TicTacToeStateSized implements State<TTTAction> {
 				}).toArray();
 	}
 
-//	@Override
-//	public Stream<Action> getActions() {
-//		if (isTerminal()) {
-//			return Stream.empty();
-//		}
-//
-//		if (plrz == 0) {
-//			return Stream.of(new Action(Player.X, this, FIRST_MOVE));
-//		}
-//
-//		int assignedSize = Long.bitCount(plrz & TERMINAL_MASK);
-//		return IntStream.range(0, SIZE * SIZE)
-//				.filter(i -> !isAssigned(i))
-//				.mapToObj(i -> new Action(
-//						assignedSize % 2 == 0 ? Player.X : Player.O,
-//						this,
-//						new TicTacToeStateSized(this, i,
-//								assignedSize % 2 == 0 ?	Player.X : Player.O)));
-//	}
+	@Override
+	public Stream<Action> getActions() {
+		if (isTerminal()) {
+			return Stream.empty();
+		}
+
+		if (plrz == 0) {
+			return Stream.of(new Action(Player.X, this, FIRST_MOVE));
+		}
+
+		int assignedSize = Long.bitCount(plrz & TERMINAL_MASK);
+		return IntStream.range(0, SIZE * SIZE)
+				.filter(i -> !isAssigned(i))
+				.mapToObj(i -> new Action(
+						assignedSize % 2 == 0 ? Player.X : Player.O,
+						this,
+						new TicTacToeStateSized(this, i,
+								assignedSize % 2 == 0 ?	Player.X : Player.O)));
+	}
 
 	private Player won() {
 		for (int i = 0; i < WINNING_MASKS.length / 2; i++) {
@@ -120,24 +118,6 @@ public class TicTacToeStateSized implements State<TTTAction> {
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public Stream<TTTAction> getActions() {
-		if (isTerminal()) {
-			return Stream.empty();
-		}
-
-		return IntStream.range(0, SIZE * SIZE)
-				.filter(i -> !isAssigned(i))
-				.mapToObj(TTTAction::new);
-	}
-
-	@Override
-	public State apply(TTTAction tttAction) {
-		Player pl = IntStream.range(0, SIZE * SIZE)
-				.filter(this::isAssigned).count() % 2 == 0 ? Player.X : Player.O;
-		return new TicTacToeStateSized(this, tttAction.getCoordinate(), pl);
 	}
 
 	@Override

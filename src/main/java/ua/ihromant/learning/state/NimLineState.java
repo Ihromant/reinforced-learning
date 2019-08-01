@@ -39,11 +39,6 @@ public class NimLineState implements State {
 				});
 	}
 
-	@Override
-	public State apply(Object o) {
-		return null;
-	}
-
 	private static int[] take(int[] from, int idx, int reduce) {
 		int[] result = Arrays.copyOf(from, from.length);
 		result[idx] = result[idx] - reduce;

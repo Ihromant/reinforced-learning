@@ -4,5 +4,5 @@ import ua.ihromant.learning.state.Action;
 import ua.ihromant.learning.state.State;
 
 public interface AITemplate {
-	<A> State<A> decision(State<A> state);
+	Action decision(State state);
 }
