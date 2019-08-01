@@ -3,16 +3,20 @@ package ua.ihromant.learning;
 import ua.ihromant.learning.ai.AITemplate;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
-import ua.ihromant.learning.state.TTTAction;
-import ua.ihromant.learning.state.TicTacToeState;
 
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class GameBoard {
-	private final AITemplate<TTTAction> ai;
+public class GameBoard<A> {
+	private final AITemplate<A> ai;
+	private final Function<State<A>, A> agent;
+	private final Supplier<State<A>> baseStateProducer;
 
-	public GameBoard(AITemplate<TTTAction> ai) {
+	public GameBoard(AITemplate<A> ai, Function<State<A>, A> agent, Supplier<State<A>> baseStateProducer) {
 		this.ai = ai;
+		this.agent = agent;
+		this.baseStateProducer = baseStateProducer;
 	}
 
 	public void play() {
@@ -31,19 +35,16 @@ public class GameBoard {
 	}
 
 	public void playFirst(Scanner scan) {
-		State<TTTAction> state = new TicTacToeState();
+		State<A> state = baseStateProducer.get();
 		while (!state.isTerminal()) {
-			System.out.println("Enter your move, 1-9");
-			System.out.println("123\n456\n789");
-			int next = Integer.parseInt(scan.nextLine()) - 1;
-			state = state.apply(new TTTAction(Player.X, next));
-			System.out.println(state.toString());
+			state = state.apply(agent.apply(state));
 			if (state.isTerminal()) {
 				break;
 			}
-			state = ai.decision(state);
 			System.out.println(state.toString());
+			state = ai.decision(state);
 		}
+		System.out.println(state);
 		switch ((int) state.getUtility(Player.X)) {
 			case 0:
 				System.out.println("Draw!");
@@ -58,19 +59,16 @@ public class GameBoard {
 	}
 
 	public void playSecond(Scanner scan) {
-		State<TTTAction> state = new TicTacToeState();
+		State<A> state = baseStateProducer.get();
 		while (!state.isTerminal()) {
 			state = ai.decision(state);
-			System.out.println(state.toString());
 			if (state.isTerminal()) {
 				break;
 			}
-			System.out.println("Enter your move, 1-9");
-			System.out.println("123\n456\n789");
-			int next = Integer.parseInt(scan.nextLine()) - 1;
-			state = state.apply(new TTTAction(Player.O, next));
+			state = state.apply(agent.apply(state));
 			System.out.println(state.toString());
 		}
+		System.out.println(state);
 		switch ((int) state.getUtility(Player.O)) {
 			case 0:
 				System.out.println("Draw!");

@@ -19,12 +19,12 @@ public class TicTacToeStateSized implements State<TTTAction> {
 		this.plrz = prev.plrz;
 	}
 
-	private TicTacToeStateSized(TicTacToeStateSized prev, int nextMove, Player pl) {
+	private TicTacToeStateSized(TicTacToeStateSized prev, int nextMove) {
 		this(prev);
 		if (isAssigned(nextMove)) {
 			throw new IllegalArgumentException();
 		}
-		assign(nextMove, pl);
+		assign(nextMove, getCurrent());
 	}
 
 	public static TicTacToeStateSized from(Player[] players) {
@@ -95,16 +95,14 @@ public class TicTacToeStateSized implements State<TTTAction> {
 			return Stream.empty();
 		}
 
-		Player current = getCurrent();
-
 		return IntStream.range(0, SIZE * SIZE)
 				.filter(i -> !isAssigned(i))
-				.mapToObj(i -> new TTTAction(current, i));
+				.mapToObj(TTTAction::new);
 	}
 
 	@Override
 	public State<TTTAction> apply(TTTAction action) {
-		return new TicTacToeStateSized(this, action.getCoordinate(), action.getPlayer());
+		return new TicTacToeStateSized(this, action.getCoordinate());
 	}
 
 	private Player won() {

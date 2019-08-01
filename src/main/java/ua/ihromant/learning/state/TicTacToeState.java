@@ -26,12 +26,12 @@ public class TicTacToeState implements State<TTTAction> {
         System.arraycopy(prev.players, 0, this.players, 0, players.length);
     }
 
-    private TicTacToeState(TicTacToeState prev, int nextMove, Player pl) {
+    private TicTacToeState(TicTacToeState prev, int nextMove) {
         this(prev);
         if (players[nextMove] != null) {
             throw new IllegalArgumentException();
         }
-        players[nextMove] = pl;
+        players[nextMove] = getCurrent();
     }
 
     @Override
@@ -65,15 +65,14 @@ public class TicTacToeState implements State<TTTAction> {
             return Stream.empty();
         }
 
-        Player pl = getCurrent();
         return IntStream.range(0, players.length)
                 .filter(i -> players[i] == null)
-                .mapToObj(i -> new TTTAction(pl, i));
+                .mapToObj(TTTAction::new);
     }
 
     @Override
     public State<TTTAction> apply(TTTAction action) {
-        return new TicTacToeState(this, action.getCoordinate(), action.getPlayer());
+        return new TicTacToeState(this, action.getCoordinate());
     }
 
     private Player won() {

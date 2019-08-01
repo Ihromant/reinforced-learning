@@ -52,10 +52,6 @@ public class MapNetworkBackedTable<A> implements MonteCarloSearchThree<A> {
 
 	@Override
 	public double getMax(List<State<A>> actions) {
-		double rewardMax = actions.stream().mapToDouble(State::getUtility).max().orElse(0.0);
-		if (rewardMax > 0.0) {
-			return rewardMax;
-		}
 		double[] evals = getMultiple(actions);
 		int maxIndex = IntStream.range(0, evals.length)
 				.reduce((a, b) -> evals[a] < evals[b] ? b : a)
@@ -72,10 +68,6 @@ public class MapNetworkBackedTable<A> implements MonteCarloSearchThree<A> {
 
 	@Override
 	public Map<State<A>, Double> getTree() {
-		List<State<A>> existing = new ArrayList<>(qStates.keySet());
-		double[] evaluations = backed.getMultiple(existing);
-		return IntStream.range(0, existing.size()).filter(i -> qStates.get(existing.get(i)) != evaluations[i])
-				.boxed()
-				.collect(Collectors.toMap(existing::get, i -> qStates.get(existing.get(i))));
+		return qStates;
 	}
 }
