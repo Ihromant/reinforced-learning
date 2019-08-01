@@ -4,6 +4,9 @@ import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
 import java.util.Comparator;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class MinimaxTemplate<A> implements AITemplate<A> {
     private final Player player;
@@ -12,6 +15,8 @@ public final class MinimaxTemplate<A> implements AITemplate<A> {
     }
 
     public State<A> decision(State<A> state) {
+        Map<State, Double> values = state.getStates().collect(Collectors.toMap(Function.identity(), this::minValue));
+        System.out.println(values);
         return state.getStates()
                 .max(Comparator.comparing(this::minValue)).orElseThrow(IllegalStateException::new);
     }
@@ -29,6 +34,6 @@ public final class MinimaxTemplate<A> implements AITemplate<A> {
             return state.getUtility(player);
         }
         return state.getStates()
-                .mapToDouble(this::maxValue).max().orElseThrow(IllegalStateException::new);
+                .mapToDouble(this::maxValue).min().orElseThrow(IllegalStateException::new);
     }
 }
