@@ -12,18 +12,20 @@ import java.util.stream.Stream;
 public class QLearningTemplate<A> implements AITemplate<A> {
     private static final double ALPHA = 0.3;
     private static final double GAMMA = 1.0;
-    private QTable<A> qTable = new NetworkQTable<A>();
+    private final QTable<A> qTable;
 	private final State<A> baseState;
 	private final int episodes;
 	private final int mtstGames;
+	private final Function<Stream<State<A>>, State<A>> policy;
+	private final Function<Stream<State<A>>, State<A>> greedyPolicy;
 
-	private final Function<Stream<State<A>>, State<A>> policy = new EGreedyPolicy<A>(qTable, 0.7);
-	private final Function<Stream<State<A>>, State<A>> greedyPolicy = new GreedyPolicy<A>(qTable);
-
-	public QLearningTemplate(State<A> baseState, int episodes, int mtstGames) {
+	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes, int mtstGames) {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.mtstGames = mtstGames;
+		this.qTable = qTable;
+		this.policy = new EGreedyPolicy<A>(qTable, 0.7);
+		this.greedyPolicy = new GreedyPolicy<A>(qTable);
 		init();
 	}
 

@@ -2,6 +2,7 @@ package ua.ihromant.learning;
 
 import ua.ihromant.learning.ai.AITemplate;
 import ua.ihromant.learning.ai.QLearningTemplate;
+import ua.ihromant.learning.ai.qtable.MapQTable;
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.NimLineState;
 import ua.ihromant.learning.state.Player;
@@ -11,7 +12,8 @@ import java.util.Scanner;
 
 public class NimMain {
 	// private static AITemplate template = new MinimaxTemplate(Player.O);
-	private static AITemplate<NimAction> template = new QLearningTemplate<>(new NimLineState(new int[] {1, 3, 5, 7}), 100, 100);
+	private static AITemplate<NimAction> template = new QLearningTemplate<>(new NimLineState(new int[] {1, 3, 5, 7}),
+			new MapQTable<>(0.3), 100, 100);
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		State<NimAction> state = new NimLineState(new int[] {1, 3, 5, 7});

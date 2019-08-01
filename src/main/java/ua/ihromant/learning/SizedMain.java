@@ -2,6 +2,7 @@ package ua.ihromant.learning;
 
 import ua.ihromant.learning.ai.AITemplate;
 import ua.ihromant.learning.ai.QLearningTemplate;
+import ua.ihromant.learning.ai.qtable.MapQTable;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.state.TTTAction;
@@ -11,7 +12,8 @@ import java.util.Scanner;
 
 public class SizedMain {
 	// private static AITemplate template = new MinimaxTemplate(Player.O);
-	private static AITemplate<TTTAction> template = new QLearningTemplate<>(new TicTacToeStateSized(), 100, 10000);
+	private static AITemplate<TTTAction> template = new QLearningTemplate<>(new TicTacToeStateSized(),
+			new MapQTable<>(0.3), 100, 10000);
 	public static void main(String[] args) {
 		Scanner scan = new Scanner(System.in);
 		State<TTTAction> state = new TicTacToeStateSized();
