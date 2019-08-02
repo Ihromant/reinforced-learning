@@ -13,11 +13,7 @@ public interface State<A> {
 
     Player getCurrent();
 
-    default Player[] getPossiblePlayers() { return Player.values(); }
-
     double[] toModel();
-
-    default double getUtility() { return getUtility(getCurrent()); }
 
     default Stream<State<A>> getStates() { return getActs().map(this::apply); }
 }

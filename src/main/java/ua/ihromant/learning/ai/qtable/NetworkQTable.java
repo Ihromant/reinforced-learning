@@ -54,8 +54,9 @@ public class NetworkQTable<A> implements QTable<A> {
 
 	@Override
 	public double getMax(List<State<A>> states, Map<State<A>, Double> rewards) {
-		double rewardMax = states.stream().mapToDouble(State::getUtility).max().orElse(0.0);
-		if (rewardMax > 0.0) {
+		double rewardMax = rewards.values().stream()
+				.filter(r -> r != 0).mapToDouble(Double::doubleValue).max().orElse(0.0);
+		if (rewardMax != 0.0) {
 			return rewardMax;
 		}
 		double[] evals = getMultiple(states, rewards);
