@@ -18,15 +18,12 @@ public class QLearningTemplate<A> implements Agent<A> {
 	private final State<A> baseState;
 	private final int episodes;
 	private final int mtstGames;
-	private final Map<Player, Agent<A>> agents;
 
-	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes,
-			int mtstGames) {
+	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes, int mtstGames) {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.mtstGames = mtstGames;
 		this.qTable = qTable;
-		this.agents = Arrays.stream(Player.values()).collect(Collectors.toMap(Function.identity(), v -> this));
 		init();
 	}
 
@@ -43,7 +40,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			for (int j = 0; j < mtstGames; j++) {
 				State<A> state = baseState;
 				while (!state.isTerminal()) {
-					State<A> next = agents.get(state.getCurrent()).eGreedy(state, 0.7);
+					State<A> next = eGreedy(state, 0.7);
 					double reward = next.getUtility(state.getCurrent());
 					double nextBest = getMaxNext(tree, next);
 					double newQ = reward - GAMMA * nextBest;
