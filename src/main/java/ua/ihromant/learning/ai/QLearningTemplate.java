@@ -5,13 +5,11 @@ import ua.ihromant.learning.ai.qtable.*;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class QLearningTemplate<A> implements Agent<A> {
@@ -38,7 +36,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System.currentTimeMillis() - micro) + " ms");
 				micro = System.currentTimeMillis();
 			}
-			MonteCarloSearchThree<A> tree = new MapNetworkBackedTable<A>(qTable);
+			MonteCarloSearchThree<A> tree = new MapNetworkBackedTable<>(qTable);
 			for (int j = 0; j < mtstGames; j++) {
 				State<A> state = baseState;
 				while (!state.isTerminal()) {
