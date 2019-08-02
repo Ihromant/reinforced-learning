@@ -2,9 +2,12 @@ package ua.ihromant.learning.ai;
 
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.ai.qtable.*;
+import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,16 +20,15 @@ public class QLearningTemplate<A> implements Agent<A> {
 	private final State<A> baseState;
 	private final int episodes;
 	private final int mtstGames;
-	private final Function<Stream<State<A>>, State<A>> policy;
-	private final Function<Stream<State<A>>, State<A>> greedyPolicy;
+	private final Map<Player, Agent<A>> agents;
 
-	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes, int mtstGames) {
+	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes,
+			int mtstGames) {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.mtstGames = mtstGames;
 		this.qTable = qTable;
-		this.policy = new EGreedyPolicy<>(qTable, 0.7);
-		this.greedyPolicy = new GreedyPolicy<>(qTable);
+		this.agents = Arrays.stream(Player.values()).collect(Collectors.toMap(Function.identity(), v -> this));
 		init();
 	}
 
@@ -43,8 +45,8 @@ public class QLearningTemplate<A> implements Agent<A> {
 			for (int j = 0; j < mtstGames; j++) {
 				State<A> state = baseState;
 				while (!state.isTerminal()) {
-					State<A> next = policy.apply(state.getStates());
-					double reward = next.getUtility();
+					State<A> next = agents.get(state.getCurrent()).eGreedy(state.getStates(), 0.7);
+					double reward = next.getUtility(state.getCurrent());
 					double nextBest = tree.getMax(next.getStates().collect(Collectors.toList()));
 					double newQ = reward - GAMMA * nextBest;
 					tree.set(next, newQ);
@@ -58,17 +60,17 @@ public class QLearningTemplate<A> implements Agent<A> {
 
 	@Override
 	public State<A> decision(State<A> state) {
-		List<State<A>> possibleActions = state.getStates().collect(Collectors.toList());
-		double[] values = qTable.getMultiple(possibleActions);
-		IntStream.range(0, possibleActions.size())
-				.forEach(i -> {
-					System.out.println(possibleActions.get(i) + " " + values[i]);
-				});
-		return greedyPolicy.apply(state.getStates());
+		return decision(state.getStates());
 	}
 
 	@Override
 	public State<A> decision(Stream<State<A>> possible) {
-		return null; // TODO
+		List<State<A>> list = possible.collect(Collectors.toList());
+		double[] values = qTable.getMultiple(list);
+		IntStream.range(0, list.size())
+				.forEach(i -> {
+					System.out.println(list.get(i) + " " + values[i]);
+				});
+		return qTable.getMaxAction(list);
 	}
 }
