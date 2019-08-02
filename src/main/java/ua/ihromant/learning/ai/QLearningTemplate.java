@@ -67,11 +67,11 @@ public class QLearningTemplate<A> implements Agent<A> {
 		Map<State<A>, Double> rewards = state.getStates()
 				.collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current)));
 		List<State<A>> list = state.getStates().collect(Collectors.toList());
-		double[] values = qTable.getMultiple(list, rewards);
-		IntStream.range(0, list.size())
-				.forEach(i -> {
-					System.out.println(list.get(i) + " " + values[i]);
-				});
+//		double[] values = qTable.getMultiple(list, rewards);
+//		IntStream.range(0, list.size())
+//				.forEach(i -> {
+//					System.out.println(list.get(i) + " " + values[i]);
+//				});
 		return qTable.getMaxAction(list, rewards);
 	}
 }
