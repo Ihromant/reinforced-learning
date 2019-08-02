@@ -17,8 +17,8 @@ public final class MinimaxTemplate<A> implements Agent<A> {
     }
 
     @Override
-    public State<A> decision(Stream<State<A>> possible) {
-        return possible.max(Comparator.comparing(this::minValue)).orElseThrow(IllegalStateException::new);
+    public State<A> decision(State<A> from) {
+        return from.getStates().max(Comparator.comparing(this::minValue)).orElseThrow(IllegalStateException::new);
     }
 
     private double maxValue(State<A> state) {

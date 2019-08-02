@@ -21,9 +21,4 @@ public abstract class ConsolePlayer<A> implements Agent<A> {
 		explanation(from);
 		return from.apply(getAction(scan));
 	}
-
-	@Override
-	public State<A> decision(Stream<State<A>> possibleActions) {
-		return null; // TODO
-	}
 }

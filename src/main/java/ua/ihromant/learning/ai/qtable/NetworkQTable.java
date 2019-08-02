@@ -17,16 +17,15 @@ public class NetworkQTable<A> implements QTable<A> {
     private MultiLayerNetwork net = TF.createNetwork();
 
     @Override
-    public double get(State<A> state) {
+    public double get(State<A> state, double reward) {
         Pair<double[], double[]> pair = Pair.create(state.toModel(),
                 new double[]{0});
-        double result = net.output(new DoublesDataSetIterator(Collections.singletonList(
-                pair), 1)).getDouble(0);
-        return result;
+	    return net.output(new DoublesDataSetIterator(Collections.singletonList(
+	            pair), 1)).getDouble(0);
     }
 
     @Override
-    public double[] getMultiple(List<State<A>> states) {
+    public double[] getMultiple(List<State<A>> states, Map<State<A>, Double> rewards) {
         DataSetIterator iter = new DoublesDataSetIterator(
                 states.stream().map(st -> new Pair<>(st.toModel(),
                         new double[]{0})).collect(Collectors.toList()), states.size());
@@ -54,12 +53,12 @@ public class NetworkQTable<A> implements QTable<A> {
     }
 
 	@Override
-	public double getMax(List<State<A>> states) {
+	public double getMax(List<State<A>> states, Map<State<A>, Double> rewards) {
 		double rewardMax = states.stream().mapToDouble(State::getUtility).max().orElse(0.0);
 		if (rewardMax > 0.0) {
 			return rewardMax;
 		}
-		double[] evals = getMultiple(states);
+		double[] evals = getMultiple(states, rewards);
 		int maxIndex = IntStream.range(0, evals.length)
 				.reduce((a, b) -> evals[a] < evals[b] ? b : a)
 				.orElse(-1);
@@ -67,8 +66,8 @@ public class NetworkQTable<A> implements QTable<A> {
 	}
 
 	@Override
-	public State<A> getMaxAction(List<State<A>> actions) {
-		double[] results = getMultiple(actions);
+	public State<A> getMaxAction(List<State<A>> actions, Map<State<A>, Double> rewards) {
+		double[] results = getMultiple(actions, rewards);
 		return actions.get(IntStream.range(0, results.length)
 				.reduce((a, b) -> results[a] < results[b] ? b : a).orElse(0));
 	}

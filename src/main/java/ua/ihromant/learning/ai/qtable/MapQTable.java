@@ -16,8 +16,7 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	}
 
 	@Override
-	public double get(State<A> state) {
-		double reward = state.getUtility();
+	public double get(State<A> state, double reward) {
 		if (reward != 0.0) {
 			return reward;
 		}
@@ -25,8 +24,8 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	}
 
 	@Override
-	public double[] getMultiple(List<State<A>> actions) {
-		return actions.stream().mapToDouble(this::get).toArray();
+	public double[] getMultiple(List<State<A>> actions, Map<State<A>, Double> rewards) {
+		return actions.stream().mapToDouble(act -> get(act, rewards.getOrDefault(act, 0.0))).toArray();
 	}
 
 	@Override
@@ -43,13 +42,16 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	}
 
 	@Override
-	public double getMax(List<State<A>> actions) {
-		return actions.stream().mapToDouble(this::get).max().orElse(0.0);
+	public double getMax(List<State<A>> actions, Map<State<A>, Double> rewards) {
+		return actions.stream()
+				.mapToDouble(act -> get(act, rewards.get(act))).max().orElse(0.0);
 	}
 
 	@Override
-	public State<A> getMaxAction(List<State<A>> actions) {
-		return actions.stream().max(Comparator.comparingDouble(this::get)).orElseThrow(IllegalStateException::new);
+	public State<A> getMaxAction(List<State<A>> actions, Map<State<A>, Double> rewards) {
+		return actions.stream()
+				.max(Comparator.comparingDouble(act -> get(act, rewards.get(act))))
+				.orElseThrow(IllegalStateException::new);
 	}
 
 	@Override
