@@ -24,8 +24,8 @@ public class QLearningTemplate<A> implements AITemplate<A> {
 		this.episodes = episodes;
 		this.mtstGames = mtstGames;
 		this.qTable = qTable;
-		this.policy = new EGreedyPolicy<A>(qTable, 0.7);
-		this.greedyPolicy = new GreedyPolicy<A>(qTable);
+		this.policy = new EGreedyPolicy<>(qTable, 0.7);
+		this.greedyPolicy = new GreedyPolicy<>(qTable);
 		init();
 	}
 

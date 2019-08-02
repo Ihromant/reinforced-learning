@@ -13,6 +13,8 @@ public interface State<A> {
 
     Player getCurrent();
 
+    default Player[] getPossiblePlayers() { return Player.values(); }
+
     double[] toModel();
 
     default double getUtility() { return getUtility(getCurrent()); }

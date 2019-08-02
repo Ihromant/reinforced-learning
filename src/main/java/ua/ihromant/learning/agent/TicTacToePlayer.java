@@ -1,23 +1,24 @@
 package ua.ihromant.learning.agent;
 
 import java.util.Scanner;
-import java.util.function.Function;
 
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.state.TTTAction;
 
-public class TicTacToePlayer implements Function<State<TTTAction>, TTTAction> {
-	private final Scanner scan;
-
+public class TicTacToePlayer extends ConsolePlayer<TTTAction> {
 	public TicTacToePlayer(Scanner scan) {
-		this.scan = scan;
+		super(scan);
 	}
 
 	@Override
-	public TTTAction apply(State<TTTAction> state) {
+	protected void explanation(State<TTTAction> state) {
 		System.out.println(state);
 		System.out.println("Enter your move, 1-9");
 		System.out.println("123\n456\n789");
+	}
+
+	@Override
+	protected TTTAction getAction(Scanner scan) {
 		int next = Integer.parseInt(scan.nextLine()) - 1;
 		return new TTTAction(next);
 	}
