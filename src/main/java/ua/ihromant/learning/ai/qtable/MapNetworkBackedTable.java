@@ -5,6 +5,7 @@ import ua.ihromant.learning.state.State;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class MapNetworkBackedTable<A> implements MonteCarloSearchThree<A> {
 	private final Map<State<A>, Double> qStates = new HashMap<>();
@@ -15,30 +16,27 @@ public class MapNetworkBackedTable<A> implements MonteCarloSearchThree<A> {
 	}
 
 	@Override
-	public double get(State<A> state, double reward) {
-		if (reward != 0.0) {
-			return reward;
-		}
-		return qStates.getOrDefault(state, backed.get(state, reward));
+	public double get(State<A> state) {
+		return qStates.getOrDefault(state, backed.get(state));
 	}
 
 	@Override
-	public double[] getMultiple(List<State<A>> states, Map<State<A>, Double> rewards) {
-		Double[] result = new Double[states.size()];
-		for (int i = 0; i < states.size(); i++) {
-			result[i] = qStates.get(states.get(i));
+	public Map<State<A>, Double> getMultiple(Stream<State<A>> stream) {
+		List<State<A>> states = stream.collect(Collectors.toList());
+		Map<State<A>, Double> result = new HashMap<>();
+		for (State<A> state : states) {
+			result.put(state, qStates.get(state));
 		}
-		int[] missing = IntStream.range(0, result.length).filter(i -> result[i] == null).toArray();
+		int[] missing = IntStream.range(0, states.size()).filter(i -> result.get(states.get(i)) == null).toArray();
 		if (missing.length != 0) {
-			double[] computed = backed.getMultiple(
-					Arrays.stream(missing).mapToObj(states::get).collect(Collectors.toList()), rewards);
+			Map<State<A>, Double> computed = backed.getMultiple(Arrays.stream(missing).mapToObj(states::get));
 			IntStream.range(0, missing.length).forEach(i -> {
 				int missingIdx = missing[i];
-				qStates.put(states.get(missingIdx), computed[i]);
-				result[missingIdx] = computed[i];
+				qStates.put(states.get(missingIdx), computed.get(states.get(missingIdx)));
+				result.put(states.get(missingIdx), computed.get(states.get(missingIdx)));
 			});
 		}
-		return Arrays.stream(result).mapToDouble(Double::doubleValue).toArray();
+		return result;
 	}
 
 	@Override
@@ -49,22 +47,6 @@ public class MapNetworkBackedTable<A> implements MonteCarloSearchThree<A> {
 	@Override
 	public void setMultiple(Map<State<A>, Double> newValues) {
 		qStates.putAll(newValues);
-	}
-
-	@Override
-	public double getMax(List<State<A>> actions, Map<State<A>, Double> rewards) {
-		double[] evals = getMultiple(actions, rewards);
-		int maxIndex = IntStream.range(0, evals.length)
-				.reduce((a, b) -> evals[a] < evals[b] ? b : a)
-				.orElse(-1);
-		return maxIndex == -1 ? 0.0 : evals[maxIndex];
-	}
-
-	@Override
-	public State<A> getMaxAction(List<State<A>> states, Map<State<A>, Double> rewards) {
-		double[] results = getMultiple(states, rewards);
-		return states.get(IntStream.range(0, results.length)
-				.reduce((a, b) -> results[a] < results[b] ? b : a).orElse(0));
 	}
 
 	@Override

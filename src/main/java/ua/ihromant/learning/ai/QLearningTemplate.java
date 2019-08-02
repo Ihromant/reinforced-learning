@@ -6,11 +6,13 @@ import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class QLearningTemplate<A> implements Agent<A> {
     private static final double GAMMA = 1.0;
@@ -54,24 +56,29 @@ public class QLearningTemplate<A> implements Agent<A> {
 	}
 
 	private double getMaxNext(MonteCarloSearchThree<A> tree, State<A> base) {
-		Player current = base.getCurrent();
 		List<State<A>> actions = base.getStates().collect(Collectors.toList());
-		Map<State<A>, Double> rewards = actions.stream()
+		Map<State<A>, Double> rewards = getFilteredRewards(base.getStates(), base.getCurrent());
+		rewards.putAll(tree.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
+		return rewards.entrySet().stream().mapToDouble(Map.Entry::getValue).max().orElse(0.0);
+	}
+
+	private Map<State<A>, Double> getFilteredRewards(Stream<State<A>> actions, Player current) {
+		return actions.filter(act -> act.getUtility(current) != 0.0)
 				.collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current)));
-		return tree.getMax(actions, rewards);
 	}
 
 	@Override
 	public State<A> decision(State<A> state) {
-		Player current = state.getCurrent();
-		Map<State<A>, Double> rewards = state.getStates()
-				.collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current)));
-		List<State<A>> list = state.getStates().collect(Collectors.toList());
+		List<State<A>> actions = state.getStates().collect(Collectors.toList());
+		Map<State<A>, Double> rewards = getFilteredRewards(state.getStates(), state.getCurrent());
+		rewards.putAll(qTable.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
 //		double[] values = qTable.getMultiple(list, rewards);
 //		IntStream.range(0, list.size())
 //				.forEach(i -> {
 //					System.out.println(list.get(i) + " " + values[i]);
 //				});
-		return qTable.getMaxAction(list, rewards);
+		return rewards.entrySet().stream()
+				.max(Comparator.comparingDouble(Map.Entry::getValue))
+				.orElseThrow(IllegalStateException::new).getKey();
 	}
 }

@@ -20,7 +20,7 @@ public class TF {
 				.list()
 				.layer(0, new DenseLayer.Builder().nIn(27).nOut(1000)
 						.weightInit(WeightInit.ZERO)
-						.activation(Activation.IDENTITY)
+						.activation(Activation.TANH)
 						.build())
 				.layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
 						.activation(Activation.IDENTITY)

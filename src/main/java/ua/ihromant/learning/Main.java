@@ -7,6 +7,7 @@ import ua.ihromant.learning.agent.TicTacToePlayer;
 import ua.ihromant.learning.ai.MinimaxTemplate;
 import ua.ihromant.learning.ai.QLearningTemplate;
 import ua.ihromant.learning.ai.qtable.MapQTable;
+import ua.ihromant.learning.ai.qtable.NetworkQTable;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;

@@ -2,10 +2,10 @@ package ua.ihromant.learning.ai.qtable;
 
 import ua.ihromant.learning.state.State;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	private final double alpha;
@@ -16,16 +16,13 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	}
 
 	@Override
-	public double get(State<A> state, double reward) {
-		if (reward != 0.0) {
-			return reward;
-		}
-		return qStates.getOrDefault(state, reward);
+	public double get(State<A> state) {
+		return qStates.getOrDefault(state, 0.0);
 	}
 
 	@Override
-	public double[] getMultiple(List<State<A>> actions, Map<State<A>, Double> rewards) {
-		return actions.stream().mapToDouble(act -> get(act, rewards.getOrDefault(act, 0.0))).toArray();
+	public Map<State<A>, Double> getMultiple(Stream<State<A>> actions) {
+		return actions.collect(Collectors.toMap(Function.identity(), act -> qStates.getOrDefault(act, 0.0)));
 	}
 
 	@Override
@@ -39,19 +36,6 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	@Override
 	public void setMultiple(Map<State<A>, Double> newValues) {
 		newValues.forEach(this::set);
-	}
-
-	@Override
-	public double getMax(List<State<A>> actions, Map<State<A>, Double> rewards) {
-		return actions.stream()
-				.mapToDouble(act -> get(act, rewards.get(act))).max().orElse(0.0);
-	}
-
-	@Override
-	public State<A> getMaxAction(List<State<A>> actions, Map<State<A>, Double> rewards) {
-		return actions.stream()
-				.max(Comparator.comparingDouble(act -> get(act, rewards.get(act))))
-				.orElseThrow(IllegalStateException::new);
 	}
 
 	@Override

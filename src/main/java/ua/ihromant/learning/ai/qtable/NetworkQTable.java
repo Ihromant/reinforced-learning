@@ -12,12 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class NetworkQTable<A> implements QTable<A> {
     private MultiLayerNetwork net = TF.createNetwork();
 
     @Override
-    public double get(State<A> state, double reward) {
+    public double get(State<A> state) {
         Pair<double[], double[]> pair = Pair.create(state.toModel(),
                 new double[]{0});
 	    return net.output(new DoublesDataSetIterator(Collections.singletonList(
@@ -25,14 +26,14 @@ public class NetworkQTable<A> implements QTable<A> {
     }
 
     @Override
-    public double[] getMultiple(List<State<A>> states, Map<State<A>, Double> rewards) {
+    public Map<State<A>, Double> getMultiple(Stream<State<A>> stream) {
+        List<State> states = stream.collect(Collectors.toList());
         DataSetIterator iter = new DoublesDataSetIterator(
                 states.stream().map(st -> new Pair<>(st.toModel(),
                         new double[]{0})).collect(Collectors.toList()), states.size());
         INDArray output = net.output(iter);
-        return IntStream.range(0, states.size())
-                .mapToDouble(i -> output.getDouble(i, 0))
-                .toArray();
+        return IntStream.range(0, states.size()).boxed()
+                .collect(Collectors.toMap(states::get, i -> output.getDouble(i, 0)));
     }
 
     @Override
@@ -51,25 +52,4 @@ public class NetworkQTable<A> implements QTable<A> {
                         new double[]{e.getValue()})).collect(Collectors.toList()), newValues.size());
         net.fit(iter);
     }
-
-	@Override
-	public double getMax(List<State<A>> states, Map<State<A>, Double> rewards) {
-		double rewardMax = rewards.values().stream()
-				.filter(r -> r != 0).mapToDouble(Double::doubleValue).max().orElse(0.0);
-		if (rewardMax != 0.0) {
-			return rewardMax;
-		}
-		double[] evals = getMultiple(states, rewards);
-		int maxIndex = IntStream.range(0, evals.length)
-				.reduce((a, b) -> evals[a] < evals[b] ? b : a)
-				.orElse(-1);
-		return maxIndex == -1 ? 0.0 : evals[maxIndex];
-	}
-
-	@Override
-	public State<A> getMaxAction(List<State<A>> actions, Map<State<A>, Double> rewards) {
-		double[] results = getMultiple(actions, rewards);
-		return actions.get(IntStream.range(0, results.length)
-				.reduce((a, b) -> results[a] < results[b] ? b : a).orElse(0));
-	}
 }
