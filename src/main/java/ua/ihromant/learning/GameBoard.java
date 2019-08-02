@@ -1,7 +1,6 @@
 package ua.ihromant.learning;
 
 import ua.ihromant.learning.agent.Agent;
-import ua.ihromant.learning.ai.AITemplate;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
@@ -9,11 +8,11 @@ import java.util.Scanner;
 import java.util.function.Supplier;
 
 public class GameBoard<A> {
-	private final AITemplate<A> ai;
+	private final Agent<A> ai;
 	private final Agent<A> agent;
 	private final Supplier<State<A>> baseStateProducer;
 
-	public GameBoard(AITemplate<A> ai, Agent<A> agent, Supplier<State<A>> baseStateProducer) {
+	public GameBoard(Agent<A> ai, Agent<A> agent, Supplier<State<A>> baseStateProducer) {
 		this.ai = ai;
 		this.agent = agent;
 		this.baseStateProducer = baseStateProducer;

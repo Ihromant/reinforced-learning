@@ -1,5 +1,6 @@
 package ua.ihromant.learning.ai;
 
+import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.ai.qtable.*;
 import ua.ihromant.learning.state.State;
 
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class QLearningTemplate<A> implements AITemplate<A> {
+public class QLearningTemplate<A> implements Agent<A> {
     private static final double ALPHA = 0.3;
     private static final double GAMMA = 1.0;
     private final QTable<A> qTable;
@@ -64,5 +65,10 @@ public class QLearningTemplate<A> implements AITemplate<A> {
 					System.out.println(possibleActions.get(i) + " " + values[i]);
 				});
 		return greedyPolicy.apply(state.getStates());
+	}
+
+	@Override
+	public State<A> decision(Stream<State<A>> possible) {
+		return null; // TODO
 	}
 }
