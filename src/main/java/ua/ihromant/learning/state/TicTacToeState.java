@@ -90,10 +90,10 @@ public class TicTacToeState implements State<TTTAction> {
     public double getUtility(Player player) {
         Player won = won();
         if (won == null) {
-            return 0;
+            return 0.5;
         }
 
-        return player == won ? 1 : -1;
+        return player == won ? 1 : 0;
     }
 
     @Override

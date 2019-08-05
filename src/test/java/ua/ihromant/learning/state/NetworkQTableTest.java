@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NetworkQTableTest {
-	private NetworkQTable<TTTAction> net = new NetworkQTable<>();
+	//private NetworkQTable<TTTAction> net = new NetworkQTable<>();
 
 //	@Test
 //	public void testQNetworkBatch() {

@@ -2,7 +2,6 @@ package ua.ihromant.learning.agent;
 
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.function.Function;
 
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.State;

@@ -1,7 +1,6 @@
 package ua.ihromant.learning.agent;
 
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 import ua.ihromant.learning.state.State;
 
