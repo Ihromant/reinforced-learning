@@ -19,12 +19,12 @@ public class TF {
 				.weightInit(WeightInit.XAVIER)
 				.updater(new Adam())
 				.list()
-				.layer(0, new DenseLayer.Builder().nIn(27).nOut(270)
+				.layer(0, new DenseLayer.Builder().nIn(75).nOut(750)
 						.activation(Activation.RELU)
 						.build())
 				.layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
 						.activation(Activation.SOFTMAX)
-						.nIn(270).nOut(3).build())
+						.nIn(750).nOut(3).build())
 				.build();
 	}
 

@@ -76,17 +76,21 @@ public class TicTacToeStateSized implements State<TTTAction> {
 
 	@Override
 	public double[] toModel() {
-		return IntStream.range(0, SIZE * SIZE)
-				.mapToDouble(i -> {
+		double[] result = new double[3 * SIZE * SIZE];
+		IntStream.range(0, SIZE * SIZE)
+				.forEach(i -> {
 					Player pl = getPlayer(i);
 					if (pl == Player.X) {
-						return 1;
+						result[i] = 1;
 					}
 					if (pl == Player.O) {
-						return -1;
+						result[i + SIZE * SIZE] = 1;
 					}
-					return 0;
-				}).toArray();
+					if (pl == null) {
+						result[i + SIZE * SIZE * 2] = 1;
+					}
+				});
+		return result;
 	}
 
 	@Override
@@ -123,10 +127,10 @@ public class TicTacToeStateSized implements State<TTTAction> {
 	public double getUtility(Player player) {
 		Player won = won();
 		if (won == null) {
-			return 0;
+			return 0.5;
 		}
 
-		return player == won ? 1 : -1;
+		return player == won ? 1 : 0;
 	}
 
 	@Override
