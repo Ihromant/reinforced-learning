@@ -19,12 +19,10 @@ public class QLearningTemplate<A> implements Agent<A> {
     private final QTable<A> qTable;
 	private final State<A> baseState;
 	private final int episodes;
-	private final int mtstGames;
 
-	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes, int mtstGames) {
+	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes) {
 		this.baseState = baseState;
 		this.episodes = episodes;
-		this.mtstGames = mtstGames;
 		this.qTable = qTable;
 		init();
 	}
@@ -35,21 +33,20 @@ public class QLearningTemplate<A> implements Agent<A> {
 		long micro = time;
 		for (int i = 0; i < episodes; i++) {
 			if (i == episodes / 100 * percentage) {
-				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System.currentTimeMillis() - micro) + " ms");
+				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System
+						.currentTimeMillis() - micro) + " ms");
 				micro = System.currentTimeMillis();
 			}
-			for (int j = 0; j < mtstGames; j++) {
-				State<A> state = baseState;
-				Map<State<A>, Player> history = new HashMap<>();
-				Player player = state.getCurrent();
-				while (!state.isTerminal()) {
-					State<A> next = eGreedy(state, 0.7);
-					history.put(next, player);
-					state = next;
-					player = state.getCurrent();
-				}
-				qTable.setMultiple(convert(history, state, player));
+			State<A> state = baseState;
+			Map<State<A>, Player> history = new HashMap<>();
+			Player player = state.getCurrent();
+			while (!state.isTerminal()) {
+				State<A> next = eGreedy(state, 0.7);
+				history.put(next, player);
+				state = next;
+				player = state.getCurrent();
 			}
+			qTable.setMultiple(convert(history, state, player));
 		}
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}

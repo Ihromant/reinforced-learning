@@ -54,10 +54,10 @@ public class NimLineState implements State<NimAction> {
 	@Override
 	public double getUtility(Player player) {
 		if (!isTerminal()) {
-			return 0;
+			return 0.5;
 		}
 
-		return this.current == player ? 1 : -1;
+		return this.current == player ? 1 : 0;
 	}
 
 	@Override
