@@ -1,5 +1,7 @@
 package ua.ihromant.learning.ai.qtable;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
@@ -11,25 +13,27 @@ import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 public class TF {
-	private static final MultiLayerConfiguration config = buildGraph();
-
-	private static MultiLayerConfiguration buildGraph() {
+	private static MultiLayerConfiguration buildGraph(NeuralNetworkConverter converter) {
 		return new NeuralNetConfiguration.Builder()
-				.seed(1000)
+				.seed(ThreadLocalRandom.current().nextLong())
 				.weightInit(WeightInit.XAVIER)
 				.updater(new Adam())
 				.list()
-				.layer(0, new DenseLayer.Builder().nIn(75).nOut(750)
+				.layer(0, new DenseLayer.Builder()
+						.nIn(converter.inputLength())
+						.nOut(converter.inputLength() * 10)
 						.activation(Activation.RELU)
 						.build())
-				.layer(1, new OutputLayer.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
+				.layer(1, new OutputLayer
+						.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
 						.activation(Activation.SOFTMAX)
-						.nIn(750).nOut(3).build())
+						.nIn(converter.inputLength() * 10)
+						.nOut(converter.outputLength()).build())
 				.build();
 	}
 
-	public static MultiLayerNetwork createNetwork() {
-	    MultiLayerNetwork net = new MultiLayerNetwork(config);
+	public static MultiLayerNetwork createNetwork(NeuralNetworkConverter converter) {
+	    MultiLayerNetwork net = new MultiLayerNetwork(buildGraph(converter));
 	    net.init();
 	    return net;
 	}

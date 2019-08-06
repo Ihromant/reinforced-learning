@@ -1,4 +1,4 @@
-package ua.ihromant.learning.ai.qtable;
+package ua.ihromant.learning.assumptions;
 
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;

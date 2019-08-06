@@ -15,11 +15,12 @@ import org.nd4j.linalg.primitives.Pair;
 import ua.ihromant.learning.state.State;
 
 public class NetworkQTable<A> implements QTable<A> {
-    private final MultiLayerNetwork net = TF.createNetwork();
+    private final MultiLayerNetwork net;
     private final NeuralNetworkConverter converter;
 
     public NetworkQTable(NeuralNetworkConverter converter) {
     	this.converter = converter;
+    	this.net = TF.createNetwork(converter);
     }
 
     @Override
@@ -35,14 +36,15 @@ public class NetworkQTable<A> implements QTable<A> {
 		List<State> states = stream.collect(Collectors.toList());
 		DataSetIterator iter = new DoublesDataSetIterator(
 				states.stream().map(st -> new Pair<>(st.toModel(),
-						new double[converter.length()])).collect(Collectors.toList()),
+						new double[converter.outputLength()])).collect(Collectors.toList()),
 				states.size());
 		INDArray output = net.output(iter);
 		return IntStream.range(0, states.size()).boxed()
 				.collect(Collectors.toMap(states::get,
 						i -> converter.convertToQValue(
-								IntStream.range(0, converter.length())
-										.mapToDouble(j -> output.getDouble(i, j)).toArray())));
+								IntStream.range(0, converter.outputLength())
+										.mapToDouble(j -> output.getDouble(i, j)).toArray()),
+						(u, v) -> u));
 	}
 
     @Override

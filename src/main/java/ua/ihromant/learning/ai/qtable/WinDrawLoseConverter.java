@@ -4,6 +4,12 @@ public class WinDrawLoseConverter implements NeuralNetworkConverter {
 	private double[] WIN = {1, 0, 0};
 	private double[] LOSE = {0, 0, 1};
 	private double[] DRAW = {0, 1, 0};
+	private final int inputLength;
+
+	public WinDrawLoseConverter(int inputLength) {
+		this.inputLength = inputLength;
+	}
+
 	@Override
 	public double convertToQValue(double[] values) {
 		return values[0] + values[1] * 0.5;
@@ -30,7 +36,12 @@ public class WinDrawLoseConverter implements NeuralNetworkConverter {
 	}
 
 	@Override
-	public int length() {
+	public int inputLength() {
+		return inputLength;
+	}
+
+	@Override
+	public int outputLength() {
 		return 3;
 	}
 }
