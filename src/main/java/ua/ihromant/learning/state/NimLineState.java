@@ -6,6 +6,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class NimLineState implements State<NimAction> {
+	private static final int PILES_MAX = 5;
+	private static final int BINARY_NUMBERS = 5;
 	private final int[] piles;
 	private final Player current;
 
@@ -67,10 +69,13 @@ public class NimLineState implements State<NimAction> {
 
 	@Override
 	public double[] toModel() {
-		double[] result = new double[10];
-		result[0] = getCurrent() == Player.X ? 1 : -1;
-		for (int i = 0; i < piles.length; i++) {
-			result[i + 1] = piles[i];
+		double[] result = new double[PILES_MAX * BINARY_NUMBERS + 1];
+		result[result.length - 1] = getCurrent() == Player.X ? 1 : 0;
+		for (int i = 0; i < PILES_MAX && i < piles.length; i++) {
+			char[] binary = Integer.toBinaryString(piles[i]).toCharArray();
+			for (int j = 0; j < binary.length && j < BINARY_NUMBERS; j++) {
+				result[i * PILES_MAX + BINARY_NUMBERS - 1 - j] = binary[j] - '0';
+			}
 		}
 		return result;
 	}
