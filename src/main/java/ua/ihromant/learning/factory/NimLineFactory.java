@@ -30,6 +30,6 @@ public class NimLineFactory implements Factory<NimAction> {
 
 	@Override
 	public int trainingEpisodes() {
-		return 100000;
+		return 300000;
 	}
 }
