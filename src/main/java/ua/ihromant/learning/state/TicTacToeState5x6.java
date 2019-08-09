@@ -100,6 +100,10 @@ public class TicTacToeState5x6 implements State<TTTAction> {
 			return Stream.empty();
 		}
 
+		if (plrz == 0) {
+			return Stream.of(new TTTAction(15));
+		}
+
 		return IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.filter(i -> !isAssigned(i))
 				.mapToObj(TTTAction::new);
@@ -144,7 +148,7 @@ public class TicTacToeState5x6 implements State<TTTAction> {
 		for (int i = 0; i < HOR_SIZE; i++) {
 			builder.append('|');
 			for (int j = 0; j < VER_SIZE; j++) {
-				int coef = i * HOR_SIZE + j;
+				int coef = i * VER_SIZE + j;
 				if (isAssigned(coef)) {
 					builder.append(getPlayer(coef).toString());
 				} else {

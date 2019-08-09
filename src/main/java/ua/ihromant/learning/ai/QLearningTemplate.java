@@ -41,7 +41,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			Map<State<A>, Player> history = new HashMap<>();
 			Player player = state.getCurrent();
 			while (!state.isTerminal()) {
-				State<A> next = eGreedy(state, 0.7 + 0.3 * i / episodes);
+				State<A> next = eGreedy(state, 0.7);
 				history.put(next, player);
 				state = next;
 				player = state.getCurrent();
