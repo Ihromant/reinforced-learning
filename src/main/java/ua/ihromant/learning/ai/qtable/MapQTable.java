@@ -22,7 +22,7 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 
 	@Override
 	public Map<State<A>, Double> getMultiple(Stream<State<A>> actions) {
-		return actions.collect(Collectors.toMap(Function.identity(), act -> qStates.getOrDefault(act, 0.0)));
+		return actions.collect(Collectors.toMap(Function.identity(), this::get));
 	}
 
 	@Override
