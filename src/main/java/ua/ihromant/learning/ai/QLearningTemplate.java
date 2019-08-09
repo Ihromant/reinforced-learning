@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.nd4j.shade.jackson.databind.ObjectMapper;
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.ai.qtable.MonteCarloSearchThree;
 import ua.ihromant.learning.ai.qtable.QTable;
@@ -13,6 +14,7 @@ import ua.ihromant.learning.state.State;
 
 public class QLearningTemplate<A> implements Agent<A> {
     private static final double GAMMA = 1.0;
+    private static final ObjectMapper mapper = new ObjectMapper();
     private final QTable<A> qTable;
 	private final State<A> baseState;
 	private final int episodes;
@@ -28,14 +30,27 @@ public class QLearningTemplate<A> implements Agent<A> {
 		Map<Double, Integer> statistics = new TreeMap<>();
 		long time = System.currentTimeMillis();
 		long micro = time;
-		Player conservativePlayer = Player.O;
+		Player conservativePlayer = Player.X;
+		int[][] stat = new int[episodes / 100 / 2][7];
+		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
-			if (i % 100 == 0) {
+			if (i % 100 == 99) {
 				System.out.println("Learning " + 1.0 * i / episodes + "% complete, elapsed: " + (System
 						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
 				micro = System.currentTimeMillis();
-				statistics.clear();
+				if (conservativePlayer == Player.X) {
+					stat[counter][0] = i;
+					stat[counter][1] = statistics.getOrDefault(1.0, 0);
+					stat[counter][2] = statistics.getOrDefault(0.5, 0);
+					stat[counter][3] = statistics.getOrDefault(0.0, 0);
+				} else {
+					stat[counter][4] = statistics.getOrDefault(1.0, 0);
+					stat[counter][5] = statistics.getOrDefault(0.5, 0);
+					stat[counter][6] = statistics.getOrDefault(0.0, 0);
+					counter++;
+				}
 				conservativePlayer = conservativePlayer == Player.X ? Player.O : Player.X;
+				statistics.clear();
 			}
 			State<A> state = baseState;
 			Map<State<A>, Player> history = new HashMap<>();
@@ -49,6 +64,11 @@ public class QLearningTemplate<A> implements Agent<A> {
 			qTable.setMultiple(convert(history, state, player));
 			double finalResult = state.getUtility(conservativePlayer);
 			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
+		}
+		try {
+			System.out.println("Extracted statictics: " + mapper.writeValueAsString(stat));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}
