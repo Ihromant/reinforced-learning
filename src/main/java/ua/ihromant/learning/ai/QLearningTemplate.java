@@ -28,14 +28,16 @@ public class QLearningTemplate<A> implements Agent<A> {
 	}
 
 	private void init() {
+		Map<Double, Integer> statistics = new HashMap<>();
 		int percentage = 0;
 		long time = System.currentTimeMillis();
 		long micro = time;
 		for (int i = 0; i < episodes; i++) {
 			if (i == episodes / 100 * percentage) {
 				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System
-						.currentTimeMillis() - micro) + " ms");
+						.currentTimeMillis() - micro) + " ms, statistics: " + statistics);
 				micro = System.currentTimeMillis();
+				statistics.clear();
 			}
 			State<A> state = baseState;
 			Map<State<A>, Player> history = new HashMap<>();
@@ -47,6 +49,8 @@ public class QLearningTemplate<A> implements Agent<A> {
 				player = state.getCurrent();
 			}
 			qTable.setMultiple(convert(history, state, player));
+			double finalResult = state.getUtility(Player.X);
+			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
 		}
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}
