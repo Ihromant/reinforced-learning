@@ -7,19 +7,20 @@ import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class TicTacToeStateSized implements State<TTTAction> {
-	private static final int SIZE = 5;
+public class TicTacToeState5x6 implements State<TTTAction> {
+	private static final int HOR_SIZE = 5;
+	private static final int VER_SIZE = 6;
 	private static final int WON = 4;
 	private long plrz;
 
-	public TicTacToeStateSized() {
+	public TicTacToeState5x6() {
 	}
 
-	private TicTacToeStateSized(TicTacToeStateSized prev) {
+	private TicTacToeState5x6(TicTacToeState5x6 prev) {
 		this.plrz = prev.plrz;
 	}
 
-	private TicTacToeStateSized(TicTacToeStateSized prev, int nextMove) {
+	private TicTacToeState5x6(TicTacToeState5x6 prev, int nextMove) {
 		this(prev);
 		if (isAssigned(nextMove)) {
 			throw new IllegalArgumentException();
@@ -27,11 +28,11 @@ public class TicTacToeStateSized implements State<TTTAction> {
 		assign(nextMove, getCurrent());
 	}
 
-	public static TicTacToeStateSized from(Player[] players) {
-		if (players.length != SIZE * SIZE) {
-			throw new IllegalArgumentException("Please provide " + SIZE * SIZE + " size of the array");
+	public static TicTacToeState5x6 from(Player[] players) {
+		if (players.length != HOR_SIZE * VER_SIZE) {
+			throw new IllegalArgumentException("Please provide " + HOR_SIZE * VER_SIZE + " size of the array");
 		}
-		TicTacToeStateSized state = new TicTacToeStateSized();
+		TicTacToeState5x6 state = new TicTacToeState5x6();
 		for (int i = 0; i < players.length; i++) {
 			if (players[i] != null) {
 				state.assign(i, players[i]);
@@ -76,18 +77,18 @@ public class TicTacToeStateSized implements State<TTTAction> {
 
 	@Override
 	public double[] toModel() {
-		double[] result = new double[3 * SIZE * SIZE];
-		IntStream.range(0, SIZE * SIZE)
+		double[] result = new double[3 * HOR_SIZE * VER_SIZE];
+		IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.forEach(i -> {
 					Player pl = getPlayer(i);
 					if (pl == Player.X) {
 						result[i] = 1;
 					}
 					if (pl == Player.O) {
-						result[i + SIZE * SIZE] = 1;
+						result[i + HOR_SIZE * VER_SIZE] = 1;
 					}
 					if (pl == null) {
-						result[i + SIZE * SIZE * 2] = 1;
+						result[i + HOR_SIZE * VER_SIZE * 2] = 1;
 					}
 				});
 		return result;
@@ -99,14 +100,14 @@ public class TicTacToeStateSized implements State<TTTAction> {
 			return Stream.empty();
 		}
 
-		return IntStream.range(0, SIZE * SIZE)
+		return IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.filter(i -> !isAssigned(i))
 				.mapToObj(TTTAction::new);
 	}
 
 	@Override
 	public State<TTTAction> apply(TTTAction action) {
-		return new TicTacToeStateSized(this, action.getCoordinate());
+		return new TicTacToeState5x6(this, action.getCoordinate());
 	}
 
 	private Player won() {
@@ -136,14 +137,14 @@ public class TicTacToeStateSized implements State<TTTAction> {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < SIZE + 2; i++) {
+		for (int i = 0; i < VER_SIZE + 2; i++) {
 			builder.append('-');
 		}
 		builder.append('\n');
-		for (int i = 0; i < SIZE; i++) {
+		for (int i = 0; i < HOR_SIZE; i++) {
 			builder.append('|');
-			for (int j = 0; j < SIZE; j++) {
-				int coef = i * SIZE + j;
+			for (int j = 0; j < VER_SIZE; j++) {
+				int coef = i * HOR_SIZE + j;
 				if (isAssigned(coef)) {
 					builder.append(getPlayer(coef).toString());
 				} else {
@@ -153,7 +154,7 @@ public class TicTacToeStateSized implements State<TTTAction> {
 			builder.append('|');
 			builder.append('\n');
 		}
-		for (int i = 0; i < SIZE + 2; i++) {
+		for (int i = 0; i < VER_SIZE + 2; i++) {
 			builder.append('-');
 		}
 		return builder.toString();
@@ -167,14 +168,14 @@ public class TicTacToeStateSized implements State<TTTAction> {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		TicTacToeStateSized that = (TicTacToeStateSized) o;
+		TicTacToeState5x6 that = (TicTacToeState5x6) o;
 		return this.plrz == that.plrz;
 	}
 
 	@Override
 	public int hashCode() {
 		long res = 0;
-		for (int i = 0; i < SIZE * SIZE; i++) {
+		for (int i = 0; i < HOR_SIZE * VER_SIZE; i++) {
 			long rest = (plrz >>> (2 * i)) % 4;
 			rest = rest == 3 ? 2 : rest;
 			res = res * 3 + rest;
@@ -182,25 +183,32 @@ public class TicTacToeStateSized implements State<TTTAction> {
 		return Long.hashCode(res);
 	}
 
-	// ABCDE
-	// FGHIJ
-	// KLMNO
-	// PQRST
-	// UVWXY
-	private static final Map<Integer, char[]> POSSIBLE_SHIFTS = new HashMap<Integer, char[]>() {
+	private static final Map<Integer, int[]> POSSIBLE_SHIFTS = new HashMap<Integer, int[]>() {
 		{
-			put(1, "ABFGKLPQUV".toCharArray()); // 1
-			put(SIZE, "ABCDEFGHIJ".toCharArray()); // 5
-			put(SIZE + 1, "ABFG".toCharArray()); // 6
-			put(SIZE - 1, "DEIJ".toCharArray()); // 4
+			put(1, getStartingPositionsForDirection(1, 0)); // 1
+			put(VER_SIZE, getStartingPositionsForDirection(0, 1)); // 5
+			put(VER_SIZE + 1, getStartingPositionsForDirection(1, 1)); // 6
+			put(VER_SIZE - 1, getStartingPositionsForDirection(-1, 1)); // 4
 		}
 	};
+
+	private static int[] getStartingPositionsForDirection(int horShift, int verShift) {
+		return IntStream.range(0, HOR_SIZE * VER_SIZE)
+				.filter(i -> {
+					int verPos = i / VER_SIZE;
+					int horPos = i % VER_SIZE;
+					return verPos + verShift * (WON - 1) < HOR_SIZE
+							&& horPos + horShift * (WON - 1) < VER_SIZE
+							&& horPos + horShift * (WON - 1) >= 0;
+				})
+				.toArray();
+	}
 
 	private static final long[] WINNING_MASKS = POSSIBLE_SHIFTS.entrySet().stream()
 			.flatMapToLong(e -> {
 				long[] result = new long[e.getValue().length * 4];
 				for (int i = 0; i < e.getValue().length; i++) {
-					int start = e.getValue()[i] - 'A';
+					int start = e.getValue()[i];
 					result[4 * i] = encodeLine(start, e.getKey(), Player.X); // mask
 					result[4 * i + 1] = encodeLine(start, e.getKey(), Player.X);
 					result[4 * i + 2] = encodeLine(start, e.getKey(), Player.X); // mask
@@ -210,7 +218,7 @@ public class TicTacToeStateSized implements State<TTTAction> {
 			}).toArray();
 
 	private static long encodeLine(int start, int shift, Player player) {
-		TicTacToeStateSized state = new TicTacToeStateSized();
+		TicTacToeState5x6 state = new TicTacToeState5x6();
 		for (int i = 0; i < WON; i++) {
 			state.assign(start + i * shift, player);
 		}
@@ -218,10 +226,10 @@ public class TicTacToeStateSized implements State<TTTAction> {
 	}
 
 	private static final long TERMINAL_MASK =
-			IntStream.range(0, SIZE * SIZE).boxed().collect(Collector.of(TicTacToeStateSized::new,
+			IntStream.range(0, HOR_SIZE * VER_SIZE).boxed().collect(Collector.of(TicTacToeState5x6::new,
 					(state, numb) -> state.assign(numb, Player.O),
 					(state1, state2) -> {
-						TicTacToeStateSized newState = new TicTacToeStateSized(state1);
+						TicTacToeState5x6 newState = new TicTacToeState5x6(state1);
 						newState.plrz |= state2.plrz;
 						return newState;
 					})).plrz;

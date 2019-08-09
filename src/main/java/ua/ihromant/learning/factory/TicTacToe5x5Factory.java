@@ -9,12 +9,12 @@ import ua.ihromant.learning.ai.qtable.NeuralNetworkConverter;
 import ua.ihromant.learning.ai.qtable.WinDrawLoseConverter;
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.state.TTTAction;
-import ua.ihromant.learning.state.TicTacToeStateSized;
+import ua.ihromant.learning.state.TicTacToeState5x5;
 
-public class TicTacToeSizedFactory implements Factory<TTTAction> {
+public class TicTacToe5x5Factory implements Factory<TTTAction> {
 	@Override
 	public Supplier<State<TTTAction>> getStateSupplier() {
-		return TicTacToeStateSized::new;
+		return TicTacToeState5x5::new;
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class TicTacToeSizedFactory implements Factory<TTTAction> {
 
 	@Override
 	public NeuralNetworkConverter converter() {
-		return new WinDrawLoseConverter(new TicTacToeStateSized().toModel().length);
+		return new WinDrawLoseConverter(new TicTacToeState5x5().toModel().length);
 	}
 
 	@Override

@@ -41,7 +41,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			Map<State<A>, Player> history = new HashMap<>();
 			Player player = state.getCurrent();
 			while (!state.isTerminal()) {
-				State<A> next = eGreedy(state, 0.7);
+				State<A> next = eGreedy(state, 0.7 + 0.3 * i / episodes);
 				history.put(next, player);
 				state = next;
 				player = state.getCurrent();
@@ -54,7 +54,8 @@ public class QLearningTemplate<A> implements Agent<A> {
 	private Map<State<A>, Double> convert(Map<State<A>, Player> history, State<A> finalState, Player lastMoved) {
 		double finalResult = finalState.getUtility(lastMoved);
 		if (finalResult == 0.5) {
-			return history.keySet().stream().collect(Collectors.toMap(Function.identity(), p -> 0.5));
+			return history.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
+					e -> 0.5));
 		}
 		if (finalResult == 1.0) {
 			return history.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
