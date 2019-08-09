@@ -1,9 +1,6 @@
 package ua.ihromant.learning.ai;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,28 +25,29 @@ public class QLearningTemplate<A> implements Agent<A> {
 	}
 
 	private void init() {
-		Map<Double, Integer> statistics = new HashMap<>();
-		int percentage = 0;
+		Map<Double, Integer> statistics = new TreeMap<>();
 		long time = System.currentTimeMillis();
 		long micro = time;
+		Player conservativePlayer = Player.O;
 		for (int i = 0; i < episodes; i++) {
-			if (i == episodes / 100 * percentage) {
-				System.out.println("Learning " + percentage++ + "% complete, elapsed: " + (System
-						.currentTimeMillis() - micro) + " ms, statistics: " + statistics);
+			if (i % 100 == 0) {
+				System.out.println("Learning " + 1.0 * i / episodes + "% complete, elapsed: " + (System
+						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
 				micro = System.currentTimeMillis();
 				statistics.clear();
+				conservativePlayer = conservativePlayer == Player.X ? Player.O : Player.X;
 			}
 			State<A> state = baseState;
 			Map<State<A>, Player> history = new HashMap<>();
 			Player player = state.getCurrent();
 			while (!state.isTerminal()) {
-				State<A> next = eGreedy(state, 0.7);
+				State<A> next = player == conservativePlayer ? decision(state) : eGreedy(state, history.isEmpty() ? 0.0 : 0.7);
 				history.put(next, player);
 				state = next;
 				player = state.getCurrent();
 			}
 			qTable.setMultiple(convert(history, state, player));
-			double finalResult = state.getUtility(Player.X);
+			double finalResult = state.getUtility(conservativePlayer);
 			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
 		}
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
