@@ -1,6 +1,11 @@
 package ua.ihromant.learning.ai;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,11 +37,13 @@ public class QLearningTemplate<A> implements Agent<A> {
 		long micro = time;
 		Player conservativePlayer = Player.X;
 		int[][] stat = new int[episodes / 100 / 2][7];
+        Map<State<A>, Player> history = new LinkedHashMap<>();
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
 			if (i % 100 == 99) {
 				System.out.println("Learning " + 1.0 * i / episodes + "% complete, elapsed: " + (System
 						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
+				writeHistory(history);
 				micro = System.currentTimeMillis();
 				if (conservativePlayer == Player.X) {
 					stat[counter][0] = i;
@@ -53,7 +60,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 				statistics.clear();
 			}
 			State<A> state = baseState;
-			Map<State<A>, Player> history = new HashMap<>();
+			history = new LinkedHashMap<>();
 			Player player = state.getCurrent();
 			while (!state.isTerminal()) {
 				State<A> next = player == conservativePlayer ? decision(state) : eGreedy(state, history.isEmpty() ? 0.0 : 0.7);
@@ -73,7 +80,27 @@ public class QLearningTemplate<A> implements Agent<A> {
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}
 
-	private Map<State<A>, Double> convert(Map<State<A>, Player> history, State<A> finalState, Player lastMoved) {
+    private void writeHistory(Map<State<A>, Player> history) {
+	    List<State<A>> states = new ArrayList<>(history.keySet());
+        List<String[]> lines = states.stream()
+                .map(State::toString)
+                .map(s -> s.split("\n")).collect(Collectors.toList());
+        Map<State<A>, Double> evals = qTable.getMultiple(states.stream());
+        String[] firstLine = lines.get(0);
+        for (int i = 0; i < states.size(); i++) {
+            System.out.print(String.format("%." + (lines.get(i)[0].length() - 1) + "f", evals.get(states.get(i))) + " ");
+        }
+        System.out.println();
+        for (int i = 0; i < firstLine.length; i++) {
+            for (int j = 0; j < states.size(); j++) {
+               System.out.print(lines.get(j)[i] + "  ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    private Map<State<A>, Double> convert(Map<State<A>, Player> history, State<A> finalState, Player lastMoved) {
 		double finalResult = finalState.getUtility(lastMoved);
 		if (finalResult == 0.5) {
 			return history.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
