@@ -37,7 +37,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 		long time = System.currentTimeMillis();
 		long micro = time;
 		Player conservativePlayer = Player.X;
-		int[][] stat = new int[episodes / 1000 / 2][7];
+		int[][] stat = new int[episodes / 1000 / 2][4];
         Map<State<A>, Player> history = new LinkedHashMap<>();
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
@@ -47,14 +47,14 @@ public class QLearningTemplate<A> implements Agent<A> {
 				writeHistory(history);
 				micro = System.currentTimeMillis();
 				if (conservativePlayer == Player.X) {
-					stat[counter][0] = i;
-					stat[counter][1] = statistics.getOrDefault(1.0, 0);
-					stat[counter][2] = statistics.getOrDefault(0.5, 0);
-					stat[counter][3] = statistics.getOrDefault(0.0, 0);
+					stat[counter][1] += statistics.getOrDefault(1.0, 0);
+					stat[counter][2] += statistics.getOrDefault(0.5, 0);
+					stat[counter][3] += statistics.getOrDefault(0.0, 0);
 				} else {
-					stat[counter][4] = statistics.getOrDefault(1.0, 0);
-					stat[counter][5] = statistics.getOrDefault(0.5, 0);
-					stat[counter][6] = statistics.getOrDefault(0.0, 0);
+					stat[counter][0] = i + 1;
+					stat[counter][3] += statistics.getOrDefault(1.0, 0);
+					stat[counter][2] += statistics.getOrDefault(0.5, 0);
+					stat[counter][1] += statistics.getOrDefault(0.0, 0);
 					counter++;
 				}
 				conservativePlayer = conservativePlayer == Player.X ? Player.O : Player.X;
