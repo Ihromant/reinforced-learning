@@ -42,7 +42,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
 			if (i % 1000 == 999) {
-				System.out.println("Learning " + 1.0 * i / episodes + "% complete, elapsed: " + (System
+				System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
 						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
 				writeHistory(history);
 				micro = System.currentTimeMillis();
