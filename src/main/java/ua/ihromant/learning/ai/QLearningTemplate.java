@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.nd4j.shade.jackson.databind.ObjectMapper;
@@ -18,7 +19,7 @@ import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
 public class QLearningTemplate<A> implements Agent<A> {
-    private static final double GAMMA = 1.0;
+    private static final double GAMMA = 0.95;
     private static final ObjectMapper mapper = new ObjectMapper();
     private final QTable<A> qTable;
 	private final State<A> baseState;
@@ -36,11 +37,11 @@ public class QLearningTemplate<A> implements Agent<A> {
 		long time = System.currentTimeMillis();
 		long micro = time;
 		Player conservativePlayer = Player.X;
-		int[][] stat = new int[episodes / 100 / 2][7];
+		int[][] stat = new int[episodes / 1000 / 2][7];
         Map<State<A>, Player> history = new LinkedHashMap<>();
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
-			if (i % 100 == 99) {
+			if (i % 1000 == 999) {
 				System.out.println("Learning " + 1.0 * i / episodes + "% complete, elapsed: " + (System
 						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
 				writeHistory(history);
@@ -63,7 +64,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			history = new LinkedHashMap<>();
 			Player player = state.getCurrent();
 			while (!state.isTerminal()) {
-				State<A> next = player == conservativePlayer ? decision(state) : eGreedy(state, history.isEmpty() ? 0.0 : 0.7);
+				State<A> next = player == conservativePlayer ? decision(state) : eGreedy(state, 0.95);
 				history.put(next, player);
 				state = next;
 				player = state.getCurrent();
@@ -102,20 +103,28 @@ public class QLearningTemplate<A> implements Agent<A> {
 
     private Map<State<A>, Double> convert(Map<State<A>, Player> history, State<A> finalState, Player lastMoved) {
 		double finalResult = finalState.getUtility(lastMoved);
+		Map<State<A>, Double> oldValues = qTable.getMultiple(history.keySet().stream());
+		List<State<A>> states = new ArrayList<>(history.keySet());
+		int size = states.size();
 		if (finalResult == 0.5) {
-			return history.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-					e -> 0.5));
+			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
+					i -> calculateValue(oldValues.get(states.get(i)), 0.5, size - i - 1)));
 		}
 		if (finalResult == 1.0) {
-			return history.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-					e -> e.getValue() == lastMoved ? 1.0 : 0.0));
+			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
+					i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved ? 1.0 : 0.0, size - i - 1)));
 		}
 		if (finalResult == 0.0) {
-			return history.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-					e -> e.getValue() == lastMoved ? 0.0 : 1.0));
+			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
+                    i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved ? 0.0 : 1.0, size - i - 1)));
 		}
 		throw new IllegalStateException();
 	}
+
+	private double calculateValue(double oldValue, double newValue, int dist) {
+        double coeff = Math.pow(GAMMA, dist);
+        return oldValue * (1 - coeff) + newValue * coeff;
+    }
 
 	private double getMaxNext(MonteCarloSearchThree<A> tree, State<A> base) {
 		List<State<A>> actions = base.getStates().collect(Collectors.toList());
