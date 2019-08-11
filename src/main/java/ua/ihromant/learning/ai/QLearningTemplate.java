@@ -112,13 +112,23 @@ public class QLearningTemplate<A> implements Agent<A> {
 		}
 		if (finalResult == 1.0) {
 			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
-					i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved ? 1.0 : 0.0, size - i - 1)));
+					i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved
+							? getWeightedWin(size) : getWeightedLoss(size), size - i - 1)));
 		}
 		if (finalResult == 0.0) {
 			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
-                    i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved ? 0.0 : 1.0, size - i - 1)));
+                    i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved
+							? getWeightedLoss(size) : getWeightedWin(size), size - i - 1)));
 		}
 		throw new IllegalStateException();
+	}
+
+	private double getWeightedWin(int moves) {
+		return 1.0 - 0.02 * (moves / 2 - 3);
+	}
+
+	private double getWeightedLoss(int moves) {
+		return 0.02 * (moves / 2 - 3);
 	}
 
 	private double calculateValue(double oldValue, double newValue, int dist) {
