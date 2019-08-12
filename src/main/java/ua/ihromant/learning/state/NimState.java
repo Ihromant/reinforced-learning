@@ -72,12 +72,12 @@ public class NimState implements State<NimAction> {
 	}
 
 	@Override
-	public double getUtility(Player player) {
+	public GameResult getUtility(Player player) {
 		if (!isTerminal()) {
-			return 0.5;
+			return GameResult.DRAW;
 		}
 
-		return this.current == player ? 1 : 0;
+		return this.current == player ? GameResult.WIN : GameResult.LOSE;
 	}
 
 	@Override

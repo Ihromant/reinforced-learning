@@ -1,6 +1,7 @@
 package ua.ihromant.learning.ai;
 
 import ua.ihromant.learning.agent.Agent;
+import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
@@ -21,19 +22,19 @@ public final class MinimaxTemplate<A> implements Agent<A> {
         return from.getStates().max(Comparator.comparing(this::minValue)).orElseThrow(IllegalStateException::new);
     }
 
-    private double maxValue(State<A> state) {
+    private GameResult maxValue(State<A> state) {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
         return state.getStates()
-                .mapToDouble(this::minValue).max().orElseThrow(IllegalStateException::new);
+                .map(this::minValue).max(Comparator.naturalOrder()).orElseThrow(IllegalStateException::new);
     }
 
-    private double minValue(State<A> state) {
+    private GameResult minValue(State<A> state) {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
         return state.getStates()
-                .mapToDouble(this::maxValue).min().orElseThrow(IllegalStateException::new);
+                .map(this::maxValue).min(Comparator.naturalOrder()).orElseThrow(IllegalStateException::new);
     }
 }

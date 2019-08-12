@@ -9,7 +9,7 @@ public interface State<A> {
 
     boolean isTerminal();
 
-    double getUtility(Player player);
+    GameResult getUtility(Player player);
 
     Player getCurrent();
 

@@ -67,16 +67,16 @@ public class TicTacToe5x6Test {
 
 	@Test
 	public void testUtility() {
-		Assertions.assertEquals(0.5, TicTacToeState5x6.from(RAND).getUtility(X));
-		Assertions.assertEquals(1.0, TicTacToeState5x6.from(HOR_WIN).getUtility(X));
-		Assertions.assertEquals(1.0, TicTacToeState5x6.from(VER_WIN).getUtility(X));
-		Assertions.assertEquals(1.0, TicTacToeState5x6.from(NORD_WEST_WIN).getUtility(X));
-		Assertions.assertEquals(0.0, TicTacToeState5x6.from(NORD_EAST_WIN).getUtility(X));
-		Assertions.assertEquals(0.5, TicTacToeState5x6.from(RAND).getUtility(O));
-		Assertions.assertEquals(0.0, TicTacToeState5x6.from(HOR_WIN).getUtility(O));
-		Assertions.assertEquals(0.0, TicTacToeState5x6.from(VER_WIN).getUtility(O));
-		Assertions.assertEquals(0.0, TicTacToeState5x6.from(NORD_WEST_WIN).getUtility(O));
-		Assertions.assertEquals(1.0, TicTacToeState5x6.from(NORD_EAST_WIN).getUtility(O));
+		Assertions.assertEquals(GameResult.DRAW, TicTacToeState5x6.from(RAND).getUtility(X));
+		Assertions.assertEquals(GameResult.WIN, TicTacToeState5x6.from(HOR_WIN).getUtility(X));
+		Assertions.assertEquals(GameResult.WIN, TicTacToeState5x6.from(VER_WIN).getUtility(X));
+		Assertions.assertEquals(GameResult.WIN, TicTacToeState5x6.from(NORD_WEST_WIN).getUtility(X));
+		Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x6.from(NORD_EAST_WIN).getUtility(X));
+		Assertions.assertEquals(GameResult.DRAW, TicTacToeState5x6.from(RAND).getUtility(O));
+		Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x6.from(HOR_WIN).getUtility(O));
+		Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x6.from(VER_WIN).getUtility(O));
+		Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x6.from(NORD_WEST_WIN).getUtility(O));
+		Assertions.assertEquals(GameResult.WIN, TicTacToeState5x6.from(NORD_EAST_WIN).getUtility(O));
 	}
 
 	@Test

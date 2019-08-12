@@ -87,13 +87,13 @@ public class TicTacToeState implements State<TTTAction> {
     }
 
     @Override
-    public double getUtility(Player player) {
+    public GameResult getUtility(Player player) {
         Player won = won();
         if (won == null) {
-            return 0.5;
+            return GameResult.DRAW;
         }
 
-        return player == won ? 1 : 0;
+        return player == won ? GameResult.WIN : GameResult.LOSE;
     }
 
     @Override

@@ -2,26 +2,29 @@ package ua.ihromant.learning.ai;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.nd4j.shade.jackson.databind.ObjectMapper;
 import ua.ihromant.learning.agent.Agent;
-import ua.ihromant.learning.ai.qtable.MonteCarloSearchThree;
 import ua.ihromant.learning.ai.qtable.QTable;
+import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
 public class QLearningTemplate<A> implements Agent<A> {
-    private static final double GAMMA = 0.95;
+	private static final double GAMMA = 0.95;
+	private static final double RANDOM_GAMMA = 0.1;
+    private static final int STEP = 1000;
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final QTable<A> qTable;
+	public static final double CONSERVATIVE = 0.7;
+	private final QTable<A> qTable;
 	private final State<A> baseState;
 	private final int episodes;
 
@@ -33,44 +36,42 @@ public class QLearningTemplate<A> implements Agent<A> {
 	}
 
 	private void init() {
-		Map<Double, Integer> statistics = new TreeMap<>();
+		Map<GameResult, Integer> statistics = new EnumMap<>(GameResult.class);
 		long time = System.currentTimeMillis();
 		long micro = time;
 		Player conservativePlayer = Player.X;
-		int[][] stat = new int[episodes / 1000 / 2][4];
-        Map<State<A>, Player> history = new LinkedHashMap<>();
+		int[][] stat = new int[episodes / STEP / 2][4];
+        List<HistoryItem<A>> history = new ArrayList<>();
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
-			if (i % 1000 == 999) {
+			if (i % STEP == STEP - 1) {
 				System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
 						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
 				writeHistory(history);
 				micro = System.currentTimeMillis();
 				if (conservativePlayer == Player.X) {
-					stat[counter][1] += statistics.getOrDefault(1.0, 0);
-					stat[counter][2] += statistics.getOrDefault(0.5, 0);
-					stat[counter][3] += statistics.getOrDefault(0.0, 0);
+					stat[counter][1] += statistics.getOrDefault(GameResult.WIN, 0);
+					stat[counter][2] += statistics.getOrDefault(GameResult.DRAW, 0);
+					stat[counter][3] += statistics.getOrDefault(GameResult.LOSE, 0);
 				} else {
 					stat[counter][0] = i + 1;
-					stat[counter][3] += statistics.getOrDefault(1.0, 0);
-					stat[counter][2] += statistics.getOrDefault(0.5, 0);
-					stat[counter][1] += statistics.getOrDefault(0.0, 0);
+					stat[counter][3] += statistics.getOrDefault(GameResult.WIN, 0);
+					stat[counter][2] += statistics.getOrDefault(GameResult.DRAW, 0);
+					stat[counter][1] += statistics.getOrDefault(GameResult.LOSE, 0);
 					counter++;
 				}
 				conservativePlayer = conservativePlayer == Player.X ? Player.O : Player.X;
 				statistics.clear();
 			}
 			State<A> state = baseState;
-			history = new LinkedHashMap<>();
+			history.clear();
 			Player player = state.getCurrent();
 			while (!state.isTerminal()) {
-				State<A> next = player == conservativePlayer ? decision(state) : eGreedy(state, 0.95);
-				history.put(next, player);
-				state = next;
+				state = getNextAction(state, history, player, conservativePlayer);
 				player = state.getCurrent();
 			}
-			qTable.setMultiple(convert(history, state, player));
-			double finalResult = state.getUtility(conservativePlayer);
+			qTable.setMultiple(convert(history));
+			GameResult finalResult = state.getUtility(conservativePlayer);
 			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
 		}
 		try {
@@ -81,19 +82,39 @@ public class QLearningTemplate<A> implements Agent<A> {
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}
 
-    private void writeHistory(Map<State<A>, Player> history) {
-	    List<State<A>> states = new ArrayList<>(history.keySet());
-        List<String[]> lines = states.stream()
-                .map(State::toString)
+	private State<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player,
+			Player conservativePlayer) {
+		if (history.isEmpty()) {
+			State<A> next = randomAction(from);
+			history.add(new HistoryItem<>(next, player, false));
+			return next;
+		}
+
+		if (player == conservativePlayer) {
+			State<A> next = decision(from);
+			history.add(new HistoryItem<>(next, player, false));
+			return next;
+		}
+
+		boolean random = ThreadLocalRandom.current().nextDouble() > CONSERVATIVE;
+
+		State<A> next = random ? randomAction(from) : decision(from);
+		history.add(new HistoryItem<>(next, player, random));
+		return next;
+	}
+
+    private void writeHistory(List<HistoryItem<A>> history) {
+        List<String[]> lines = history.stream()
+                .map(h -> h.getState().toString())
                 .map(s -> s.split("\n")).collect(Collectors.toList());
-        Map<State<A>, Double> evals = qTable.getMultiple(states.stream());
+        Map<State<A>, Double> evals = qTable.getMultiple(history.stream().map(HistoryItem::getState));
         String[] firstLine = lines.get(0);
-        for (int i = 0; i < states.size(); i++) {
-            System.out.print(String.format("%." + (lines.get(i)[0].length() - 1) + "f", evals.get(states.get(i))) + " ");
+        for (int i = 0; i < history.size(); i++) {
+            System.out.print(String.format("%." + (lines.get(i)[0].length() - 1) + "f", evals.get(history.get(i).getState())) + " ");
         }
         System.out.println();
         for (int i = 0; i < firstLine.length; i++) {
-            for (int j = 0; j < states.size(); j++) {
+            for (int j = 0; j < history.size(); j++) {
                System.out.print(lines.get(j)[i] + "  ");
             }
             System.out.println();
@@ -101,53 +122,50 @@ public class QLearningTemplate<A> implements Agent<A> {
         System.out.println();
     }
 
-    private Map<State<A>, Double> convert(Map<State<A>, Player> history, State<A> finalState, Player lastMoved) {
-		double finalResult = finalState.getUtility(lastMoved);
-		Map<State<A>, Double> oldValues = qTable.getMultiple(history.keySet().stream());
-		List<State<A>> states = new ArrayList<>(history.keySet());
-		int size = states.size();
-		if (finalResult == 0.5) {
-			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
-					i -> calculateValue(oldValues.get(states.get(i)), 0.5, size - i - 1)));
-		}
-		if (finalResult == 1.0) {
-			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
-					i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved
-							? getWeightedWin(size) : getWeightedLoss(size), size - i - 1)));
-		}
-		if (finalResult == 0.0) {
-			return IntStream.range(0, size).boxed().collect(Collectors.toMap(states::get,
-                    i -> calculateValue(oldValues.get(states.get(i)), history.get(states.get(i)) == lastMoved
-							? getWeightedLoss(size) : getWeightedWin(size), size - i - 1)));
-		}
-		throw new IllegalStateException();
+    private Map<State<A>, Double> convert(List<HistoryItem<A>> history) {
+		Map<State<A>, Double> oldValues = qTable.getMultiple(history.stream().map(HistoryItem::getState));
+	    int size = history.size();
+	    State<A> last = history.get(size - 1).getState();
+	    Player lastMoved = history.get(size - 1).getPlayer();
+	    GameResult result = last.getUtility(lastMoved);
+	    double coeff = 1.0;
+	    Map<State<A>, Double> converted = new HashMap<>();
+	    for (int i = history.size() - 1; i >= 0; i--) {
+	    	HistoryItem<A> item = history.get(i);
+	    	double baseValue;
+	    	if (result == GameResult.DRAW) {
+	    		baseValue = 0.5;
+		    } else {
+			    if (result == GameResult.WIN) {
+				    baseValue = item.getPlayer() == lastMoved ? getWeightedWin(size) : getWeightedLoss(size);
+			    }
+			    else {
+				    baseValue = item.getPlayer() == lastMoved ? getWeightedLoss(size) : getWeightedWin(size);
+			    }
+		    }
+	    	double oldValue = oldValues.get(item.getState());
+	    	double newFactor = item.isRandom() && oldValue > baseValue ? RANDOM_GAMMA : GAMMA;
+	    	coeff = coeff * newFactor;
+	    	converted.put(item.getState(), linear(oldValue, baseValue, coeff));
+	    }
+	    return converted;
+	}
+
+	private double linear(double oldValue, double newValue, double coeff) {
+		return oldValue * (1 - coeff) + newValue * coeff;
 	}
 
 	private double getWeightedWin(int moves) {
-		return 1.0 - 0.02 * (moves / 2 - 3);
+		return 1.0 - 0.02 * (moves / 2 - 2);
 	}
 
 	private double getWeightedLoss(int moves) {
-		return 0.02 * (moves / 2 - 3);
-	}
-
-	private double calculateValue(double oldValue, double newValue, int dist) {
-        double coeff = Math.pow(GAMMA, dist);
-        return oldValue * (1 - coeff) + newValue * coeff;
-    }
-
-	private double getMaxNext(MonteCarloSearchThree<A> tree, State<A> base) {
-		List<State<A>> actions = base.getStates().collect(Collectors.toList());
-		Map<State<A>, Double> rewards = getFilteredRewards(base.getStates(), base.getCurrent());
-		if (actions.size() != rewards.size()) {
-			rewards.putAll(tree.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
-		}
-		return rewards.entrySet().stream().mapToDouble(Map.Entry::getValue).max().orElse(0.0);
+		return 0.02 * (moves / 2 - 2);
 	}
 
 	private Map<State<A>, Double> getFilteredRewards(Stream<State<A>> actions, Player current) {
-		return actions.filter(act -> act.getUtility(current) != 0.5)
-				.collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current)));
+		return actions.filter(act -> act.getUtility(current) != GameResult.DRAW)
+				.collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current).toDouble()));
 	}
 
 	@Override

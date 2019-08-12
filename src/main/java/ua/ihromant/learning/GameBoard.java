@@ -44,14 +44,14 @@ public class GameBoard<A> {
 			state = ai.decision(state);
 		}
 		System.out.println(state);
-		switch ((int) state.getUtility(Player.X)) {
-			case 0:
+		switch (state.getUtility(Player.X)) {
+			case DRAW:
 				System.out.println("Draw!");
 				break;
-			case 1:
+			case WIN:
 				System.out.println("You won!");
 				break;
-			case -1:
+			case LOSE:
 				System.out.println("Computer won!");
 				break;
 		}
@@ -68,14 +68,14 @@ public class GameBoard<A> {
 			System.out.println(state.toString());
 		}
 		System.out.println(state);
-		switch ((int) state.getUtility(Player.O)) {
-			case 0:
+		switch (state.getUtility(Player.O)) {
+			case DRAW:
 				System.out.println("Draw!");
 				return;
-			case 1:
+			case WIN:
 				System.out.println("You won!");
 				return;
-			case -1:
+			case LOSE:
 				System.out.println("Computer won!");
 		}
 	}

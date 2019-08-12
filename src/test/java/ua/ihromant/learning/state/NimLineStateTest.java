@@ -5,11 +5,10 @@ import org.junit.jupiter.api.Test;
 
 public class NimLineStateTest {
 	private static final double[] standartModel =
-				   {0, 0, 0, 0, 1,
-					0, 0, 0, 1, 1,
-					0, 0, 1, 0, 1,
-					0, 0, 1, 1, 1,
-					0, 0, 0, 0, 0,
+				   {0, 0, 1,
+					0, 1, 1,
+					1, 0, 1,
+					1, 1, 1,
 					1};
 	@Test
 	public void testActions() {
