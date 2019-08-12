@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.nd4j.shade.jackson.databind.ObjectMapper;
@@ -42,12 +43,13 @@ public class QLearningTemplate<A> implements Agent<A> {
 		Player conservativePlayer = Player.X;
 		int[][] stat = new int[episodes / STEP / 2][4];
         List<HistoryItem<A>> history = new ArrayList<>();
+        List<List<HistoryItem<A>>> conservativeLoses = new ArrayList<>();
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
 			if (i % STEP == STEP - 1) {
 				System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
 						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
-				writeHistory(history);
+				IntStream.range(0, Math.min(conservativeLoses.size(), 3)).forEach(j -> writeHistory(conservativeLoses.get(j)));
 				micro = System.currentTimeMillis();
 				if (conservativePlayer == Player.X) {
 					stat[counter][1] += statistics.getOrDefault(GameResult.WIN, 0);
@@ -62,6 +64,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 				}
 				conservativePlayer = conservativePlayer == Player.X ? Player.O : Player.X;
 				statistics.clear();
+				conservativeLoses.clear();
 			}
 			State<A> state = baseState;
 			history.clear();
@@ -72,6 +75,9 @@ public class QLearningTemplate<A> implements Agent<A> {
 			}
 			qTable.setMultiple(convert(history));
 			GameResult finalResult = state.getUtility(conservativePlayer);
+			if (finalResult == GameResult.LOSE) {
+				conservativeLoses.add(new ArrayList<>(history));
+			}
 			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
 		}
 		try {
