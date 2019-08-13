@@ -1,6 +1,7 @@
 package ua.ihromant.learning.ai;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -115,6 +116,19 @@ public class QLearningTemplate<A> implements Agent<A> {
 		HistoryItem<A> result = new HistoryItem<>(next, player, random);
 		history.add(result);
 		return result;
+	}
+
+	@Override
+	public State<A> randomAction(State<A> from) {
+		List<State<A>> states = from.getStates().collect(Collectors.toList());
+		Map<State<A>, Double> evals = qTable.getMultiple(states.stream());
+		double[] weights = states.stream()
+				.mapToDouble(state -> Arrays.stream(GameResult.values())
+						.mapToDouble(val -> Math.abs(evals.get(state) - val.toDouble()))
+						.min().orElseThrow(RuntimeException::new)).toArray();
+		double sum = Arrays.stream(weights).sum();
+		int counter = -1;
+		return states.get(counter); // TODO
 	}
 
     private void writeHistory(List<HistoryItem<A>> history) {
