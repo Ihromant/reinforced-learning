@@ -99,6 +99,11 @@ public class NimState implements State<NimAction> {
 	}
 
 	@Override
+	public int getMaximumMoves() {
+		return Arrays.stream(piles).sum();
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;

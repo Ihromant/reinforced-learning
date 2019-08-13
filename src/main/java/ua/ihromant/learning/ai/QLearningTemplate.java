@@ -24,61 +24,74 @@ public class QLearningTemplate<A> implements Agent<A> {
 	private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
     private static final ObjectMapper mapper = new ObjectMapper();
-	public static final double CONSERVATIVE = 0.7;
+	private static final double CONSERVATIVE = 0.2;
 	private final QTable<A> qTable;
 	private final State<A> baseState;
 	private final int episodes;
+	private final double[] probabilities;
 
 	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes) {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.qTable = qTable;
+		this.probabilities = initProbabilities(baseState.getMaximumMoves() - 2, CONSERVATIVE);
 		init();
+	}
+
+	private double[] initProbabilities(int moves, double conservativeRate) {
+		double one = (1.0 - conservativeRate) / moves;
+		double[] result = new double[moves];
+		double multiplier = 1.0;
+		for (int i = 0; i < moves; i++) {
+			result[i] = one / multiplier;
+			multiplier = multiplier * (1 - result[i]);
+		}
+		return result;
 	}
 
 	private void init() {
 		Map<GameResult, Integer> statistics = new EnumMap<>(GameResult.class);
 		long time = System.currentTimeMillis();
 		long micro = time;
-		Player conservativePlayer = Player.X;
-		int[][] stat = new int[episodes / STEP / 2][4];
+		int[][] stat = new int[episodes / STEP][5];
         List<HistoryItem<A>> history = new ArrayList<>();
         List<List<HistoryItem<A>>> conservativeLoses = new ArrayList<>();
 		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
 			if (i % STEP == STEP - 1) {
 				System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
-						.currentTimeMillis() - micro) + " ms, statistics for player " + conservativePlayer + ": " + statistics);
+						.currentTimeMillis() - micro) + " ms, statistics for player X: " + statistics + " " +
+						", conservative loses size: " + conservativeLoses.size());
 				IntStream.range(0, Math.min(conservativeLoses.size(), 3)).forEach(j -> writeHistory(conservativeLoses.get(j)));
+				writeHistory(history);
 				micro = System.currentTimeMillis();
-				if (conservativePlayer == Player.X) {
-					stat[counter][1] += statistics.getOrDefault(GameResult.WIN, 0);
-					stat[counter][2] += statistics.getOrDefault(GameResult.DRAW, 0);
-					stat[counter][3] += statistics.getOrDefault(GameResult.LOSE, 0);
-				} else {
-					stat[counter][0] = i + 1;
-					stat[counter][3] += statistics.getOrDefault(GameResult.WIN, 0);
-					stat[counter][2] += statistics.getOrDefault(GameResult.DRAW, 0);
-					stat[counter][1] += statistics.getOrDefault(GameResult.LOSE, 0);
-					counter++;
-				}
-				conservativePlayer = conservativePlayer == Player.X ? Player.O : Player.X;
+
+				stat[counter][0] = i + 1;
+				stat[counter][1] += statistics.getOrDefault(GameResult.WIN, 0);
+				stat[counter][2] += statistics.getOrDefault(GameResult.DRAW, 0);
+				stat[counter][3] += statistics.getOrDefault(GameResult.LOSE, 0);
+				stat[counter][4] += conservativeLoses.size();
+				counter++;
+
 				statistics.clear();
 				conservativeLoses.clear();
 			}
 			State<A> state = baseState;
 			history.clear();
 			Player player = state.getCurrent();
+			boolean random = false;
 			while (!state.isTerminal()) {
-				state = getNextAction(state, history, player, conservativePlayer);
+				HistoryItem<A> action = getNextAction(state, history, player, random);
+				random = random || action.isRandom();
+				state = action.getState();
 				player = state.getCurrent();
 			}
 			qTable.setMultiple(convert(history));
-			GameResult finalResult = state.getUtility(conservativePlayer);
-			if (finalResult == GameResult.LOSE) {
+			GameResult finalResult = state.getUtility(Player.X);
+			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
+			if (!random && (finalResult == GameResult.LOSE || finalResult == GameResult.WIN)) {
 				conservativeLoses.add(new ArrayList<>(history));
 			}
-			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
 		}
 		try {
 			System.out.println("Extracted statictics: " + mapper.writeValueAsString(stat));
@@ -88,25 +101,20 @@ public class QLearningTemplate<A> implements Agent<A> {
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
 	}
 
-	private State<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player,
-			Player conservativePlayer) {
-		if (history.isEmpty()) {
+	private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player, boolean random) {
+		if (history.isEmpty() || history.size() == probabilities.length + 1) {
 			State<A> next = randomAction(from);
-			history.add(new HistoryItem<>(next, player, false));
-			return next;
+			HistoryItem<A> result = new HistoryItem<>(next, player, false);
+			history.add(result);
+			return result;
 		}
 
-		if (player == conservativePlayer) {
-			State<A> next = decision(from);
-			history.add(new HistoryItem<>(next, player, false));
-			return next;
-		}
-
-		boolean random = ThreadLocalRandom.current().nextDouble() > CONSERVATIVE;
+		random = !random && ThreadLocalRandom.current().nextDouble() < probabilities[history.size() - 1];
 
 		State<A> next = random ? randomAction(from) : decision(from);
-		history.add(new HistoryItem<>(next, player, random));
-		return next;
+		HistoryItem<A> result = new HistoryItem<>(next, player, random);
+		history.add(result);
+		return result;
 	}
 
     private void writeHistory(List<HistoryItem<A>> history) {
@@ -150,9 +158,9 @@ public class QLearningTemplate<A> implements Agent<A> {
 			    }
 		    }
 	    	double oldValue = oldValues.get(item.getState());
-	    	double newFactor = item.isRandom() && oldValue > baseValue ? RANDOM_GAMMA : GAMMA;
-	    	coeff = coeff * newFactor;
 	    	converted.put(item.getState(), linear(oldValue, baseValue, coeff));
+		    double newFactor = item.isRandom() && oldValue > baseValue ? RANDOM_GAMMA : GAMMA;
+		    coeff = coeff * newFactor;
 	    }
 	    return converted;
 	}
@@ -177,6 +185,10 @@ public class QLearningTemplate<A> implements Agent<A> {
 	@Override
 	public State<A> decision(State<A> state) {
 		List<State<A>> actions = state.getStates().collect(Collectors.toList());
+		if (actions.size() == 1) {
+			return actions.get(0);
+		}
+
 		Map<State<A>, Double> rewards = getFilteredRewards(state.getStates(), state.getCurrent());
 		if (actions.size() != rewards.size()) {
 			rewards.putAll(qTable.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));

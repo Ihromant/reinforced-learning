@@ -15,5 +15,7 @@ public interface State<A> {
 
     double[] toModel();
 
+    int getMaximumMoves();
+
     default Stream<State<A>> getStates() { return getActs().map(this::apply); }
 }

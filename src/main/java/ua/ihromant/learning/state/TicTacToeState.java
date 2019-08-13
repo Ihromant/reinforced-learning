@@ -60,6 +60,11 @@ public class TicTacToeState implements State<TTTAction> {
     }
 
     @Override
+    public int getMaximumMoves() {
+        return (int) IntStream.range(0, 9).filter(i -> players[i] == null).count();
+    }
+
+    @Override
     public Stream<TTTAction> getActs() {
         if (isTerminal()) {
             return Stream.empty();
