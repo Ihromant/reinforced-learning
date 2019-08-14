@@ -126,9 +126,15 @@ public class QLearningTemplate<A> implements Agent<A> {
 				.mapToDouble(state -> Arrays.stream(GameResult.values())
 						.mapToDouble(val -> Math.abs(evals.get(state) - val.toDouble()))
 						.min().orElseThrow(RuntimeException::new)).toArray();
-		double sum = Arrays.stream(weights).sum();
-		int counter = -1;
-		return states.get(counter); // TODO
+		double rand = ThreadLocalRandom.current().nextDouble(Arrays.stream(weights).sum());
+		double sum = 0.0;
+		for (int i = 0; i < states.size(); i++) {
+			sum += weights[i];
+			if (sum > rand) {
+				return states.get(i);
+			}
+		}
+		return states.get(states.size() - 1);
 	}
 
     private void writeHistory(List<HistoryItem<A>> history) {
