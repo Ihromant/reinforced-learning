@@ -54,29 +54,11 @@ public class QLearningTemplate<A> implements Agent<A> {
 		Map<GameResult, Integer> statistics = new EnumMap<>(GameResult.class);
 		long time = System.currentTimeMillis();
 		long micro = time;
-		int[][] stat = new int[episodes / STEP][5];
+		List<int[]> stat = new ArrayList<>(episodes / STEP);;
         List<HistoryItem<A>> history = new ArrayList<>();
         List<List<HistoryItem<A>>> conservativeLoses = new ArrayList<>();
-		int counter = 0;
 		for (int i = 0; i < episodes; i++) {
-			if (i % STEP == STEP - 1) {
-				System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
-						.currentTimeMillis() - micro) + " ms, statistics for player X: " + statistics + " " +
-						", conservative loses size: " + conservativeLoses.size());
-				IntStream.range(0, Math.min(conservativeLoses.size(), 3)).forEach(j -> writeHistory(conservativeLoses.get(j)));
-				writeHistory(history);
-				micro = System.currentTimeMillis();
-
-				stat[counter][0] = i + 1;
-				stat[counter][1] += statistics.getOrDefault(GameResult.WIN, 0);
-				stat[counter][2] += statistics.getOrDefault(GameResult.DRAW, 0);
-				stat[counter][3] += statistics.getOrDefault(GameResult.LOSE, 0);
-				stat[counter][4] += conservativeLoses.size();
-				counter++;
-
-				statistics.clear();
-				conservativeLoses.clear();
-			}
+			micro = logStats(statistics, micro, stat, history, conservativeLoses, i);
 			State<A> state = baseState;
 			history.clear();
 			Player player = state.getCurrent();
@@ -100,6 +82,25 @@ public class QLearningTemplate<A> implements Agent<A> {
 			throw new RuntimeException(e);
 		}
 		System.out.println("Learning for " + episodes + " took " + (System.currentTimeMillis() - time) + " ms");
+	}
+
+	private long logStats(Map<GameResult, Integer> statistics, long micro, List<int[]> stat,
+			List<HistoryItem<A>> history, List<List<HistoryItem<A>>> conservativeLoses, int i) {
+		if (i % STEP == STEP - 1) {
+			System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
+					.currentTimeMillis() - micro) + " ms, statistics for player X: " + statistics + " " +
+					", conservative loses size: " + conservativeLoses.size());
+			IntStream.range(0, Math.min(conservativeLoses.size(), 3)).forEach(j -> writeHistory(conservativeLoses.get(j)));
+			writeHistory(history);
+			micro = System.currentTimeMillis();
+
+			stat.add(new int[] {i + 1 ,statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
+					statistics.getOrDefault(GameResult.LOSE, 0), conservativeLoses.size()});
+
+			statistics.clear();
+			conservativeLoses.clear();
+		}
+		return micro;
 	}
 
 	private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player, boolean random) {
