@@ -107,9 +107,6 @@ public class NimLineState implements State<NimAction> {
 
 	@Override
 	public String toString() {
-		return "NimState{" +
-				"piles=" + Arrays.toString(piles) +
-				", current=" + current +
-				'}';
+		return current + ":" + Arrays.toString(piles);
 	}
 }
