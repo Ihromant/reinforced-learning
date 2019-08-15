@@ -19,12 +19,12 @@ import ua.ihromant.learning.ai.qtable.QTable;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
+import ua.ihromant.learning.util.ProbabilityUtil;
 
 public class QLearningTemplate<A> implements Agent<A> {
 	private static final double GAMMA = 0.95;
 	private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
-    private static final ObjectMapper mapper = new ObjectMapper();
 	private static final double CONSERVATIVE = 0.2;
 	private final QTable<A> qTable;
 	private final State<A> baseState;
@@ -35,19 +35,8 @@ public class QLearningTemplate<A> implements Agent<A> {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.qTable = qTable;
-		this.probabilities = initProbabilities(baseState.getMaximumMoves() - 2, CONSERVATIVE);
+		this.probabilities = ProbabilityUtil.getOneTimeProbabilities(baseState.getMaximumMoves() - 2, CONSERVATIVE);
 		init();
-	}
-
-	private double[] initProbabilities(int moves, double conservativeRate) {
-		double one = (1.0 - conservativeRate) / moves;
-		double[] result = new double[moves];
-		double multiplier = 1.0;
-		for (int i = 0; i < moves; i++) {
-			result[i] = one / multiplier;
-			multiplier = multiplier * (1 - result[i]);
-		}
-		return result;
 	}
 
 	private void init() {
@@ -78,7 +67,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			}
 		}
 		try {
-			System.out.println("Extracted statictics: " + mapper.writeValueAsString(stat));
+			System.out.println("Extracted statictics: " + new ObjectMapper().writeValueAsString(stat));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -132,15 +121,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 				.mapToDouble(state -> Arrays.stream(GameResult.values())
 						.mapToDouble(val -> Math.abs(evals.get(state) - val.toDouble()))
 						.min().orElseThrow(RuntimeException::new)).toArray();
-		double rand = ThreadLocalRandom.current().nextDouble(Arrays.stream(weights).sum());
-		double sum = 0.0;
-		for (int i = 0; i < states.size(); i++) {
-			sum += weights[i];
-			if (sum > rand) {
-				return states.get(i);
-			}
-		}
-		return states.get(states.size() - 1);
+		return states.get(ProbabilityUtil.weightedRandom(weights));
 	}
 
     private void writeHistory(List<HistoryItem<A>> history) {
