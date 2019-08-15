@@ -95,7 +95,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			writeHistory(history);
 			micro = System.currentTimeMillis();
 
-			stat.add(new int[] {i + 1 ,statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
+			stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
 					statistics.getOrDefault(GameResult.LOSE, 0), conservativeLoses.size()});
 
 			statistics.clear();
