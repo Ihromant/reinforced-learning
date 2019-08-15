@@ -59,8 +59,9 @@ public class QLearningTemplate<A> implements Agent<A> {
         List<List<HistoryItem<A>>> conservativeLoses = new ArrayList<>();
 		for (int i = 0; i < episodes; i++) {
 			micro = logStats(statistics, micro, stat, history, conservativeLoses, i);
-			State<A> state = baseState;
 			history.clear();
+
+			State<A> state = baseState;
 			Player player = state.getCurrent();
 			boolean random = false;
 			while (!state.isTerminal()) {
