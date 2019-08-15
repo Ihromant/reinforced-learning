@@ -92,7 +92,7 @@ public class NimState implements State<NimAction> {
 		for (int i = 0; i < PILES_MAX && i < piles.length; i++) {
 			char[] binary = Integer.toBinaryString(piles[i]).toCharArray();
 			for (int j = 0; j < binary.length && j < BINARY_NUMBERS; j++) {
-				result[i * BINARY_NUMBERS + BINARY_NUMBERS - 1 - j] = binary[j] - '0';
+				result[i * BINARY_NUMBERS + BINARY_NUMBERS - 1 - j] = binary[binary.length - 1 - j] - '0';
 			}
 		}
 		return result;
