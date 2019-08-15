@@ -45,9 +45,10 @@ public class QLearningTemplate<A> implements Agent<A> {
 		long micro = time;
 		List<int[]> stat = new ArrayList<>(episodes / STEP);;
         List<HistoryItem<A>> history = new ArrayList<>();
-        List<List<HistoryItem<A>>> conservativeLoses = new ArrayList<>();
+        List<List<HistoryItem<A>>> conservativeWrong = new ArrayList<>();
+        GameResult expectedResult = baseState.getExpectedResult(Player.X);
 		for (int i = 0; i < episodes; i++) {
-			micro = logStats(statistics, micro, stat, history, conservativeLoses, i);
+			micro = logStats(statistics, micro, stat, history, conservativeWrong, i);
 			history.clear();
 
 			State<A> state = baseState;
@@ -62,8 +63,8 @@ public class QLearningTemplate<A> implements Agent<A> {
 			qTable.setMultiple(convert(history));
 			GameResult finalResult = state.getUtility(Player.X);
 			statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
-			if (!random && (finalResult == GameResult.LOSE || finalResult == GameResult.WIN)) {
-				conservativeLoses.add(new ArrayList<>(history));
+			if (!random && finalResult != expectedResult) {
+				conservativeWrong.add(new ArrayList<>(history));
 			}
 		}
 		try {
@@ -75,19 +76,19 @@ public class QLearningTemplate<A> implements Agent<A> {
 	}
 
 	private long logStats(Map<GameResult, Integer> statistics, long micro, List<int[]> stat,
-			List<HistoryItem<A>> history, List<List<HistoryItem<A>>> conservativeLoses, int i) {
+			List<HistoryItem<A>> history, List<List<HistoryItem<A>>> conservativeWrong, int i) {
 		if (i % STEP == STEP - 1) {
 			long res = System.currentTimeMillis();
 			System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (res - micro) + " ms, " +
-					"statistics for player X: " + statistics + ", conservative loses size: " + conservativeLoses.size());
-			IntStream.range(0, Math.min(conservativeLoses.size(), 3)).forEach(j -> writeHistory(conservativeLoses.get(j)));
+					"statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
+			IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> writeHistory(conservativeWrong.get(j)));
 			writeHistory(history);
 
 			stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
-					statistics.getOrDefault(GameResult.LOSE, 0), conservativeLoses.size()});
+					statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
 
 			statistics.clear();
-			conservativeLoses.clear();
+			conservativeWrong.clear();
 			return res;
 		}
 		return micro;

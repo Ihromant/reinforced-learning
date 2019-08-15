@@ -139,6 +139,11 @@ public class TicTacToeState5x5 implements State<TTTAction> {
 	}
 
 	@Override
+	public GameResult getExpectedResult(Player pl) {
+		return GameResult.DRAW;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < SIZE + 2; i++) {

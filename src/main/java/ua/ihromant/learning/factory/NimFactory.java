@@ -12,7 +12,7 @@ import ua.ihromant.learning.state.NimState;
 import ua.ihromant.learning.state.State;
 
 public class NimFactory implements Factory<NimAction> {
-	int[] base = {1, 3, 5, 7};
+	private static final int[] base = {1, 3, 5, 7};
 	@Override
 	public Supplier<State<NimAction>> getStateSupplier() {
 		return () -> new NimState(base);
@@ -30,6 +30,6 @@ public class NimFactory implements Factory<NimAction> {
 
 	@Override
 	public int trainingEpisodes() {
-		return 300000;
+		return 100000;
 	}
 }

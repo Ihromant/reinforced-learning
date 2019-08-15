@@ -134,4 +134,9 @@ public class TicTacToeState implements State<TTTAction> {
     public int hashCode() {
         return Arrays.hashCode(players);
     }
+
+    @Override
+    public GameResult getExpectedResult(Player pl) {
+        return GameResult.DRAW;
+    }
 }

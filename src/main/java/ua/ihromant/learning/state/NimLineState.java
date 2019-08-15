@@ -86,6 +86,11 @@ public class NimLineState implements State<NimAction> {
 	}
 
 	@Override
+	public GameResult getExpectedResult(Player pl) {
+		return Arrays.stream(piles).reduce((a, b) -> a ^ b).orElse(0) == 0 ^ pl == Player.X ? GameResult.WIN : GameResult.LOSE;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
