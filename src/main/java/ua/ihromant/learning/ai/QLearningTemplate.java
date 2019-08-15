@@ -88,9 +88,9 @@ public class QLearningTemplate<A> implements Agent<A> {
 	private long logStats(Map<GameResult, Integer> statistics, long micro, List<int[]> stat,
 			List<HistoryItem<A>> history, List<List<HistoryItem<A>>> conservativeLoses, int i) {
 		if (i % STEP == STEP - 1) {
-			System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (System
-					.currentTimeMillis() - micro) + " ms, statistics for player X: " + statistics + " " +
-					", conservative loses size: " + conservativeLoses.size());
+			long res = System.currentTimeMillis();
+			System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (res - micro) + " ms, " +
+					"statistics for player X: " + statistics + ", conservative loses size: " + conservativeLoses.size());
 			IntStream.range(0, Math.min(conservativeLoses.size(), 3)).forEach(j -> writeHistory(conservativeLoses.get(j)));
 			writeHistory(history);
 
@@ -99,7 +99,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 
 			statistics.clear();
 			conservativeLoses.clear();
-			return System.currentTimeMillis();
+			return res;
 		}
 		return micro;
 	}
