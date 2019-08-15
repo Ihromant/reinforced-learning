@@ -123,6 +123,10 @@ public class QLearningTemplate<A> implements Agent<A> {
 	@Override
 	public State<A> randomAction(State<A> from) {
 		List<State<A>> states = from.getStates().collect(Collectors.toList());
+		if (states.size() == 1) {
+			return states.get(0);
+		}
+
 		Map<State<A>, Double> evals = qTable.getMultiple(states.stream());
 		double[] weights = states.stream()
 				.mapToDouble(state -> Arrays.stream(GameResult.values())
