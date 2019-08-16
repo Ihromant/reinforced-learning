@@ -11,12 +11,12 @@ import ua.ihromant.learning.ai.qtable.WinDrawLoseConverter;
 import ua.ihromant.learning.ai.qtable.converter.TicTacToeStateConverter;
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.state.TTTAction;
-import ua.ihromant.learning.state.TicTacToeState;
+import ua.ihromant.learning.state.TicTacToeState3x3;
 
 public class TicTacToeFactory implements Factory<TTTAction> {
 	@Override
 	public Supplier<State<TTTAction>> getStateSupplier() {
-		return TicTacToeState::new;
+		return TicTacToeState3x3::new;
 	}
 
 	@Override

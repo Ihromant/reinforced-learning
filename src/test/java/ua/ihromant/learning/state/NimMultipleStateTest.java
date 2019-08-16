@@ -3,7 +3,7 @@ package ua.ihromant.learning.state;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class NimStateTest {
+public class NimMultipleStateTest {
 	private static final double[] standartModel =
 			       {0, 0, 1,
 					0, 1, 1,
@@ -20,18 +20,18 @@ public class NimStateTest {
 
 	@Test
 	public void testActions() {
-		NimState state = new NimState(new int[] {1, 2, 2});
+		NimMultipleState state = new NimMultipleState(new int[] {1, 2, 2});
 		Assertions.assertEquals(10, state.getActs().count());
 
-		state = new NimState(new int[] {1, 3, 5, 7});
+		state = new NimMultipleState(new int[] {1, 3, 5, 7});
 		Assertions.assertEquals(37, state.getActs().count());
 	}
 
 	@Test
 	public void testToModel() {
-		NimState state = new NimState(new int[] {1, 3, 5, 7});
+		NimMultipleState state = new NimMultipleState(new int[] {1, 3, 5, 7});
 		Assertions.assertArrayEquals(state.toModel(), standartModel);
-		state = new NimState(new int[] {1, 2});
+		state = new NimMultipleState(new int[] {1, 2});
 		Assertions.assertArrayEquals(state.toModel(), testModel);
 	}
 }

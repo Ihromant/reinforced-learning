@@ -12,7 +12,7 @@ public class NetworkQTableTest {
 
 //	@Test
 //	public void testQNetworkBatch() {
-//		State<TTTAction> baseState = new TicTacToeState();
+//		State<TTTAction> baseState = new TicTacToeState3x3();
 //		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextState = baseState.apply(act);
 //		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
@@ -38,7 +38,7 @@ public class NetworkQTableTest {
 //
 //	@Test
 //	public void testQNetworkMultiple() {
-//		State<TTTAction> baseState = new TicTacToeState();
+//		State<TTTAction> baseState = new TicTacToeState3x3();
 //		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextState = baseState.apply(act);
 //		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
@@ -53,7 +53,7 @@ public class NetworkQTableTest {
 //
 //	@Test
 //	public void testQNetworkMultiple1() {
-//		State<TTTAction> baseState = new TicTacToeState();
+//		State<TTTAction> baseState = new TicTacToeState3x3();
 //		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextState = baseState.apply(act);
 //		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];

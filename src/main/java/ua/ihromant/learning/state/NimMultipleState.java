@@ -5,17 +5,17 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class NimLineState implements NimState {
+public class NimMultipleState implements NimState {
 	private static final int PILES_MAX = 4;
 	private static final int BINARY_NUMBERS = 3;
 	private final int[] piles;
 	private final Player current;
 
-	public NimLineState(int[] piles) {
+	public NimMultipleState(int[] piles) {
 		this(piles, Player.X);
 	}
 
-	private NimLineState(int[] piles, Player player) {
+	private NimMultipleState(int[] piles, Player player) {
 		this.piles = Arrays.stream(piles).sorted().filter(i -> i != 0).toArray();
 		this.current = player;
 	}
@@ -31,21 +31,39 @@ public class NimLineState implements NimState {
 				.flatMap(red -> {
 					int[] coeffsBigger = IntStream.range(0, piles.length)
 							.filter(i -> piles[i] >= red).toArray();
-					return Arrays.stream(coeffsBigger)
-							.mapToObj(coeff -> new NimAction(coeff, red));
+					return powerSetNotEpmty(coeffsBigger).map(coeffs -> new NimAction(coeffs, red));
 				});
 	}
 
 	@Override
 	public State<NimAction> apply(NimAction action) {
-		return new NimLineState(take(this.piles, action.getCoeffs()[0], action.getReduce()),
+		return new NimMultipleState(take(this.piles, action.getCoeffs(), action.getReduce()),
 						this.current == Player.X ? Player.O : Player.X);
 	}
 
-	private static int[] take(int[] from, int idx, int reduce) {
+	private static int[] take(int[] from, int[] indices, int reduce) {
 		int[] result = Arrays.copyOf(from, from.length);
-		result[idx] = result[idx] - reduce;
+		for (int i : indices) {
+			result[i] = result[i] - reduce;
+		}
 		return result;
+	}
+
+	private static Stream<int[]> powerSetNotEpmty(int[] base) {
+		return IntStream.range(1, 1 << base.length)
+				.mapToObj(i -> {
+					int[] res = new int[Integer.bitCount(i)];
+					int counter = 0;
+					int idx = 0;
+					while (i != 0) {
+						if (i % 2 == 1) {
+							res[idx++] = base[counter];
+						}
+						counter++;
+						i = i / 2;
+					}
+					return res;
+				});
 	}
 
 	@Override
@@ -74,7 +92,7 @@ public class NimLineState implements NimState {
 		for (int i = 0; i < PILES_MAX && i < piles.length; i++) {
 			char[] binary = Integer.toBinaryString(piles[i]).toCharArray();
 			for (int j = 0; j < binary.length && j < BINARY_NUMBERS; j++) {
-				result[i * BINARY_NUMBERS + BINARY_NUMBERS - 1 - j] = binary[binary.length  - 1 - j] - '0';
+				result[i * BINARY_NUMBERS + BINARY_NUMBERS - 1 - j] = binary[binary.length - 1 - j] - '0';
 			}
 		}
 		return result;
@@ -91,11 +109,6 @@ public class NimLineState implements NimState {
 	}
 
 	@Override
-	public GameResult getExpectedResult(Player pl) {
-		return Arrays.stream(piles).reduce((a, b) -> a ^ b).orElse(0) == 0 ^ pl == Player.X ? GameResult.WIN : GameResult.LOSE;
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
 			return true;
@@ -103,9 +116,9 @@ public class NimLineState implements NimState {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		NimLineState nimState = (NimLineState) o;
-		return Arrays.equals(piles, nimState.piles) &&
-				current == nimState.current;
+		NimMultipleState nimMultipleState = (NimMultipleState) o;
+		return Arrays.equals(piles, nimMultipleState.piles) &&
+				current == nimMultipleState.current;
 	}
 
 	@Override

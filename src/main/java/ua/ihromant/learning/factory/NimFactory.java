@@ -10,14 +10,14 @@ import ua.ihromant.learning.ai.qtable.converter.NimStateConverter;
 import ua.ihromant.learning.ai.qtable.converter.QValueConverter;
 import ua.ihromant.learning.ai.qtable.WinLoseConverter;
 import ua.ihromant.learning.state.NimAction;
-import ua.ihromant.learning.state.NimState;
+import ua.ihromant.learning.state.NimMultipleState;
 import ua.ihromant.learning.state.State;
 
 public class NimFactory implements Factory<NimAction> {
 	private static final int[] base = {1, 3, 5, 7};
 	@Override
 	public Supplier<State<NimAction>> getStateSupplier() {
-		return () -> new NimState(base);
+		return () -> new NimMultipleState(base);
 	}
 
 	@Override

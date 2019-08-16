@@ -7,7 +7,7 @@ import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class TicTacToeState5x6 implements ITicTacToeState {
+public class TicTacToeState5x6 implements TicTacToeState {
 	private static final int HOR_SIZE = 5;
 	private static final int VER_SIZE = 6;
 	private static final int WON = 4;
