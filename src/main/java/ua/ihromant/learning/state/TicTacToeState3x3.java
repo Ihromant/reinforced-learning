@@ -46,24 +46,6 @@ public class TicTacToeState3x3 implements State<TTTAction> {
     }
 
     @Override
-    public double[] toModel() {
-        double[] result = new double[3 * 9];
-        IntStream.range(0, 9)
-                .forEach(i -> {
-                    if (players[i] == Player.X) {
-                        result[i] = 1;
-                    }
-                    if (players[i] == Player.O) {
-                        result[i + 9] = 1;
-                    }
-                    if (players[i] == null) {
-                        result[i + 18] = 1;
-                    }
-                });
-        return result;
-    }
-
-    @Override
     public int getMaximumMoves() {
         return (int) IntStream.range(0, 9).filter(i -> players[i] == null).count();
     }

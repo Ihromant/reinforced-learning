@@ -76,25 +76,6 @@ public class TicTacToeState5x5 implements TicTacToeState {
 	}
 
 	@Override
-	public double[] toModel() {
-		double[] result = new double[3 * SIZE * SIZE];
-		IntStream.range(0, SIZE * SIZE)
-				.forEach(i -> {
-					Player pl = getPlayer(i);
-					if (pl == Player.X) {
-						result[i] = 1;
-					}
-					if (pl == Player.O) {
-						result[i + SIZE * SIZE] = 1;
-					}
-					if (pl == null) {
-						result[i + SIZE * SIZE * 2] = 1;
-					}
-				});
-		return result;
-	}
-
-	@Override
 	public int getMaximumMoves() {
 		return SIZE * SIZE - Long.bitCount(plrz & TERMINAL_MASK);
 	}

@@ -86,19 +86,6 @@ public class NimMultipleState implements NimState {
 	}
 
 	@Override
-	public double[] toModel() {
-		double[] result = new double[PILES_MAX * BINARY_NUMBERS + 1];
-		result[result.length - 1] = getCurrent() == Player.X ? 1 : 0;
-		for (int i = 0; i < PILES_MAX && i < piles.length; i++) {
-			char[] binary = Integer.toBinaryString(piles[i]).toCharArray();
-			for (int j = 0; j < binary.length && j < BINARY_NUMBERS; j++) {
-				result[i * BINARY_NUMBERS + BINARY_NUMBERS - 1 - j] = binary[binary.length - 1 - j] - '0';
-			}
-		}
-		return result;
-	}
-
-	@Override
 	public int getMaximumMoves() {
 		return Arrays.stream(piles).sum();
 	}
