@@ -96,7 +96,7 @@ public class TicTacToeState5x6 implements State<TTTAction> {
 
 	@Override
 	public int getMaximumMoves() {
-		return (int) IntStream.range(0, HOR_SIZE * VER_SIZE).filter(i -> !isAssigned(i)).count();
+		return HOR_SIZE * VER_SIZE - Long.bitCount(plrz & TERMINAL_MASK);
 	}
 
 	@Override

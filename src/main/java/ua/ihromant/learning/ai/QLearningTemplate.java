@@ -25,17 +25,16 @@ public class QLearningTemplate<A> implements Agent<A> {
 	private static final double GAMMA = 0.95;
 	private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
-	private static final double CONSERVATIVE = 0.2;
+	private static final double CONSERVATIVE = 0.8;
 	private final QTable<A> qTable;
 	private final State<A> baseState;
 	private final int episodes;
-	private final double[] probabilities;
 
 	public QLearningTemplate(State<A> baseState, QTable<A> qTable, int episodes) {
 		this.baseState = baseState;
 		this.episodes = episodes;
 		this.qTable = qTable;
-		this.probabilities = ProbabilityUtil.getOneTimeProbabilities(baseState.getMaximumMoves() - 2, CONSERVATIVE);
+		//this.probabilities = ProbabilityUtil.getOneTimeProbabilities(baseState.getMaximumMoves() - 2, CONSERVATIVE);
 		init();
 	}
 
@@ -55,7 +54,7 @@ public class QLearningTemplate<A> implements Agent<A> {
 			Player player = state.getCurrent();
 			boolean random = false;
 			while (!state.isTerminal()) {
-				HistoryItem<A> action = getNextAction(state, history, player, random);
+				HistoryItem<A> action = getNextAction(state, history, player);
 				random = random || action.isRandom();
 				state = action.getState();
 				player = state.getCurrent();
@@ -94,15 +93,15 @@ public class QLearningTemplate<A> implements Agent<A> {
 		return micro;
 	}
 
-	private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player, boolean random) {
-		if (history.isEmpty() || history.size() == probabilities.length + 1) {
+	private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player) {
+		if (history.isEmpty()) {
 			State<A> next = randomAction(from);
 			HistoryItem<A> result = new HistoryItem<>(next, player, false);
 			history.add(result);
 			return result;
 		}
 
-		random = !random && ThreadLocalRandom.current().nextDouble() < probabilities[history.size() - 1];
+		boolean random = ThreadLocalRandom.current().nextDouble() > CONSERVATIVE;
 
 		State<A> next = random ? randomAction(from) : decision(from);
 		HistoryItem<A> result = new HistoryItem<>(next, player, random);

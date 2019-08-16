@@ -29,6 +29,6 @@ public class TicTacToe5x5Factory implements Factory<TTTAction> {
 
 	@Override
 	public int trainingEpisodes() {
-		return 100000;
+		return 300000;
 	}
 }
