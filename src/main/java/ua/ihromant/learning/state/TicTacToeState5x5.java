@@ -7,7 +7,7 @@ import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class TicTacToeState5x5 implements State<TTTAction> {
+public class TicTacToeState5x5 implements ITicTacToeState {
 	private static final int SIZE = 5;
 	private static final int WON = 4;
 	private long plrz;
@@ -62,7 +62,8 @@ public class TicTacToeState5x5 implements State<TTTAction> {
 		}
 	}
 
-	private Player getPlayer(int position) {
+	@Override
+	public Player getPlayer(int position) {
 		if (!get(position * 2)) {
 			return null;
 		}

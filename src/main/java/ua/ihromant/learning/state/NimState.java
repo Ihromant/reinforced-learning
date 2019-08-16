@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class NimState implements State<NimAction> {
+public class NimState implements INimState {
 	private static final int PILES_MAX = 4;
 	private static final int BINARY_NUMBERS = 3;
 	private final int[] piles;
@@ -101,6 +101,11 @@ public class NimState implements State<NimAction> {
 	@Override
 	public int getMaximumMoves() {
 		return Arrays.stream(piles).sum();
+	}
+
+	@Override
+	public int[] getPiles() {
+		return piles;
 	}
 
 	@Override

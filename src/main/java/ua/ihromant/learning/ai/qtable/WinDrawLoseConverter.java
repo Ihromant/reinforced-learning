@@ -1,14 +1,11 @@
 package ua.ihromant.learning.ai.qtable;
 
-public class WinDrawLoseConverter implements NeuralNetworkConverter {
+import ua.ihromant.learning.ai.qtable.converter.QValueConverter;
+
+public class WinDrawLoseConverter implements QValueConverter {
 	private double[] WIN = {1, 0, 0};
 	private double[] LOSE = {0, 0, 1};
 	private double[] DRAW = {0, 1, 0};
-	private final int inputLength;
-
-	public WinDrawLoseConverter(int inputLength) {
-		this.inputLength = inputLength;
-	}
 
 	@Override
 	public double convertToQValue(double[] values) {
@@ -33,11 +30,6 @@ public class WinDrawLoseConverter implements NeuralNetworkConverter {
 			return new double[] {2 * value - 1, 2 - 2 * value, 0};
 		}
 		return DRAW; // never, but in case of NAN etc.
-	}
-
-	@Override
-	public int inputLength() {
-		return inputLength;
 	}
 
 	@Override

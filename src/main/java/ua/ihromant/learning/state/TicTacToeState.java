@@ -34,6 +34,10 @@ public class TicTacToeState implements State<TTTAction> {
         players[nextMove] = getCurrent();
     }
 
+    public Player getPlayer(int position) {
+        return players[position];
+    }
+
     @Override
     public Player getCurrent() {
         return IntStream.range(0, 9)

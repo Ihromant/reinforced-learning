@@ -7,7 +7,7 @@ import ua.ihromant.learning.factory.TicTacToe5x6Factory;
 import ua.ihromant.learning.factory.TicTacToeFactory;
 
 public class Main {
-    private static final Factory<?> factory = new TicTacToeFactory();
+    private static final Factory<?> factory = new NimLineFactory();
     public static void main(String[] args) {
         factory.createBoard().play();
     }

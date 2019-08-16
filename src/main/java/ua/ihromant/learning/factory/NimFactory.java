@@ -5,7 +5,9 @@ import java.util.function.Supplier;
 
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.agent.NimPlayer;
-import ua.ihromant.learning.ai.qtable.NeuralNetworkConverter;
+import ua.ihromant.learning.ai.qtable.converter.InputConverter;
+import ua.ihromant.learning.ai.qtable.converter.NimStateConverter;
+import ua.ihromant.learning.ai.qtable.converter.QValueConverter;
 import ua.ihromant.learning.ai.qtable.WinLoseConverter;
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.NimState;
@@ -24,8 +26,13 @@ public class NimFactory implements Factory<NimAction> {
 	}
 
 	@Override
-	public NeuralNetworkConverter converter() {
-		return new WinLoseConverter(getStateSupplier().get().toModel().length);
+	public QValueConverter converter() {
+		return new WinLoseConverter();
+	}
+
+	@Override
+	public InputConverter conv() {
+		return new NimStateConverter();
 	}
 
 	@Override

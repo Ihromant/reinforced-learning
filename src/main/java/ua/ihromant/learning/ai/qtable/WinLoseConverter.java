@@ -1,13 +1,10 @@
 package ua.ihromant.learning.ai.qtable;
 
-public class WinLoseConverter implements NeuralNetworkConverter {
+import ua.ihromant.learning.ai.qtable.converter.QValueConverter;
+
+public class WinLoseConverter implements QValueConverter {
 	private double[] WIN = {1, 0};
 	private double[] LOSE = {0, 1};
-	private final int inputLength;
-
-	public WinLoseConverter(int inputLength) {
-		this.inputLength = inputLength;
-	}
 
 	@Override
 	public double convertToQValue(double[] values) {
@@ -28,12 +25,6 @@ public class WinLoseConverter implements NeuralNetworkConverter {
 
 		return LOSE; // never, but in case of NAN etc.
 	}
-
-	@Override
-	public int inputLength() {
-		return inputLength;
-	}
-
 
 	@Override
 	public int outputLength() {

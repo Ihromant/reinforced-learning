@@ -39,6 +39,11 @@ public class MapQTable<A> implements MonteCarloSearchThree<A> {
 	}
 
 	@Override
+	public void serialize(String path) {
+		// TODO
+	}
+
+	@Override
 	public Map<State<A>, Double> getTree() {
 		return qStates;
 	}

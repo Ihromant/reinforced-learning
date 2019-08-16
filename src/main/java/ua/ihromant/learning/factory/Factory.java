@@ -7,7 +7,8 @@ import ua.ihromant.learning.GameBoard;
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.ai.QLearningTemplate;
 import ua.ihromant.learning.ai.qtable.NetworkQTable;
-import ua.ihromant.learning.ai.qtable.NeuralNetworkConverter;
+import ua.ihromant.learning.ai.qtable.converter.InputConverter;
+import ua.ihromant.learning.ai.qtable.converter.QValueConverter;
 import ua.ihromant.learning.state.State;
 
 public interface Factory<A> {
@@ -15,13 +16,15 @@ public interface Factory<A> {
 
 	Agent<A> player(Scanner scan);
 
-	NeuralNetworkConverter converter();
+	QValueConverter converter();
+
+	InputConverter conv();
 
 	int trainingEpisodes();
 
 	default Agent<A> createAI() {
 		return new QLearningTemplate<>(getStateSupplier().get(),
-				new NetworkQTable<>(converter()), trainingEpisodes());
+				new NetworkQTable<>(conv(), converter()), trainingEpisodes());
 	}
 
 	default GameBoard<A> createBoard() {

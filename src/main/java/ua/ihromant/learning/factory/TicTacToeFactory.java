@@ -5,8 +5,10 @@ import java.util.function.Supplier;
 
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.agent.TicTacToePlayer;
-import ua.ihromant.learning.ai.qtable.NeuralNetworkConverter;
+import ua.ihromant.learning.ai.qtable.converter.InputConverter;
+import ua.ihromant.learning.ai.qtable.converter.QValueConverter;
 import ua.ihromant.learning.ai.qtable.WinDrawLoseConverter;
+import ua.ihromant.learning.ai.qtable.converter.TicTacToeStateConverter;
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;
@@ -23,8 +25,13 @@ public class TicTacToeFactory implements Factory<TTTAction> {
 	}
 
 	@Override
-	public NeuralNetworkConverter converter() {
-		return new WinDrawLoseConverter(new TicTacToeState().toModel().length);
+	public QValueConverter converter() {
+		return new WinDrawLoseConverter();
+	}
+
+	@Override
+	public InputConverter conv() {
+		return new TicTacToeStateConverter(9);
 	}
 
 	@Override
