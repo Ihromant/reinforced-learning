@@ -31,4 +31,8 @@ public class ProbabilityUtil {
 		}
 		return length - 1;
 	}
+
+	public static double calculateExploration(int consSize, int maxMoves) {
+		return 1 - Math.pow(1 - Math.pow(0.5, consSize + Math.log(0.8) / Math.log(0.5)), 0.5 / Math.sqrt(maxMoves));
+	}
 }

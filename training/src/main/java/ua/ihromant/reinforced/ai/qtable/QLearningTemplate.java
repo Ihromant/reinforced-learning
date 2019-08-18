@@ -40,7 +40,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     "statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
             IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> writeHistory(conservativeWrong.get(j)));
             writeHistory(history);
-            updateExploration(conservativeWrong.size());
+            updateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
 
             stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
                     statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
@@ -52,20 +52,9 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         return micro;
     }
 
-    private void updateExploration(int size) {
-        if (size > 100) {
-            exploration = 0.0;
-            return;
-        }
-        if (size > 10) {
-            exploration = 0.1;
-            return;
-        }
-        if (size > 0) {
-            exploration = 0.15;
-            return;
-        }
-        exploration = 0.2;
+    private void updateExploration(int size, int maxMoves) {
+        this.exploration = ProbabilityUtil.calculateExploration(size, maxMoves);
+        System.out.println("Max moves: " + maxMoves + ", cons size: " + size + ", new exploration: " + exploration);
     }
 
     private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player) {
