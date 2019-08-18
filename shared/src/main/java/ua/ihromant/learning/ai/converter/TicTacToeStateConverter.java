@@ -3,16 +3,16 @@ package ua.ihromant.learning.ai.converter;
 import java.util.stream.IntStream;
 
 import ua.ihromant.learning.state.Player;
-import ua.ihromant.learning.state.TicTacToeState3x3;
+import ua.ihromant.learning.state.TicTacToeState;
 
-public class TicTacToeStateConverter implements InputConverter<TicTacToeState3x3> {
+public class TicTacToeStateConverter implements InputConverter<TicTacToeState> {
 	private int size;
 	public TicTacToeStateConverter(int size) {
 		this.size = size;
 	}
 
 	@Override
-	public double[] convert(TicTacToeState3x3 state) {
+	public double[] convert(TicTacToeState state) {
 		double[] res = new double[inputLength()];
 		IntStream.range(0, size)
 				.forEach(i -> {

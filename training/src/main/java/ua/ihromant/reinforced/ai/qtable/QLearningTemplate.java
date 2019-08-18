@@ -23,7 +23,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     private static final double GAMMA = 0.95;
     private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
-    private static final double CONSERVATIVE = 0.8;
+    private double exploration = 0.2;
     private final TrainableQTable<A> qTable;
     private final State<A> baseState;
 
@@ -40,6 +40,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     "statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
             IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> writeHistory(conservativeWrong.get(j)));
             writeHistory(history);
+            updateExploration(conservativeWrong.size());
 
             stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
                     statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
@@ -51,6 +52,22 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         return micro;
     }
 
+    private void updateExploration(int size) {
+        if (size > 100) {
+            exploration = 0.0;
+            return;
+        }
+        if (size > 10) {
+            exploration = 0.1;
+            return;
+        }
+        if (size > 0) {
+            exploration = 0.15;
+            return;
+        }
+        exploration = 0.2;
+    }
+
     private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player) {
         if (history.isEmpty()) {
             State<A> next = randomAction(from);
@@ -59,7 +76,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             return result;
         }
 
-        boolean random = ThreadLocalRandom.current().nextDouble() > CONSERVATIVE;
+        boolean random = ThreadLocalRandom.current().nextDouble() < exploration;
 
         State<A> next = random ? randomAction(from) : decision(from);
         HistoryItem<A> result = new HistoryItem<>(next, player, random);
@@ -88,7 +105,10 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         Map<State<A>, Double> evals = qTable.getMultiple(history.stream().map(HistoryItem::getState));
         String[] firstLine = lines.get(0);
         for (int i = 0; i < history.size(); i++) {
-            System.out.print(String.format("%." + (lines.get(i)[0].length() - 1) + "f", evals.get(history.get(i).getState())) + " ");
+            String format = history.get(i).isRandom()
+                    ? "R%." + (lines.get(i)[0].length() - 2) + "f"
+                    : "%." + (lines.get(i)[0].length() - 1) + "f";
+            System.out.print(String.format(format, evals.get(history.get(i).getState())) + " ");
         }
         System.out.println();
         for (int i = 0; i < firstLine.length; i++) {

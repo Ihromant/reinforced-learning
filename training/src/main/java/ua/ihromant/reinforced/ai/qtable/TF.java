@@ -6,7 +6,6 @@ import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Adam;
@@ -32,11 +31,5 @@ public class TF {
 						.nIn(inputConverter.inputLength() * 10)
 						.nOut(converter.outputLength()).build())
 				.build();
-	}
-
-	public static MultiLayerNetwork createNetwork(InputConverter inputConverter, QValueConverter converter) {
-	    MultiLayerNetwork net = new MultiLayerNetwork(buildGraph(inputConverter, converter));
-	    net.init();
-	    return net;
 	}
 }
