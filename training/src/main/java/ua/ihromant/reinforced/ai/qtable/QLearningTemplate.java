@@ -23,7 +23,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     private static final double GAMMA = 0.95;
     private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
-    private double exploration = 0.2;
+    private double exploration = 0.0;
     private final TrainableQTable<A> qTable;
     private final State<A> baseState;
 
