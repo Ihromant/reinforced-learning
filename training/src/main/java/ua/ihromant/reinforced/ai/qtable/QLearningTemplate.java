@@ -40,7 +40,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     "statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
             IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> writeHistory(conservativeWrong.get(j)));
             writeHistory(history);
-            updateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
+            this.exploration = ProbabilityUtil.calculateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
 
             stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
                     statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
@@ -50,11 +50,6 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             return res;
         }
         return micro;
-    }
-
-    private void updateExploration(int size, int maxMoves) {
-        this.exploration = ProbabilityUtil.calculateExploration(size, maxMoves);
-        System.out.println("Max moves: " + maxMoves + ", cons size: " + size + ", new exploration: " + exploration);
     }
 
     private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player) {
@@ -179,7 +174,6 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         List<int[]> stat = new ArrayList<>(episodes / STEP);;
         List<HistoryItem<A>> history = new ArrayList<>();
         List<List<HistoryItem<A>>> conservativeWrong = new ArrayList<>();
-        GameResult expectedResult = baseState.getExpectedResult(Player.X);
         for (int i = 0; i < episodes; i++) {
             micro = logStats(statistics, micro, stat, history, conservativeWrong, i, episodes);
             history.clear();
@@ -196,7 +190,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             qTable.setMultiple(convert(history));
             GameResult finalResult = state.getUtility(Player.X);
             statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
-            if (!random && finalResult != expectedResult) {
+            if (!random && finalResult != history.get(0).getState().getExpectedResult(Player.X)) {
                 conservativeWrong.add(new ArrayList<>(history));
             }
         }

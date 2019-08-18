@@ -11,17 +11,29 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	private static final int HOR_SIZE = 5;
 	private static final int VER_SIZE = 6;
 	private static final int WON = 4;
+	private static final Map<TicTacToeState5x6, GameResult> EXPECTED = new HashMap<TicTacToeState5x6, GameResult>() {
+		{
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 8), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 9), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 14), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 15), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 20), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 21), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 7), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 10), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 13), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 16), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 19), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 22), GameResult.DRAW);
+		}
+	};
 	private long plrz;
 
 	public TicTacToeState5x6() {
 	}
 
-	private TicTacToeState5x6(TicTacToeState5x6 prev) {
-		this.plrz = prev.plrz;
-	}
-
 	private TicTacToeState5x6(TicTacToeState5x6 prev, int nextMove) {
-		this(prev);
+		this.plrz = prev.plrz;
 		if (isAssigned(nextMove)) {
 			throw new IllegalArgumentException();
 		}
@@ -87,10 +99,6 @@ public class TicTacToeState5x6 implements TicTacToeState {
 			return Stream.empty();
 		}
 
-		if (plrz == 0) {
-			return Stream.of(new TTTAction(15));
-		}
-
 		return IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.filter(i -> !isAssigned(i))
 				.mapToObj(TTTAction::new);
@@ -127,7 +135,11 @@ public class TicTacToeState5x6 implements TicTacToeState {
 
 	@Override
 	public GameResult getExpectedResult(Player pl) {
-		return pl == Player.X ? GameResult.WIN : GameResult.LOSE;
+		if (this.plrz == 0) {
+			return pl == Player.X ? GameResult.WIN : GameResult.LOSE;
+		}
+		GameResult res = EXPECTED.getOrDefault(this, GameResult.LOSE);
+		return res; // TODO fix for Player.O
 	}
 
 	@Override
@@ -225,8 +237,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 			IntStream.range(0, HOR_SIZE * VER_SIZE).boxed().collect(Collector.of(TicTacToeState5x6::new,
 					(state, numb) -> state.assign(numb, Player.O),
 					(state1, state2) -> {
-						TicTacToeState5x6 newState = new TicTacToeState5x6(state1);
-						newState.plrz |= state2.plrz;
-						return newState;
+						state1.plrz |= state2.plrz;
+						return state1;
 					})).plrz;
 }
