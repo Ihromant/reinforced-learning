@@ -32,7 +32,22 @@ public class ProbabilityUtil {
 		return length - 1;
 	}
 
+	private static final double A = -0.001;
+	private static final double B = 0.8;
+	private static final double C = 0.69;
+
+	protected static double notRandomFunction(double consSize) {
+		double result = (A * consSize + B) / (C * consSize + 1);
+		if (result > 0.8) {
+			return 0.8;
+		}
+		if (result < 0.01) {
+			return 0.01;
+		}
+		return result;
+	}
+
 	public static double calculateExploration(int consSize, int maxMoves) {
-		return 1 - Math.pow(1 - Math.pow(0.5, consSize + Math.log(0.8) / Math.log(0.5)), 0.5 / Math.sqrt(maxMoves));
+		return 1 - Math.pow(1 - notRandomFunction(consSize), 0.5 / Math.sqrt(maxMoves));
 	}
 }
