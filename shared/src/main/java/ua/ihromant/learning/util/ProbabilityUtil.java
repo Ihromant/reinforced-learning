@@ -20,16 +20,22 @@ public class ProbabilityUtil {
 	}
 
 	public static int weightedRandom(double[] weights) {
-		double rand = ThreadLocalRandom.current().nextDouble(Arrays.stream(weights).sum());
-		double sum = 0.0;
-		int length = weights.length;
-		for (int i = 0; i < length; i++) {
-			sum += weights[i];
-			if (sum > rand) {
-				return i;
+		try {
+			double rand = ThreadLocalRandom.current().nextDouble(Arrays.stream(weights).sum());
+			double sum = 0.0;
+			int length = weights.length;
+			for (int i = 0; i < length; i++) {
+				sum += weights[i];
+				if (sum > rand) {
+					return i;
+				}
 			}
+			return length - 1;
+		} catch (Exception e) {
+			System.out.println(Arrays.toString(weights));
+			e.printStackTrace();
+			return 0;
 		}
-		return length - 1;
 	}
 
 	private static final double A = -0.001;
