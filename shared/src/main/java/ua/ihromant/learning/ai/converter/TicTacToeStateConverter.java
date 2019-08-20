@@ -27,11 +27,12 @@ public class TicTacToeStateConverter implements InputConverter<TicTacToeState> {
 						res[i + 2 * size] = 1;
 					}
 				});
+		res[res.length - 1] = state.getCurrent().ordinal();
 		return res;
 	}
 
 	@Override
 	public int inputLength() {
-		return size * 3;
+		return size * 3 + 1;
 	}
 }
