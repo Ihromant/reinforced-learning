@@ -21,7 +21,7 @@ public class ProbabilityUtil {
 
 	public static int weightedRandom(double[] weights) {
 		double total = Arrays.stream(weights).sum();
-		if (total == 0.0) {
+		if (!(total > 0.0)) {
 			return ThreadLocalRandom.current().nextInt(weights.length);
 		}
 		double rand = ThreadLocalRandom.current().nextDouble(total);
