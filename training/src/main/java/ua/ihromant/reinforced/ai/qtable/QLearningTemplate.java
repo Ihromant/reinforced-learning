@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class QLearningTemplate<A> implements TrainingAgent<A> {
-    private static final double GAMMA = 0.95;
+    private static final double GAMMA = 0.8;
     private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
     private double exploration = 0.0;
@@ -127,7 +127,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             }
             double oldValue = oldValues.get(item.getState());
             converted.put(item.getState(), linear(oldValue, baseValue, coeff));
-            double newFactor = item.isRandom() && oldValue > baseValue ? RANDOM_GAMMA : GAMMA;
+            double newFactor = item.isRandom() ? oldValue > baseValue ? RANDOM_GAMMA : 1.0 : GAMMA;
             coeff = coeff * newFactor;
         }
         return converted;
@@ -160,6 +160,12 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         Map<State<A>, Double> rewards = getFilteredRewards(state.getStates(), state.getCurrent());
         if (actions.size() != rewards.size()) {
             rewards.putAll(qTable.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
+        }
+        double max = rewards.values().stream().mapToDouble(Double::doubleValue).max().orElseThrow(IllegalStateException::new);
+        if (max < 0.25) {
+            List<State<A>> states = new ArrayList<>(rewards.keySet());
+            double[] weights = states.stream().mapToDouble(st -> rewards.get(st) * rewards.get(st)).toArray();
+            return states.get(ProbabilityUtil.weightedRandom(weights));
         }
         return rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
