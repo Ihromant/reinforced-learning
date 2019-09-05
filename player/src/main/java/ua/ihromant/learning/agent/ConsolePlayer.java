@@ -1,7 +1,9 @@
 package ua.ihromant.learning.agent;
 
+import java.util.List;
 import java.util.Scanner;
 
+import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.state.State;
 
 public abstract class ConsolePlayer<A> implements Agent<A> {
@@ -16,8 +18,8 @@ public abstract class ConsolePlayer<A> implements Agent<A> {
 	protected abstract A getAction(Scanner scan);
 
 	@Override
-	public A decision(State<A> from) {
+	public Decision<A> decision(State<A> from, List<HistoryItem<A>> history) {
 		explanation(from);
-		return getAction(scan);
+		return new Decision<>(getAction(scan));
 	}
 }

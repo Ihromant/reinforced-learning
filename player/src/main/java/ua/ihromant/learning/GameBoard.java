@@ -1,9 +1,11 @@
 package ua.ihromant.learning;
 
 import ua.ihromant.learning.agent.Agent;
+import ua.ihromant.learning.agent.GamePlayer;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
+import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
@@ -33,17 +35,9 @@ public class GameBoard<A> {
 		} while (decision.equals("1") || decision.equals("2"));
 	}
 
-	public void playFirst() {
+	private void playFirst() {
 		State<A> state = baseStateProducer.get();
-		while (!state.isTerminal()) {
-			state = state.apply(agent.decision(state));
-			if (state.isTerminal()) {
-				break;
-			}
-			System.out.println(state.toString());
-			state = state.apply(ai.decision(state));
-		}
-		System.out.println(state);
+		new GamePlayer<>(Map.of(Player.X, agent, Player.O, ai), state).play();
 		switch (state.getUtility(Player.X)) {
 			case DRAW:
 				System.out.println("Draw!");
@@ -57,17 +51,9 @@ public class GameBoard<A> {
 		}
 	}
 
-	public void playSecond() {
+	private void playSecond() {
 		State<A> state = baseStateProducer.get();
-		while (!state.isTerminal()) {
-			state = state.apply(ai.decision(state));
-			if (state.isTerminal()) {
-				break;
-			}
-			state = state.apply(agent.decision(state));
-			System.out.println(state.toString());
-		}
-		System.out.println(state);
+		new GamePlayer<>(Map.of(Player.X, ai, Player.O, agent), state).play();
 		switch (state.getUtility(Player.O)) {
 			case DRAW:
 				System.out.println("Draw!");

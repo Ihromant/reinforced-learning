@@ -1,6 +1,7 @@
 package ua.ihromant.learning.ai;
 
 import ua.ihromant.learning.agent.Agent;
+import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.qtable.QTable;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
@@ -21,22 +22,17 @@ public class QLearningAI<A> implements Agent<A> {
         this.qTable = qTable;
     }
 
-    private Map<State<A>, Double> getFilteredRewards(Stream<State<A>> actions, Player current) {
-        return actions.filter(act -> act.getUtility(current) != GameResult.DRAW)
-                .collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current).toDouble()));
-    }
-
     @Override
-    public A decision(State<A> state) {
+    public Decision<A> decision(State<A> state, List<HistoryItem<A>> history) {
         List<A> actions = state.getActions().collect(Collectors.toList());
         if (actions.size() == 1) {
-            return actions.get(0);
+            return new Decision<>(actions.get(0));
         }
 
         Map<StateAction<A>, Double> rewards = qTable.getMultiple(
                 actions.stream().map(act -> new StateAction<>(state, act)));
-        return rewards.entrySet().stream()
+        return new Decision<>(rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .orElseThrow(IllegalStateException::new).getKey().getAction();
+                .orElseThrow(IllegalStateException::new).getKey().getAction());
     }
 }

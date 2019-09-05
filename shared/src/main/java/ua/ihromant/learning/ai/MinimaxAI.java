@@ -1,6 +1,7 @@
 package ua.ihromant.learning.ai;
 
 import ua.ihromant.learning.agent.Agent;
+import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
@@ -18,11 +19,11 @@ public final class MinimaxAI<A> implements Agent<A> {
     }
 
     @Override
-    public A decision(State<A> from) {
+    public Decision<A> decision(State<A> from, List<HistoryItem<A>> history) {
         List<StateAction<A>> maxStates = from.getActions()
                 .map(act -> new StateAction<>(from, act))
                 .collect(MaxUtil.maxList(Comparator.comparing(this::minValue)));
-        return maxStates.get(ThreadLocalRandom.current().nextInt(maxStates.size())).getAction();
+        return new Decision<>(maxStates.get(ThreadLocalRandom.current().nextInt(maxStates.size())).getAction());
     }
 
     private GameResult maxValue(StateAction<A> stateAction) {

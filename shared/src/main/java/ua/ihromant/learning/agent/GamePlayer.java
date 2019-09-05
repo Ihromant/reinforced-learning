@@ -21,8 +21,9 @@ public class GamePlayer<A> {
 		State<A> state = baseState;
 		while (!state.isTerminal()) {
 			Agent<A> currentAgent = players.get(state.getCurrent());
-			A action = currentAgent.decision(state);
-			HistoryItem<A> item = new HistoryItem<>(state, action, state.apply(action), state.getCurrent(), false);
+			Agent.Decision<A> dec = currentAgent.decision(state, history);
+			HistoryItem<A> item = new HistoryItem<>(state, dec.action, state.apply(dec.action), state.getCurrent(), dec.random);
+			history.add(item);
 			state = item.getTo();
 		}
 		return history;
