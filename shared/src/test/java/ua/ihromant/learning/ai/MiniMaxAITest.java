@@ -18,8 +18,8 @@ import java.util.stream.IntStream;
 
 public class MiniMaxAITest {
     private int[] def = {1, 2, 3};
-    private Map<Player, MinimaxAI> players = Arrays.stream(
-            Player.values()).collect(Collectors.toMap(Function.identity(), MinimaxAI::new));
+    private Map<Player, MinimaxAI> players = Arrays.stream(Player.values()).collect(Collectors.toMap(Function.identity(), MinimaxAI::new));
+
     @Test
     public void testTicTacToe() {
         IntStream.range(0, 10)
