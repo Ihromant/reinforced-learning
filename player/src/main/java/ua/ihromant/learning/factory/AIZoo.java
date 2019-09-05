@@ -14,8 +14,6 @@ import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.TTTAction;
 
-import java.io.IOException;
-
 public class AIZoo {
     private AIZoo() throws IllegalAccessException {
         throw new IllegalAccessException();

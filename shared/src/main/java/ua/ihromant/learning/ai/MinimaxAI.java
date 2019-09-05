@@ -19,7 +19,7 @@ public final class MinimaxAI<A> implements Agent<A> {
 
     @Override
     public A decision(State<A> from) {
-        List<StateAction<A>> maxStates = from.getActs()
+        List<StateAction<A>> maxStates = from.getActions()
                 .map(act -> new StateAction<>(from, act))
                 .collect(MaxUtil.maxList(Comparator.comparing(this::minValue)));
         return maxStates.get(ThreadLocalRandom.current().nextInt(maxStates.size())).getAction();
@@ -30,7 +30,7 @@ public final class MinimaxAI<A> implements Agent<A> {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
-        return state.getActs().map(act -> new StateAction<>(state, act))
+        return state.getActions().map(act -> new StateAction<>(state, act))
                 .map(this::minValue).max(Comparator.naturalOrder()).orElseThrow(IllegalStateException::new);
     }
 
@@ -39,7 +39,7 @@ public final class MinimaxAI<A> implements Agent<A> {
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
-        return state.getActs().map(act -> new StateAction<>(state, act))
+        return state.getActions().map(act -> new StateAction<>(state, act))
                 .map(this::maxValue).min(Comparator.naturalOrder()).orElseThrow(IllegalStateException::new);
     }
 }

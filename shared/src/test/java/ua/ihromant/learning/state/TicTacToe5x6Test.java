@@ -58,11 +58,11 @@ public class TicTacToe5x6Test {
 
 	@Test
 	public void testActions() {
-		Assertions.assertEquals(20, TicTacToeState5x6.from(RAND).getActs().count());
-		Assertions.assertEquals(0, TicTacToeState5x6.from(HOR_WIN).getActs().count());
-		Assertions.assertEquals(0, TicTacToeState5x6.from(VER_WIN).getActs().count());
-		Assertions.assertEquals(0, TicTacToeState5x6.from(NORD_WEST_WIN).getActs().count());
-		Assertions.assertEquals(0, TicTacToeState5x6.from(NORD_EAST_WIN).getActs().count());
+		Assertions.assertEquals(20, TicTacToeState5x6.from(RAND).getActions().count());
+		Assertions.assertEquals(0, TicTacToeState5x6.from(HOR_WIN).getActions().count());
+		Assertions.assertEquals(0, TicTacToeState5x6.from(VER_WIN).getActions().count());
+		Assertions.assertEquals(0, TicTacToeState5x6.from(NORD_WEST_WIN).getActions().count());
+		Assertions.assertEquals(0, TicTacToeState5x6.from(NORD_EAST_WIN).getActions().count());
 	}
 
 	@Test

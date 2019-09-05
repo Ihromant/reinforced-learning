@@ -6,9 +6,9 @@ public class NetworkQTableTest {
 //	@Test
 //	public void testQNetworkBatch() {
 //		State<TTTAction> baseState = new TicTacToeState3x3();
-//		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
+//		TTTAction act = baseState.getActions().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextState = baseState.apply(act);
-//		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
+//		TTTAction next = nextState.getActions().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextNextState = nextState.apply(next);
 //		System.out.println(Arrays.toString(net.getMultiple((Arrays.asList(nextState, nextNextState)))));
 //		net.set(nextState, 0.3);
@@ -32,9 +32,9 @@ public class NetworkQTableTest {
 //	@Test
 //	public void testQNetworkMultiple() {
 //		State<TTTAction> baseState = new TicTacToeState3x3();
-//		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
+//		TTTAction act = baseState.getActions().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextState = baseState.apply(act);
-//		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
+//		TTTAction next = nextState.getActions().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextNextState = nextState.apply(next);
 //		for (int i = 0; i < 200; i++) {
 //			net.set(nextState, 0.3);
@@ -47,9 +47,9 @@ public class NetworkQTableTest {
 //	@Test
 //	public void testQNetworkMultiple1() {
 //		State<TTTAction> baseState = new TicTacToeState3x3();
-//		TTTAction act = baseState.getActs().toArray(TTTAction[]::new)[0];
+//		TTTAction act = baseState.getActions().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextState = baseState.apply(act);
-//		TTTAction next = nextState.getActs().toArray(TTTAction[]::new)[0];
+//		TTTAction next = nextState.getActions().toArray(TTTAction[]::new)[0];
 //		State<TTTAction> nextNextState = nextState.apply(next);
 //		Map<State<TTTAction>, Double> valuesMap = new HashMap<>();
 //		valuesMap.put(nextState, 0.3);

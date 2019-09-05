@@ -21,7 +21,7 @@ public class NimMultipleState implements NimState {
 	}
 
 	@Override
-	public Stream<NimAction> getActs() {
+	public Stream<NimAction> getActions() {
 		if (isTerminal()) {
 			return Stream.empty();
 		}

@@ -70,7 +70,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     }
 
     private A randomAction(State<A> from) {
-        List<StateAction<A>> actions = from.getActs().map(a -> new StateAction<>(from ,a)).collect(Collectors.toList());
+        List<StateAction<A>> actions = from.getActions().map(a -> new StateAction<>(from ,a)).collect(Collectors.toList());
         if (actions.size() == 1) {
             return actions.get(0).getAction();
         }
@@ -153,7 +153,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
 
     @Override
     public A decision(State<A> state) {
-        List<StateAction<A>> actions = state.getActs().map(a -> new StateAction<>(state, a)).collect(Collectors.toList());
+        List<StateAction<A>> actions = state.getActions().map(a -> new StateAction<>(state, a)).collect(Collectors.toList());
         if (actions.size() == 1) {
             return actions.get(0).getAction();
         }

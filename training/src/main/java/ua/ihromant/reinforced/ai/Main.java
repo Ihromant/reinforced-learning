@@ -21,9 +21,9 @@ public class Main {
         String pathDist = System.getProperty("java.io.tmpdir") + File.separator + "5x5e.ai";
         String path3x3 = System.getProperty("java.io.tmpdir") + File.separator + "test2.ai";
         String path3x31 = System.getProperty("java.io.tmpdir") + File.separator + "test3.ai";
-        String path5x6 = System.getProperty("java.io.tmpdir") + File.separator + "5x62.ai";
-        String path5x61 = System.getProperty("java.io.tmpdir") + File.separator + "5x63.ai";
-        TrainerFactory.loadTicTacToeAgent(TicTacToeState5x6::new, path5x6).train(200_000, path5x61);
+        String path5x6 = System.getProperty("java.io.tmpdir") + File.separator + "5x67.ai";
+        String path5x61 = System.getProperty("java.io.tmpdir") + File.separator + "5x68.ai";
+        TrainerFactory.loadTicTacToeAgent(TicTacToeState5x6::new, path5x6).train(1_000_000, path5x61);
        // TrainerFactory.loadTicTacToeAgent(TicTacToeState5x6::new, path5x6).train(500_000, path5x61);
     }
 }

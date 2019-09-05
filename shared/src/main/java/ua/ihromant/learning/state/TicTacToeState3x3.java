@@ -52,7 +52,7 @@ public class TicTacToeState3x3 implements TicTacToeState {
     }
 
     @Override
-    public Stream<TTTAction> getActs() {
+    public Stream<TTTAction> getActions() {
         if (isTerminal()) {
             return Stream.empty();
         }

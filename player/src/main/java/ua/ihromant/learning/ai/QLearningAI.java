@@ -28,7 +28,7 @@ public class QLearningAI<A> implements Agent<A> {
 
     @Override
     public A decision(State<A> state) {
-        List<A> actions = state.getActs().collect(Collectors.toList());
+        List<A> actions = state.getActions().collect(Collectors.toList());
         if (actions.size() == 1) {
             return actions.get(0);
         }
