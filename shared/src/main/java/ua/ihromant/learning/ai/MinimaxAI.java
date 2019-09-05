@@ -1,6 +1,7 @@
 package ua.ihromant.learning.ai;
 
 import ua.ihromant.learning.agent.Agent;
+import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
@@ -17,24 +18,28 @@ public final class MinimaxAI<A> implements Agent<A> {
     }
 
     @Override
-    public State<A> decision(State<A> from) {
-        List<State<A>> maxStates = from.getStates().collect(MaxUtil.maxList(Comparator.comparing(this::minValue)));
-        return maxStates.get(ThreadLocalRandom.current().nextInt(maxStates.size()));
+    public A decision(State<A> from) {
+        List<StateAction<A>> maxStates = from.getActs()
+                .map(act -> new StateAction<>(from, act))
+                .collect(MaxUtil.maxList(Comparator.comparing(this::minValue)));
+        return maxStates.get(ThreadLocalRandom.current().nextInt(maxStates.size())).getAction();
     }
 
-    private GameResult maxValue(State<A> state) {
+    private GameResult maxValue(StateAction<A> stateAction) {
+        State<A> state = stateAction.getResult();
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
-        return state.getStates()
+        return state.getActs().map(act -> new StateAction<>(state, act))
                 .map(this::minValue).max(Comparator.naturalOrder()).orElseThrow(IllegalStateException::new);
     }
 
-    private GameResult minValue(State<A> state) {
+    private GameResult minValue(StateAction<A> stateAction) {
+        State<A> state = stateAction.getResult();
         if (state.isTerminal()) {
             return state.getUtility(player);
         }
-        return state.getStates()
+        return state.getActs().map(act -> new StateAction<>(state, act))
                 .map(this::maxValue).min(Comparator.naturalOrder()).orElseThrow(IllegalStateException::new);
     }
 }

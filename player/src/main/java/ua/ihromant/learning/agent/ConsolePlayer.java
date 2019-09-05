@@ -16,8 +16,8 @@ public abstract class ConsolePlayer<A> implements Agent<A> {
 	protected abstract A getAction(Scanner scan);
 
 	@Override
-	public State<A> decision(State<A> from) {
+	public A decision(State<A> from) {
 		explanation(from);
-		return from.apply(getAction(scan));
+		return getAction(scan);
 	}
 }

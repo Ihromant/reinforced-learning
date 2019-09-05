@@ -14,26 +14,26 @@ import java.util.stream.Stream;
 public class NetworkQTable<A> implements QTable<A> {
 	protected final NeuralNetworkAgent agent;
 	protected final QValueConverter qConverter;
-	protected final InputConverter<State<A>> inputConverter;
+	protected final InputConverter<A> inputConverter;
 
-	public NetworkQTable(InputConverter<State<A>> inputConverter, QValueConverter qConverter, NeuralNetworkAgent agent) {
+	public NetworkQTable(InputConverter<A> inputConverter, QValueConverter qConverter, NeuralNetworkAgent agent) {
 		this.qConverter = qConverter;
 		this.agent = agent;
 		this.inputConverter = inputConverter;
 	}
 
 	@Override
-	public double get(State<A> state) {
-		return qConverter.convertToQValue(agent.get(inputConverter.convert(state), qConverter.outputLength()));
+	public double get(StateAction<A> stateAction) {
+		return qConverter.convertToQValue(agent.get(inputConverter.convert(stateAction), qConverter.outputLength()));
 	}
 
 	@Override
-	public Map<State<A>, Double> getMultiple(Stream<State<A>> stream) {
-		List<State<A>> states = stream.collect(Collectors.toList());
+	public Map<StateAction<A>, Double> getMultiple(Stream<StateAction<A>> stream) {
+		List<StateAction<A>> pairs = stream.collect(Collectors.toList());
 		List<double[]> evals = agent.getMultiple(
-				states.stream().map(inputConverter::convert).collect(Collectors.toList()), qConverter.outputLength());
-		return IntStream.range(0, states.size()).boxed()
-				.collect(Collectors.toMap(states::get,
+				pairs.stream().map(inputConverter::convert).collect(Collectors.toList()), qConverter.outputLength());
+		return IntStream.range(0, pairs.size()).boxed()
+				.collect(Collectors.toMap(pairs::get,
 						i -> qConverter.convertToQValue(evals.get(i)),
 						(u, v) -> u));
 	}

@@ -2,6 +2,7 @@ package ua.ihromant.learning.factory;
 
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.agent.TicTacToePlayer;
+import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState3x3;
@@ -21,6 +22,7 @@ public class TicTacToeFactory implements Factory<TTTAction> {
 
 	@Override
 	public Agent<TTTAction> createAI(String path) {
-		return AIZoo.networkTTTAI(getStateSupplier().get().getMaximumMoves(), path);
+		return AIZoo.miniMax(Player.X);
+		//return AIZoo.networkTTTAI(getStateSupplier().get().getMaximumMoves(), path);
 	}
 }

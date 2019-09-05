@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public interface QTable<A> {
-    double get(State<A> state);
+    double get(StateAction<A> stateAction);
 
-    Map<State<A>, Double> getMultiple(Stream<State<A>> state);
+    Map<StateAction<A>, Double> getMultiple(Stream<StateAction<A>> state);
 }

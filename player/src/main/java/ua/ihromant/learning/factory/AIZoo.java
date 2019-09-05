@@ -10,7 +10,9 @@ import ua.ihromant.learning.ai.converter.WinLoseConverter;
 import ua.ihromant.learning.network.NeuralNetworkAgent;
 import ua.ihromant.learning.qtable.MapQTable;
 import ua.ihromant.learning.qtable.NetworkQTable;
+import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.Player;
+import ua.ihromant.learning.state.TTTAction;
 
 import java.io.IOException;
 
@@ -27,11 +29,15 @@ public class AIZoo {
         return new QLearningAI<>(new MapQTable<>(null)); // TODO
     }
 
-    public static <A> Agent<A> networkTTTAI(int size, String model) {
-        return new QLearningAI<>(new NetworkQTable(new TicTacToeStateConverter(size), new WinDrawLoseConverter(), new NeuralNetworkAgent(model)));
+    public static Agent<TTTAction> networkTTTAI(int size, String model) {
+        return new QLearningAI<>(new NetworkQTable<>(new TicTacToeStateConverter(size),
+                new WinDrawLoseConverter(),
+                new NeuralNetworkAgent(model)));
     }
 
-    public static <A> Agent<A> networkNimAI(String model) {
-        return new QLearningAI<>(new NetworkQTable(new NimStateConverter(), new WinLoseConverter(), new NeuralNetworkAgent(model)));
+    public static Agent<NimAction> networkNimAI(String model) {
+        return new QLearningAI<>(new NetworkQTable<>(new NimStateConverter(),
+                new WinLoseConverter(),
+                new NeuralNetworkAgent(model)));
     }
 }

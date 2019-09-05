@@ -2,6 +2,7 @@ package ua.ihromant.learning.ai;
 
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.qtable.QTable;
+import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
@@ -26,18 +27,16 @@ public class QLearningAI<A> implements Agent<A> {
     }
 
     @Override
-    public State<A> decision(State<A> state) {
-        List<State<A>> actions = state.getStates().collect(Collectors.toList());
+    public A decision(State<A> state) {
+        List<A> actions = state.getActs().collect(Collectors.toList());
         if (actions.size() == 1) {
             return actions.get(0);
         }
 
-        Map<State<A>, Double> rewards = getFilteredRewards(state.getStates(), state.getCurrent());
-        if (actions.size() != rewards.size()) {
-            rewards.putAll(qTable.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
-        }
+        Map<StateAction<A>, Double> rewards = qTable.getMultiple(
+                actions.stream().map(act -> new StateAction<>(state, act)));
         return rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .orElseThrow(IllegalStateException::new).getKey();
+                .orElseThrow(IllegalStateException::new).getKey().getAction();
     }
 }
