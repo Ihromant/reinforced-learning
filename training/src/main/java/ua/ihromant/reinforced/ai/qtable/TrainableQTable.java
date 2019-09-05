@@ -7,9 +7,9 @@ import ua.ihromant.learning.state.State;
 import java.util.Map;
 
 public interface TrainableQTable<A> extends QTable<A> {
-    void set(StateAction<State<A>, A> stateAction, double newValue);
+    void set(StateAction<A> stateAction, double newValue);
 
-    void setMultiple(Map<StateAction<State<A>, A>, Double> newValues);
+    void setMultiple(Map<StateAction<A>, Double> newValues);
 
     void serialize(String path);
 }

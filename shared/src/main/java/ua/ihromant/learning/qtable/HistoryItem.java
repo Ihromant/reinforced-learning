@@ -5,12 +5,14 @@ import ua.ihromant.learning.state.State;
 
 public class HistoryItem<A> {
     private final State<A> from;
+    private final A action;
     private final State<A> to;
     private final Player player;
     private final boolean random;
 
-    public HistoryItem(State<A> from, State<A> to, Player player, boolean random) {
+    public HistoryItem(State<A> from, A action, State<A> to, Player player, boolean random) {
         this.from = from;
+        this.action = action;
         this.to = to;
         this.player = player;
         this.random = random;
@@ -30,5 +32,9 @@ public class HistoryItem<A> {
 
     public State<A> getTo() {
         return to;
+    }
+
+    public StateAction<A> getStateAction() {
+    	return new StateAction<>(from, action);
     }
 }

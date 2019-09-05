@@ -36,12 +36,12 @@ public class GameBoard<A> {
 	public void playFirst() {
 		State<A> state = baseStateProducer.get();
 		while (!state.isTerminal()) {
-			state = agent.decision(state);
+			state = state.apply(agent.decision(state));
 			if (state.isTerminal()) {
 				break;
 			}
 			System.out.println(state.toString());
-			state = ai.decision(state);
+			state = state.apply(ai.decision(state));
 		}
 		System.out.println(state);
 		switch (state.getUtility(Player.X)) {
@@ -60,11 +60,11 @@ public class GameBoard<A> {
 	public void playSecond() {
 		State<A> state = baseStateProducer.get();
 		while (!state.isTerminal()) {
-			state = ai.decision(state);
+			state = state.apply(ai.decision(state));
 			if (state.isTerminal()) {
 				break;
 			}
-			state = agent.decision(state);
+			state = state.apply(agent.decision(state));
 			System.out.println(state.toString());
 		}
 		System.out.println(state);

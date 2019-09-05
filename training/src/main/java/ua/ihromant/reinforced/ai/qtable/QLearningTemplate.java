@@ -2,6 +2,7 @@ package ua.ihromant.reinforced.ai.qtable;
 
 import org.nd4j.shade.jackson.databind.ObjectMapper;
 import ua.ihromant.learning.qtable.HistoryItem;
+import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
@@ -18,7 +19,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class QLearningTemplate<A> implements TrainingAgent<A> {
     private static final double GAMMA = 0.8;
@@ -55,45 +55,45 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
 
     private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player) {
         if (history.isEmpty()) {
-            State<A> next = randomAction(from);
-            HistoryItem<A> result = new HistoryItem<>(from, next, player, false);
+            A next = randomAction(from);
+            HistoryItem<A> result = new HistoryItem<>(from, next, from.apply(next), player, false);
             history.add(result);
             return result;
         }
 
         boolean random = ThreadLocalRandom.current().nextDouble() < exploration;
 
-        State<A> next = random ? randomAction(from) : decision(from);
-        HistoryItem<A> result = new HistoryItem<>(from, next, player, random);
+        A next = random ? randomAction(from) : decision(from);
+        HistoryItem<A> result = new HistoryItem<>(from, next, from.apply(next), player, random);
         history.add(result);
         return result;
     }
 
-    private State<A> randomAction(State<A> from) {
-        List<State<A>> states = from.getStates().collect(Collectors.toList());
-        if (states.size() == 1) {
-            return states.get(0);
+    private A randomAction(State<A> from) {
+        List<StateAction<A>> actions = from.getActs().map(a -> new StateAction<>(from ,a)).collect(Collectors.toList());
+        if (actions.size() == 1) {
+            return actions.get(0).getAction();
         }
 
-        Map<State<A>, Double> evals = qTable.getMultiple(states.stream());
-        double[] weights = states.stream()
+        Map<StateAction<A>, Double> evals = qTable.getMultiple(actions.stream());
+        double[] weights = actions.stream()
                 .mapToDouble(state -> Arrays.stream(GameResult.values())
                         .mapToDouble(val -> Math.abs(evals.get(state) - val.toDouble()))
                         .min().orElseThrow(RuntimeException::new)).toArray();
-        return states.get(ProbabilityUtil.weightedRandom(weights));
+        return actions.get(ProbabilityUtil.weightedRandom(weights)).getAction();
     }
 
     private void writeHistory(List<HistoryItem<A>> history) {
         List<String[]> lines = history.stream()
                 .map(h -> h.getTo().toString())
                 .map(s -> s.split("\n")).collect(Collectors.toList());
-        Map<State<A>, Double> evals = qTable.getMultiple(history.stream().map(HistoryItem::getTo));
+        Map<StateAction<A>, Double> evals = qTable.getMultiple(history.stream().map(HistoryItem::getStateAction));
         String[] firstLine = lines.get(0);
         for (int i = 0; i < history.size(); i++) {
             String format = history.get(i).isRandom()
                     ? "R%." + (lines.get(i)[0].length() - 2) + "f"
                     : "%." + (lines.get(i)[0].length() - 1) + "f";
-            System.out.print(String.format(format, evals.get(history.get(i).getTo())) + " ");
+            System.out.print(String.format(format, evals.get(history.get(i).getStateAction())) + " ");
         }
         System.out.println();
         for (int i = 0; i < firstLine.length; i++) {
@@ -105,14 +105,14 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         System.out.println();
     }
 
-    private Map<State<A>, Double> convert(List<HistoryItem<A>> history) {
-        Map<State<A>, Double> oldValues = qTable.getMultiple(history.stream().map(HistoryItem::getTo));
+    private Map<StateAction<A>, Double> convert(List<HistoryItem<A>> history) {
+        Map<StateAction<A>, Double> oldValues = qTable.getMultiple(history.stream().map(HistoryItem::getStateAction));
         int size = history.size();
         State<A> last = history.get(size - 1).getTo();
         Player lastMoved = history.get(size - 1).getPlayer();
         GameResult result = last.getUtility(lastMoved);
         double coeff = 1.0;
-        Map<State<A>, Double> converted = new HashMap<>();
+        Map<StateAction<A>, Double> converted = new HashMap<>();
         for (int i = history.size() - 1; i >= 0; i--) {
             HistoryItem<A> item = history.get(i);
             double baseValue;
@@ -126,8 +126,8 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     baseValue = item.getPlayer() == lastMoved ? getWeightedLoss(size) : getWeightedWin(size);
                 }
             }
-            double oldValue = oldValues.get(item.getTo());
-            converted.put(item.getTo(), linear(oldValue, baseValue, coeff));
+            double oldValue = oldValues.get(item.getStateAction());
+            converted.put(item.getStateAction(), linear(oldValue, baseValue, coeff));
             double newFactor = item.isRandom() ? oldValue > baseValue ? RANDOM_GAMMA : 1.0 : GAMMA;
             coeff = coeff * newFactor;
         }
@@ -146,31 +146,31 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         return 0.02 * (moves / 2 - 2);
     }
 
-    private Map<State<A>, Double> getFilteredRewards(Stream<State<A>> actions, Player current) {
-        return actions.filter(act -> act.getUtility(current) != GameResult.DRAW)
-                .collect(Collectors.toMap(Function.identity(), act -> act.getUtility(current).toDouble()));
+    private Map<StateAction<A>, Double> getFilteredRewards(List<StateAction<A>> actions, Player current) {
+        return actions.stream().filter(act -> act.getResult().getUtility(current) != GameResult.DRAW)
+                .collect(Collectors.toMap(Function.identity(), act -> act.getResult().getUtility(current).toDouble()));
     }
 
     @Override
-    public State<A> decision(State<A> state) {
-        List<State<A>> actions = state.getStates().collect(Collectors.toList());
+    public A decision(State<A> state) {
+        List<StateAction<A>> actions = state.getActs().map(a -> new StateAction<>(state, a)).collect(Collectors.toList());
         if (actions.size() == 1) {
-            return actions.get(0);
+            return actions.get(0).getAction();
         }
 
-        Map<State<A>, Double> rewards = getFilteredRewards(state.getStates(), state.getCurrent());
+        Map<StateAction<A>, Double> rewards = getFilteredRewards(actions, state.getCurrent());
         if (actions.size() != rewards.size()) {
             rewards.putAll(qTable.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
         }
         double max = rewards.values().stream().mapToDouble(Double::doubleValue).max().orElseThrow(IllegalStateException::new);
         if (max < 0.25) {
-            List<State<A>> states = new ArrayList<>(rewards.keySet());
+            List<StateAction<A>> states = new ArrayList<>(rewards.keySet());
             double[] weights = states.stream().mapToDouble(st -> rewards.get(st) * rewards.get(st)).toArray();
-            return states.get(ProbabilityUtil.weightedRandom(weights));
+            return states.get(ProbabilityUtil.weightedRandom(weights)).getAction();
         }
         return rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .orElseThrow(IllegalStateException::new).getKey();
+                .orElseThrow(IllegalStateException::new).getKey().getAction();
     }
 
     @Override
