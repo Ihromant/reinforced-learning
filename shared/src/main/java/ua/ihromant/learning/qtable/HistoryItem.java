@@ -1,17 +1,23 @@
-package ua.ihromant.reinforced.ai.qtable;
+package ua.ihromant.learning.qtable;
 
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
 public class HistoryItem<A> {
+    private final State<A> from;
+    private final State<A> to;
     private final Player player;
     private final boolean random;
-    private final State<A> state;
 
-    public HistoryItem(State<A> state, Player player, boolean random) {
-        this.state = state;
+    public HistoryItem(State<A> from, State<A> to, Player player, boolean random) {
+        this.from = from;
+        this.to = to;
         this.player = player;
         this.random = random;
+    }
+
+    public State<A> getFrom() {
+        return from;
     }
 
     public Player getPlayer() {
@@ -22,7 +28,7 @@ public class HistoryItem<A> {
         return random;
     }
 
-    public State<A> getState() {
-        return state;
+    public State<A> getTo() {
+        return to;
     }
 }

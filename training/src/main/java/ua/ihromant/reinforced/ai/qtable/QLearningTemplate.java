@@ -1,6 +1,7 @@
 package ua.ihromant.reinforced.ai.qtable;
 
 import org.nd4j.shade.jackson.databind.ObjectMapper;
+import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
@@ -55,7 +56,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     private HistoryItem<A> getNextAction(State<A> from, List<HistoryItem<A>> history, Player player) {
         if (history.isEmpty()) {
             State<A> next = randomAction(from);
-            HistoryItem<A> result = new HistoryItem<>(next, player, false);
+            HistoryItem<A> result = new HistoryItem<>(from, next, player, false);
             history.add(result);
             return result;
         }
@@ -63,7 +64,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         boolean random = ThreadLocalRandom.current().nextDouble() < exploration;
 
         State<A> next = random ? randomAction(from) : decision(from);
-        HistoryItem<A> result = new HistoryItem<>(next, player, random);
+        HistoryItem<A> result = new HistoryItem<>(from, next, player, random);
         history.add(result);
         return result;
     }
@@ -84,15 +85,15 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
 
     private void writeHistory(List<HistoryItem<A>> history) {
         List<String[]> lines = history.stream()
-                .map(h -> h.getState().toString())
+                .map(h -> h.getTo().toString())
                 .map(s -> s.split("\n")).collect(Collectors.toList());
-        Map<State<A>, Double> evals = qTable.getMultiple(history.stream().map(HistoryItem::getState));
+        Map<State<A>, Double> evals = qTable.getMultiple(history.stream().map(HistoryItem::getTo));
         String[] firstLine = lines.get(0);
         for (int i = 0; i < history.size(); i++) {
             String format = history.get(i).isRandom()
                     ? "R%." + (lines.get(i)[0].length() - 2) + "f"
                     : "%." + (lines.get(i)[0].length() - 1) + "f";
-            System.out.print(String.format(format, evals.get(history.get(i).getState())) + " ");
+            System.out.print(String.format(format, evals.get(history.get(i).getTo())) + " ");
         }
         System.out.println();
         for (int i = 0; i < firstLine.length; i++) {
@@ -105,9 +106,9 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     }
 
     private Map<State<A>, Double> convert(List<HistoryItem<A>> history) {
-        Map<State<A>, Double> oldValues = qTable.getMultiple(history.stream().map(HistoryItem::getState));
+        Map<State<A>, Double> oldValues = qTable.getMultiple(history.stream().map(HistoryItem::getTo));
         int size = history.size();
-        State<A> last = history.get(size - 1).getState();
+        State<A> last = history.get(size - 1).getTo();
         Player lastMoved = history.get(size - 1).getPlayer();
         GameResult result = last.getUtility(lastMoved);
         double coeff = 1.0;
@@ -125,8 +126,8 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     baseValue = item.getPlayer() == lastMoved ? getWeightedLoss(size) : getWeightedWin(size);
                 }
             }
-            double oldValue = oldValues.get(item.getState());
-            converted.put(item.getState(), linear(oldValue, baseValue, coeff));
+            double oldValue = oldValues.get(item.getTo());
+            converted.put(item.getTo(), linear(oldValue, baseValue, coeff));
             double newFactor = item.isRandom() ? oldValue > baseValue ? RANDOM_GAMMA : 1.0 : GAMMA;
             coeff = coeff * newFactor;
         }
@@ -190,13 +191,13 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             while (!state.isTerminal()) {
                 HistoryItem<A> action = getNextAction(state, history, player);
                 random = random || action.isRandom();
-                state = action.getState();
+                state = action.getTo();
                 player = state.getCurrent();
             }
             qTable.setMultiple(convert(history));
             GameResult finalResult = state.getUtility(Player.X);
             statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
-            if (!random && finalResult != history.get(0).getState().getExpectedResult(Player.X)) {
+            if (!random && finalResult != history.get(0).getTo().getExpectedResult(Player.X)) {
                 conservativeWrong.add(new ArrayList<>(history));
             }
         }
