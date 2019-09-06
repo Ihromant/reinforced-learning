@@ -4,19 +4,15 @@ import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.qtable.QTable;
 import ua.ihromant.learning.qtable.StateAction;
-import ua.ihromant.learning.state.GameResult;
-import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QLearningAI<A> implements Agent<A> {
-    private final QTable<A> qTable;
+    protected final QTable<A> qTable;
 
     public QLearningAI(QTable<A> qTable) {
         this.qTable = qTable;
