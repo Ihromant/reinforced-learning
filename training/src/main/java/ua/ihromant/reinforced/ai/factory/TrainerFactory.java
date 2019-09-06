@@ -7,6 +7,7 @@ import ua.ihromant.learning.ai.converter.TicTacToeStateConverter;
 import ua.ihromant.learning.ai.converter.WinDrawLoseConverter;
 import ua.ihromant.learning.ai.converter.WinLoseConverter;
 import ua.ihromant.learning.network.NeuralNetworkAgent;
+import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.NimState;
 import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;
@@ -25,31 +26,31 @@ public class TrainerFactory {
     public static TrainingAgent<TTTAction> loadTicTacToeAgent(Supplier<TicTacToeState> supplier, String path) {
         TicTacToeState state = supplier.get();
         return new QLearningTemplate<>(state,
-                new TrainableNetworkQTable(new TicTacToeStateConverter(state.getMaximumMoves()),
+                new TrainableNetworkQTable<>(new TicTacToeStateConverter(state.getMaximumMoves()),
                         new WinDrawLoseConverter(), new NeuralNetworkAgent(path)));
     }
 
     public static TrainingAgent<TTTAction> newTicTacToeAgent(Supplier<TicTacToeState> supplier) {
         TicTacToeState state = supplier.get();
-        InputConverter inputConvert = new TicTacToeStateConverter(state.getMaximumMoves());
+        InputConverter<TTTAction> inputConvert = new TicTacToeStateConverter(state.getMaximumMoves());
         QValueConverter qConvert = new WinDrawLoseConverter();
         return new QLearningTemplate<>(state,
-                new TrainableNetworkQTable(inputConvert,
+                new TrainableNetworkQTable<>(inputConvert,
                         qConvert, new NeuralNetworkAgent(
                         TF.buildGraph(inputConvert, qConvert))));
     }
 
-    public static TrainingAgent<TTTAction> loadNimAgent(Supplier<NimState> supplier, String path) {
+    public static TrainingAgent<NimAction> loadNimAgent(Supplier<NimState> supplier, String path) {
         return new QLearningTemplate<>(supplier.get(),
-                new TrainableNetworkQTable(new NimStateConverter(),
+                new TrainableNetworkQTable<>(new NimStateConverter(),
                         new WinLoseConverter(), new NeuralNetworkAgent(path)));
     }
 
-    public static TrainingAgent<TTTAction> newNimAgent(Supplier<NimState> supplier) {
-        InputConverter inputConvert = new NimStateConverter();
+    public static TrainingAgent<NimAction> newNimAgent(Supplier<NimState> supplier) {
+        InputConverter<NimAction> inputConvert = new NimStateConverter();
         QValueConverter qConvert = new WinLoseConverter();
         return new QLearningTemplate<>(supplier.get(),
-                new TrainableNetworkQTable(inputConvert,
+                new TrainableNetworkQTable<>(inputConvert,
                         qConvert, new NeuralNetworkAgent(
                         TF.buildGraph(inputConvert, qConvert))));
     }

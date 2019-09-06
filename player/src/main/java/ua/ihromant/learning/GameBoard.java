@@ -2,9 +2,12 @@ package ua.ihromant.learning;
 
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.agent.GamePlayer;
+import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
+import ua.ihromant.learning.util.WriterUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Supplier;
@@ -36,9 +39,9 @@ public class GameBoard<A> {
 	}
 
 	private void playFirst() {
-		State<A> state = baseStateProducer.get();
-		new GamePlayer<>(Map.of(Player.X, agent, Player.O, ai), state).play();
-		switch (state.getUtility(Player.X)) {
+		List<HistoryItem<A>> history = new GamePlayer<>(Map.of(Player.X, agent, Player.O, ai), baseStateProducer.get()).play();
+		WriterUtil.writeHistory(history);
+		switch (history.get(history.size() - 1).getTo().getUtility(Player.X)) {
 			case DRAW:
 				System.out.println("Draw!");
 				break;
@@ -52,9 +55,9 @@ public class GameBoard<A> {
 	}
 
 	private void playSecond() {
-		State<A> state = baseStateProducer.get();
-		new GamePlayer<>(Map.of(Player.X, ai, Player.O, agent), state).play();
-		switch (state.getUtility(Player.O)) {
+		List<HistoryItem<A>> history = new GamePlayer<>(Map.of(Player.X, ai, Player.O, agent), baseStateProducer.get()).play();
+		WriterUtil.writeHistory(history);
+		switch (history.get(history.size() - 1).getTo().getUtility(Player.O)) {
 			case DRAW:
 				System.out.println("Draw!");
 				return;
