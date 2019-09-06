@@ -61,7 +61,9 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     @Override
     public Decision<A> decision(State<A> from, List<HistoryItem<A>> history) {
         if (history.isEmpty()) {
-            return randomAction(from);
+            Decision<A> res = randomAction(from);
+            res.random = false;
+            return res;
         }
         boolean random = ThreadLocalRandom.current().nextDouble() < exploration;
         return random ? randomAction(from) : algoDecision(from);

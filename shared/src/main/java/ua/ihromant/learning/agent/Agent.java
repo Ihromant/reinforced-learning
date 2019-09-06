@@ -10,7 +10,7 @@ public interface Agent<A> {
 
 	class Decision<A> {
 		public final A action;
-		public final boolean random;
+		public boolean random;
 
 		public Decision(A action) {
 			this.action = action;
