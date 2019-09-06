@@ -138,8 +138,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 		if (this.plrz == 0) {
 			return pl == Player.X ? GameResult.WIN : GameResult.LOSE;
 		}
-		GameResult res = EXPECTED.getOrDefault(this, GameResult.LOSE);
-		return res; // TODO fix for Player.O
+		return EXPECTED.getOrDefault(this, GameResult.LOSE);  // TODO fix for Player.O
 	}
 
 	@Override
