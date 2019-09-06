@@ -1,7 +1,6 @@
 package ua.ihromant.learning;
 
 import ua.ihromant.learning.agent.Agent;
-import ua.ihromant.learning.agent.GamePlayer;
 import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.State;
@@ -39,7 +38,8 @@ public class GameBoard<A> {
 	}
 
 	private void playFirst() {
-		List<HistoryItem<A>> history = new GamePlayer<>(Map.of(Player.X, agent, Player.O, ai), baseStateProducer.get()).play();
+		List<HistoryItem<A>> history = Agent.play(Map.of(Player.X, agent, Player.O, ai),
+				baseStateProducer.get());
 		WriterUtil.writeHistory(history);
 		switch (history.get(history.size() - 1).getTo().getUtility(Player.X)) {
 			case DRAW:
@@ -55,7 +55,8 @@ public class GameBoard<A> {
 	}
 
 	private void playSecond() {
-		List<HistoryItem<A>> history = new GamePlayer<>(Map.of(Player.X, ai, Player.O, agent), baseStateProducer.get()).play();
+		List<HistoryItem<A>> history = Agent.play(Map.of(Player.X, ai, Player.O, agent),
+				baseStateProducer.get());
 		WriterUtil.writeHistory(history);
 		switch (history.get(history.size() - 1).getTo().getUtility(Player.O)) {
 			case DRAW:

@@ -2,7 +2,6 @@ package ua.ihromant.reinforced.ai.qtable;
 
 import org.nd4j.shade.jackson.databind.ObjectMapper;
 import ua.ihromant.learning.agent.Agent;
-import ua.ihromant.learning.agent.GamePlayer;
 import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
@@ -159,7 +158,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         List<List<HistoryItem<A>>> conservativeWrong = new ArrayList<>();
         for (int i = 0; i < episodes; i++) {
             micro = logStats(statistics, micro, stat, history, conservativeWrong, i, episodes);
-            history = new GamePlayer<>(this.players, baseState).play();
+            history = Agent.play(players, baseState);
             qTable.setMultiple(convert(history));
             GameResult finalResult = history.get(history.size() - 1).getTo().getUtility(Player.X);
             statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
