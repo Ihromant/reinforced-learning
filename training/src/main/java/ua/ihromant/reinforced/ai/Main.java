@@ -3,8 +3,6 @@ package ua.ihromant.reinforced.ai;
 import ch.qos.logback.classic.Level;
 import org.slf4j.LoggerFactory;
 import ua.ihromant.learning.state.TicTacToeState3x3;
-import ua.ihromant.learning.state.TicTacToeState5x5;
-import ua.ihromant.learning.state.TicTacToeState5x6;
 import ua.ihromant.reinforced.ai.factory.TrainerFactory;
 import ch.qos.logback.classic.Logger;
 

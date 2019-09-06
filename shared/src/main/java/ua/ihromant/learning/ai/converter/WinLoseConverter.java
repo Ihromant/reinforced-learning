@@ -1,8 +1,8 @@
 package ua.ihromant.learning.ai.converter;
 
 public class WinLoseConverter implements QValueConverter {
-	private double[] WIN = {1, 0};
-	private double[] LOSE = {0, 1};
+	private static final double[] WIN = {1, 0};
+	private static final double[] LOSE = {0, 1};
 
 	@Override
 	public double convertToQValue(double[] values) {

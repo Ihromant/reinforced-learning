@@ -128,9 +128,7 @@ public class TicTacToeState5x5 implements TicTacToeState {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < SIZE + 2; i++) {
-			builder.append('-');
-		}
+		builder.append("-".repeat(SIZE + 2));
 		builder.append('\n');
 		for (int i = 0; i < SIZE; i++) {
 			builder.append('|');
@@ -145,9 +143,7 @@ public class TicTacToeState5x5 implements TicTacToeState {
 			builder.append('|');
 			builder.append('\n');
 		}
-		for (int i = 0; i < SIZE + 2; i++) {
-			builder.append('-');
-		}
+		builder.append("-".repeat(SIZE + 2));
 		return builder.toString();
 	}
 
@@ -179,7 +175,7 @@ public class TicTacToeState5x5 implements TicTacToeState {
 	// KLMNO
 	// PQRST
 	// UVWXY
-	private static final Map<Integer, char[]> POSSIBLE_SHIFTS = new HashMap<Integer, char[]>() {
+	private static final Map<Integer, char[]> POSSIBLE_SHIFTS = new HashMap<>() {
 		{
 			put(1, "ABFGKLPQUV".toCharArray()); // 1
 			put(SIZE, "ABCDEFGHIJ".toCharArray()); // 5

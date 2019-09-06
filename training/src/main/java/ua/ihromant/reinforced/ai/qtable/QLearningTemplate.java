@@ -153,7 +153,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         Map<GameResult, Integer> statistics = new EnumMap<>(GameResult.class);
         long time = System.currentTimeMillis();
         long micro = time;
-        List<int[]> stat = new ArrayList<>(episodes / STEP);;
+        List<int[]> stat = new ArrayList<>(episodes / STEP);
         List<HistoryItem<A>> history = new ArrayList<>();
         List<List<HistoryItem<A>>> conservativeWrong = new ArrayList<>();
         for (int i = 0; i < episodes; i++) {

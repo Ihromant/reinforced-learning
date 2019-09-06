@@ -11,7 +11,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	private static final int HOR_SIZE = 5;
 	private static final int VER_SIZE = 6;
 	private static final int WON = 4;
-	private static final Map<TicTacToeState5x6, GameResult> EXPECTED = new HashMap<TicTacToeState5x6, GameResult>() {
+	private static final Map<TicTacToeState5x6, GameResult> EXPECTED = new HashMap<>() {
 		{
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 8), GameResult.WIN);
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 9), GameResult.WIN);
@@ -145,9 +145,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < VER_SIZE + 2; i++) {
-			builder.append('-');
-		}
+		builder.append("-".repeat(VER_SIZE + 2));
 		builder.append('\n');
 		for (int i = 0; i < HOR_SIZE; i++) {
 			builder.append('|');
@@ -162,9 +160,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 			builder.append('|');
 			builder.append('\n');
 		}
-		for (int i = 0; i < VER_SIZE + 2; i++) {
-			builder.append('-');
-		}
+		builder.append("-".repeat(VER_SIZE + 2));
 		return builder.toString();
 	}
 
@@ -191,7 +187,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 		return Long.hashCode(res);
 	}
 
-	private static final Map<Integer, int[]> POSSIBLE_SHIFTS = new HashMap<Integer, int[]>() {
+	private static final Map<Integer, int[]> POSSIBLE_SHIFTS = new HashMap<>() {
 		{
 			put(1, getStartingPositionsForDirection(1, 0)); // 1
 			put(VER_SIZE, getStartingPositionsForDirection(0, 1)); // 5

@@ -8,7 +8,7 @@ import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;
 
 public class TicTacToeStateConverter implements InputConverter<TTTAction> {
-	private int size;
+	private final int size;
 	public TicTacToeStateConverter(int size) {
 		this.size = size;
 	}

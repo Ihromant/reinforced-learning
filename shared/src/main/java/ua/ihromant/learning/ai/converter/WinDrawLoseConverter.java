@@ -1,9 +1,9 @@
 package ua.ihromant.learning.ai.converter;
 
 public class WinDrawLoseConverter implements QValueConverter {
-	private double[] WIN = {1, 0, 0};
-	private double[] LOSE = {0, 0, 1};
-	private double[] DRAW = {0, 1, 0};
+	private static final double[] WIN = {1, 0, 0};
+	private static final double[] LOSE = {0, 0, 1};
+	private static final double[] DRAW = {0, 1, 0};
 
 	@Override
 	public double convertToQValue(double[] values) {

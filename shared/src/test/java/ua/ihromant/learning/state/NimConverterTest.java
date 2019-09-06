@@ -21,7 +21,7 @@ public class NimConverterTest {
 					0, 0, 0,
 					0};
 
-	private InputConverter<NimAction> converter = new NimStateConverter();
+	private final InputConverter<NimAction> converter = new NimStateConverter();
 
 	@Test
 	public void testToModel() {

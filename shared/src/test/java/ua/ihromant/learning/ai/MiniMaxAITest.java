@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MiniMaxAITest {
-    private int[] def = {1, 2, 3};
+    private final int[] def = {1, 2, 3};
 
     @Test
     public void testTicTacToe() {

@@ -2,7 +2,6 @@ package ua.ihromant.reinforced.ai.qtable.map;
 
 import ua.ihromant.learning.qtable.MapQTable;
 import ua.ihromant.learning.qtable.StateAction;
-import ua.ihromant.learning.state.State;
 import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 
 import java.util.HashMap;

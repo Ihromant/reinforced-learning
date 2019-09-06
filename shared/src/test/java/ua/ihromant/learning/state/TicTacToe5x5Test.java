@@ -7,7 +7,7 @@ import static ua.ihromant.learning.state.Player.O;
 import static ua.ihromant.learning.state.Player.X;
 
 public class TicTacToe5x5Test {
-    private static Player[] RAND = new Player[]{
+    private static final Player[] RAND = new Player[]{
             X,    X,    X,    O,    O,
             X,    X,    O,    O,    O,
             null, null, null, null, null,
@@ -15,7 +15,7 @@ public class TicTacToe5x5Test {
             null, null, null, null, null,
     };
 
-    private static Player[] HOR_WIN = new Player[]{
+    private static final Player[] HOR_WIN = new Player[]{
             X,    X,    X,    X,    O,
             O,    X,    O,    O,    O,
             null, null, null, null, null,
@@ -23,7 +23,7 @@ public class TicTacToe5x5Test {
             null, null, null, null, null,
     };
 
-    private static Player[] VER_WIN = new Player[]{
+    private static final Player[] VER_WIN = new Player[]{
             X,    X,    X,    O,    O,
             X,    X,    O,    O,    O,
             null, X,    O,    null, null,
@@ -31,7 +31,7 @@ public class TicTacToe5x5Test {
             null, null, null, null, null,
     };
 
-    private static Player[] NORD_WEST_WIN = new Player[]{
+    private static final Player[] NORD_WEST_WIN = new Player[]{
             X,    X,    X,    O,    O,
             X,    X,    O,    O,    O,
             null, O,    X,    null, null,
@@ -39,7 +39,7 @@ public class TicTacToe5x5Test {
             null, null, null, null, null,
     };
 
-    private static Player[] NORD_EAST_WIN = new Player[]{
+    private static final Player[] NORD_EAST_WIN = new Player[]{
             X,    X,    X,    O,    O,
             X,    X,    O,    O,    O,
             X,    O,    X,    null, null,

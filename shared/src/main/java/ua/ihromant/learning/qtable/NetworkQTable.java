@@ -3,7 +3,6 @@ package ua.ihromant.learning.qtable;
 import ua.ihromant.learning.ai.converter.InputConverter;
 import ua.ihromant.learning.ai.converter.QValueConverter;
 import ua.ihromant.learning.network.NeuralNetworkAgent;
-import ua.ihromant.learning.state.State;
 
 import java.util.List;
 import java.util.Map;

@@ -7,7 +7,7 @@ import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.state.State;
 
 public abstract class ConsolePlayer<A> implements Agent<A> {
-	private Scanner scan;
+	private final Scanner scan;
 
 	protected ConsolePlayer() {
 		this.scan = new Scanner(System.in);

@@ -5,7 +5,6 @@ import ua.ihromant.learning.ai.converter.QValueConverter;
 import ua.ihromant.learning.network.NeuralNetworkAgent;
 import ua.ihromant.learning.qtable.NetworkQTable;
 import ua.ihromant.learning.qtable.StateAction;
-import ua.ihromant.learning.state.State;
 import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 
 import java.util.List;
