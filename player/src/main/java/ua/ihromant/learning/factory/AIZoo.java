@@ -23,10 +23,6 @@ public class AIZoo {
         return new MinimaxAI<>(pl);
     }
 
-    public static <A> Agent<A> mapQTableAI() {
-        return new QLearningAI<>(new MapQTable<>(null)); // TODO
-    }
-
     public static QLearningAI<TTTAction> networkTTTAI(int size, String model) {
         return new QLearningAI<>(new NetworkQTable<>(new TicTacToeStateConverter(size),
                 new WinDrawLoseConverter(),
@@ -37,5 +33,9 @@ public class AIZoo {
         return new QLearningAI<>(new NetworkQTable<>(new NimStateConverter(),
                 new WinLoseConverter(),
                 new NeuralNetworkAgent(model)));
+    }
+
+    public static <A> QLearningAI<A> mapAI(String model) {
+        return new QLearningAI<>(new MapQTable<>(MapQTable.readModelMap(model)));
     }
 }

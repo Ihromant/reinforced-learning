@@ -13,7 +13,9 @@ import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;
 import ua.ihromant.reinforced.ai.qtable.QLearningTemplate;
 import ua.ihromant.reinforced.ai.qtable.TF;
+import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 import ua.ihromant.reinforced.ai.qtable.TrainingAgent;
+import ua.ihromant.reinforced.ai.qtable.map.TrainableMapQTable;
 import ua.ihromant.reinforced.ai.qtable.network.TrainableNetworkQTable;
 
 import java.util.function.Supplier;
@@ -34,10 +36,8 @@ public class TrainerFactory {
         TicTacToeState state = supplier.get();
         InputConverter<TTTAction> inputConvert = new TicTacToeStateConverter(state.getMaximumMoves());
         QValueConverter qConvert = new WinDrawLoseConverter();
-        return new QLearningTemplate<>(state,
-                new TrainableNetworkQTable<>(inputConvert,
-                        qConvert, new NeuralNetworkAgent(
-                        TF.buildGraph(inputConvert, qConvert))));
+        //return new QLearningTemplate<>(state, newNetworkQTable(inputConvert, qConvert));
+        return new QLearningTemplate<>(state, newMapQTable());
     }
 
     public static TrainingAgent<NimAction> loadNimAgent(Supplier<NimState> supplier, String path) {
@@ -49,9 +49,15 @@ public class TrainerFactory {
     public static TrainingAgent<NimAction> newNimAgent(Supplier<NimState> supplier) {
         InputConverter<NimAction> inputConvert = new NimStateConverter();
         QValueConverter qConvert = new WinLoseConverter();
-        return new QLearningTemplate<>(supplier.get(),
-                new TrainableNetworkQTable<>(inputConvert,
-                        qConvert, new NeuralNetworkAgent(
-                        TF.buildGraph(inputConvert, qConvert))));
+        return new QLearningTemplate<>(supplier.get(), newNetworkQTable(inputConvert, qConvert));
+    }
+
+    private static <A> TrainableQTable<A> newMapQTable() {
+        return new TrainableMapQTable<>(0.3);
+    }
+
+    private static <A> TrainableQTable<A> newNetworkQTable(InputConverter<A> inputConverter,QValueConverter qValueConverter) {
+        return new TrainableNetworkQTable<>(inputConverter, qValueConverter,
+                new NeuralNetworkAgent(TF.buildGraph(inputConverter, qValueConverter)));
     }
 }

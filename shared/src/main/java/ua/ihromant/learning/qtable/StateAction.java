@@ -1,10 +1,11 @@
 package ua.ihromant.learning.qtable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import ua.ihromant.learning.state.State;
 
-public class StateAction<A> {
+public class StateAction<A> implements Serializable {
 	private final State<A> state;
 	private final A action;
 

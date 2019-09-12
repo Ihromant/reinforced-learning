@@ -84,4 +84,42 @@ public class TicTacToeTest {
 					}
 				});
 	}
+
+	@Test
+	public void testMinimaxVsMapX() {
+		int tries = 1000;
+		QLearningAI<TTTAction> ai = AIZoo.mapAI(getClass().getClassLoader().getResource("testmap.ai").getFile());
+		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
+				Player.O, ai);
+		Assertions.assertEquals(tries,
+				IntStream.range(0, tries)
+						.filter(i -> {
+							System.out.println(i + " minimax test for player O tictactoe");
+							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
+							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+								WriterUtil.writeHistory(history, ai.qTable);
+								return false;
+							}
+							return true;
+						}).count());
+	}
+
+	@Test
+	public void testMinimaxVsMapO() {
+		int tries = 1000;
+		QLearningAI<TTTAction> ai = AIZoo.mapAI(getClass().getClassLoader().getResource("testmap.ai").getFile());
+		Map<Player, Agent<TTTAction>> players = Map.of(Player.O, new MinimaxAI<>(Player.O),
+				Player.X, ai);
+		Assertions.assertEquals(tries,
+				IntStream.range(0, tries)
+						.filter(i -> {
+							System.out.println(i + " minimax test for player O tictactoe");
+							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
+							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+								WriterUtil.writeHistory(history, ai.qTable);
+								return false;
+							}
+							return true;
+						}).count());
+	}
 }

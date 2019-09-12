@@ -1,6 +1,10 @@
 package ua.ihromant.learning.state;
 
-public class NimAction {
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
+
+public class NimAction implements Serializable {
     private final int[] coeffs;
     private final int reduce;
 
@@ -19,5 +23,25 @@ public class NimAction {
 
     public int getReduce() {
         return reduce;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NimAction nimAction = (NimAction) o;
+        return reduce == nimAction.reduce &&
+                Arrays.equals(coeffs, nimAction.coeffs);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(reduce);
+        result = 31 * result + Arrays.hashCode(coeffs);
+        return result;
     }
 }

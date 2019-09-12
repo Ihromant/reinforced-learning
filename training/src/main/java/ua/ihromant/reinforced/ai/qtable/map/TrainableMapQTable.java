@@ -4,6 +4,12 @@ import ua.ihromant.learning.qtable.MapQTable;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +41,11 @@ public class TrainableMapQTable<A> extends MapQTable<A> implements TrainableQTab
 
     @Override
     public void serialize(String path) {
-        // TODO
+        try (OutputStream fos = new FileOutputStream(path); BufferedOutputStream bos = new BufferedOutputStream(fos); ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(this.qStates);
+        } catch (IOException e) {
+            throw new RuntimeException("Was not able to persist model to path: " + path, e);
+        }
     }
 }
 
