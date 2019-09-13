@@ -2,6 +2,7 @@ package ua.ihromant.learning.ai;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
@@ -19,76 +20,9 @@ import ua.ihromant.learning.util.WriterUtil;
 public class TicTacToeTest {
 	@Test
 	public void testMinimaxX() {
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
-				getClass().getClassLoader().getResource("test1500k.ai").getFile());
-		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
-				Player.O, ai);
-		IntStream.range(0, 1000)
-				.forEach(i -> {
-					System.out.println(i + " minimax test for player O tictactoe");
-					List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-					if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
-						WriterUtil.writeHistory(history, ai.qTable);
-						Assertions.fail("Lost");
-					}
-				});
-	}
-
-	@Test
-	public void testMinimaxO() {
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
-				getClass().getClassLoader().getResource("test1500k.ai").getFile());
-		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
-				Player.O, new MinimaxAI<>(Player.O));
-		IntStream.range(0, 1000)
-				.forEach(i -> {
-					System.out.println(i + " minimax test for player X tictactoe");
-					List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-					if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
-						WriterUtil.writeHistory(history, ai.qTable);
-						Assertions.fail("Lost");
-					}
-				});
-	}
-
-	@Test
-	public void testRandomX() {
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
-				getClass().getClassLoader().getResource("test1500k.ai").getFile());
-		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new RandomAgent<>(),
-				Player.O, ai);
-		IntStream.range(0, 1000)
-				.forEach(i -> {
-					System.out.println(i + " random test for player O tictactoe");
-					List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-					if (history.get(history.size() - 1).getTo().getUtility(Player.X) == GameResult.WIN) {
-						WriterUtil.writeHistory(history, ai.qTable);
-						Assertions.fail("Lost");
-					}
-				});
-	}
-
-	@Test
-	public void testRandomO() {
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
-				getClass().getClassLoader().getResource("test1500k.ai").getFile());
-		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
-				Player.O, new RandomAgent<>());
-		IntStream.range(0, 1000)
-				.forEach(i -> {
-					System.out.println(i + " random test for player X tictactoe");
-					List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-					if (history.get(history.size() - 1).getTo().getUtility(Player.X) == GameResult.LOSE) {
-						WriterUtil.writeHistory(history, ai.qTable);
-						Assertions.fail("Lost");
-					}
-				});
-	}
-
-	@Test
-	public void testMinimaxVsMapX() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.mapAI(getClass().getClassLoader().getResource("testmap.ai").getFile());
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
 				Player.O, ai);
 		Assertions.assertEquals(tries,
@@ -105,9 +39,90 @@ public class TicTacToeTest {
 	}
 
 	@Test
-	public void testMinimaxVsMapO() {
+	public void testMinimaxO() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.mapAI(getClass().getClassLoader().getResource("testmap.ai").getFile());
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
+		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
+				Player.O, new MinimaxAI<>(Player.O));
+		Assertions.assertEquals(tries,
+				IntStream.range(0, tries)
+						.filter(i -> {
+							System.out.println(i + " minimax test for player X tictactoe");
+							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
+							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+								WriterUtil.writeHistory(history, ai.qTable);
+								return false;
+							}
+							return true;
+						}).count());
+	}
+
+	@Test
+	public void testRandomX() {
+		int tries = 1000;
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
+		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new RandomAgent<>(),
+				Player.O, ai);
+		Assertions.assertEquals(tries,
+				IntStream.range(0, tries)
+						.filter(i -> {
+							System.out.println(i + " random test for player O tictactoe");
+							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
+							if (history.get(history.size() - 1).getTo().getUtility(Player.X) == GameResult.WIN) {
+								WriterUtil.writeHistory(history, ai.qTable);
+								return false;
+							}
+							return true;
+						}).count());
+	}
+
+	@Test
+	public void testRandomO() {
+		int tries = 1000;
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
+		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
+				Player.O, new RandomAgent<>());
+		Assertions.assertEquals(tries,
+				IntStream.range(0, tries)
+						.filter(i -> {
+							System.out.println(i + " random test for player X tictactoe");
+							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
+							if (history.get(history.size() - 1).getTo().getUtility(Player.X) == GameResult.LOSE) {
+								WriterUtil.writeHistory(history, ai.qTable);
+								return false;
+							}
+							return true;
+						}).count());
+	}
+
+	@Test
+	public void testMinimaxXVsMap() {
+		int tries = 1000;
+		QLearningAI<TTTAction> ai = AIZoo.mapAI(
+				Objects.requireNonNull(getClass().getClassLoader().getResource("testmap.ai")).getFile());
+		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
+				Player.O, ai);
+		Assertions.assertEquals(tries,
+				IntStream.range(0, tries)
+						.filter(i -> {
+							System.out.println(i + " minimax test for player X tictactoe");
+							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
+							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+								WriterUtil.writeHistory(history, ai.qTable);
+								return false;
+							}
+							return true;
+						}).count());
+	}
+
+	@Test
+	public void testMinimaxOVsMap() {
+		int tries = 1000;
+		QLearningAI<TTTAction> ai = AIZoo.mapAI(
+				Objects.requireNonNull(getClass().getClassLoader().getResource("testmap.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.O, new MinimaxAI<>(Player.O),
 				Player.X, ai);
 		Assertions.assertEquals(tries,

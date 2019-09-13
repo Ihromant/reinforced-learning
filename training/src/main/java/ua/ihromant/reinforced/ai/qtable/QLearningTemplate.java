@@ -41,8 +41,8 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                           List<HistoryItem<A>> history, List<List<HistoryItem<A>>> conservativeWrong, int i, int episodes) {
         if (i % STEP == STEP - 1) {
             long res = System.currentTimeMillis();
-            System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (res - micro) + " ms, " +
-                    "statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
+            System.out.println("Learning " + 100.0 * i / episodes + "% complete, elapsed: " + (res - micro)
+                    + " ms, statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
             IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> WriterUtil.writeHistory(conservativeWrong.get(j), qTable));
             WriterUtil.writeHistory(history, qTable);
             this.exploration = ProbabilityUtil.calculateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
@@ -115,16 +115,11 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     }
 
     private double getWeightedWin(int moves) {
-        return 1.0 - 0.02 * (moves / 2 - 2);
+        return 1.04 - 0.01 * moves;
     }
 
     private double getWeightedLoss(int moves) {
-        return 0.02 * (moves / 2 - 2);
-    }
-
-    private Map<StateAction<A>, Double> getFilteredRewards(List<StateAction<A>> actions, Player current) {
-        return actions.stream().filter(act -> act.getResult().getUtility(current) != GameResult.DRAW)
-                .collect(Collectors.toMap(Function.identity(), act -> act.getResult().getUtility(current).toDouble()));
+        return -0.04 + 0.01 * moves;
     }
 
     private Decision<A> algoDecision(State<A> state) {
@@ -133,16 +128,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             return new Decision<>(actions.get(0).getAction());
         }
 
-        Map<StateAction<A>, Double> rewards = getFilteredRewards(actions, state.getCurrent());
-        if (actions.size() != rewards.size()) {
-            rewards.putAll(qTable.getMultiple(actions.stream().filter(act -> !rewards.containsKey(act))));
-        }
-        double max = rewards.values().stream().mapToDouble(Double::doubleValue).max().orElseThrow(IllegalStateException::new);
-        if (max < 0.25) {
-            List<StateAction<A>> states = new ArrayList<>(rewards.keySet());
-            double[] weights = states.stream().mapToDouble(st -> rewards.get(st) * rewards.get(st)).toArray();
-            return new Decision<>(states.get(ProbabilityUtil.weightedRandom(weights)).getAction(), true);
-        }
+        Map<StateAction<A>, Double> rewards = qTable.getMultiple(actions.stream());
         return new Decision<>(rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
                 .orElseThrow(IllegalStateException::new).getKey().getAction());
