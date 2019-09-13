@@ -13,13 +13,14 @@ public class TicTacToeState15x15 implements TicTacToeState {
 	private static final int VER_SIZE = 15;
 	private static final int WON = 5;
 
-	private BitSet plrz = new BitSet();
+	private final BitSet plrz;
 
 	public TicTacToeState15x15() {
+		this.plrz = new BitSet();
 	}
 
 	private TicTacToeState15x15(TicTacToeState15x15 prev, int nextMove) {
-		this.plrz = prev.plrz;
+		this.plrz = (BitSet) prev.plrz.clone();
 		if (isAssigned(nextMove)) {
 			throw new IllegalArgumentException();
 		}
