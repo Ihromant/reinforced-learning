@@ -110,6 +110,12 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         }
 
         Map<StateAction<A>, Double> rewards = qTable.getMultiple(actions.stream());
+        double max = rewards.values().stream().mapToDouble(Double::doubleValue).max().orElseThrow(IllegalStateException::new);
+        if (max < 0.25) {
+            List<StateAction<A>> states = new ArrayList<>(rewards.keySet());
+            double[] weights = states.stream().mapToDouble(st -> Math.pow(rewards.get(st), 4)).toArray();
+            return new Decision<>(states.get(ProbabilityUtil.weightedRandom(weights)).getAction(), true);
+        }
         return new Decision<>(rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
                 .orElseThrow(IllegalStateException::new).getKey().getAction());
