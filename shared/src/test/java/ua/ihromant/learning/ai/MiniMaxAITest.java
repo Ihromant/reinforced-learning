@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.qtable.HistoryItem;
-import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.NimLineState;
 import ua.ihromant.learning.state.Player;
@@ -27,7 +26,7 @@ public class MiniMaxAITest {
                 .forEach(i -> {
                     System.out.println(i + " minimax test for tictactoe");
                     List<HistoryItem<TTTAction>> items = Agent.play(players(), new TicTacToeState3x3());
-                    Assertions.assertEquals(GameResult.DRAW, items.get(items.size() - 1).getTo().getUtility(Player.X));
+                    Assertions.assertEquals(0.5, items.get(items.size() - 1).getTo().getResult().getUtility(Player.X));
                 });
     }
 
@@ -37,7 +36,7 @@ public class MiniMaxAITest {
                 .forEach(i -> {
                     System.out.println(i + " minimax test for nim");
                     List<HistoryItem<NimAction>> items = Agent.play(players(), new NimLineState(def));
-                    Assertions.assertEquals(GameResult.LOSE, items.get(items.size() - 1).getTo().getUtility(Player.X));
+                    Assertions.assertEquals(0.0, items.get(items.size() - 1).getTo().getResult().getUtility(Player.X));
                 });
     }
 

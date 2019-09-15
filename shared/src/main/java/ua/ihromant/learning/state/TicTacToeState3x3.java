@@ -53,10 +53,6 @@ public class TicTacToeState3x3 implements TicTacToeState {
 
     @Override
     public Stream<TTTAction> getActions() {
-        if (isTerminal()) {
-            return Stream.empty();
-        }
-
         return IntStream.range(0, players.length)
                 .filter(i -> players[i] == null)
                 .mapToObj(TTTAction::new);
@@ -74,18 +70,16 @@ public class TicTacToeState3x3 implements TicTacToeState {
     }
 
     @Override
-    public boolean isTerminal() {
-        return Arrays.stream(players).filter(Objects::nonNull).count() == 9 || won() != null;
-    }
-
-    @Override
-    public GameResult getUtility(Player player) {
-        Player won = won();
-        if (won == null) {
-            return GameResult.DRAW;
+    public Result getResult() {
+        long moves = Arrays.stream(players).filter(Objects::nonNull).count();
+        if (moves == players.length) {
+            return new BoardResult();
         }
-
-        return player == won ? GameResult.WIN : GameResult.LOSE;
+        Player won = won();
+        if (won != null) {
+            return new BoardResult(won, (int) moves, 5);
+        }
+        return null;
     }
 
     @Override

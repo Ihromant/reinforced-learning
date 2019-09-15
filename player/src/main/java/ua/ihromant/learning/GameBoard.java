@@ -38,10 +38,9 @@ public class GameBoard<A> {
 	}
 
 	private void playFirst() {
-		List<HistoryItem<A>> history = Agent.play(Map.of(Player.X, agent, Player.O, ai),
-				baseStateProducer.get());
+		List<HistoryItem<A>> history = Agent.play(Map.of(Player.X, agent, Player.O, ai), baseStateProducer.get());
 		WriterUtil.writeHistory(history);
-		switch (history.get(history.size() - 1).getTo().getUtility(Player.X)) {
+		switch (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X)) {
 			case DRAW:
 				System.out.println("Draw!");
 				break;
@@ -55,10 +54,9 @@ public class GameBoard<A> {
 	}
 
 	private void playSecond() {
-		List<HistoryItem<A>> history = Agent.play(Map.of(Player.X, ai, Player.O, agent),
-				baseStateProducer.get());
+		List<HistoryItem<A>> history = Agent.play(Map.of(Player.X, ai, Player.O, agent), baseStateProducer.get());
 		WriterUtil.writeHistory(history);
-		switch (history.get(history.size() - 1).getTo().getUtility(Player.O)) {
+		switch (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.O)) {
 			case DRAW:
 				System.out.println("Draw!");
 				return;

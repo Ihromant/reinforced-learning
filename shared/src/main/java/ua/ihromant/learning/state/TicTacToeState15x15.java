@@ -80,10 +80,6 @@ public class TicTacToeState15x15 implements TicTacToeState {
 
 	@Override
 	public Stream<TTTAction> getActions() {
-		if (isTerminal()) {
-			return Stream.empty();
-		}
-
 		return IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.filter(i -> !isAssigned(i))
 				.mapToObj(TTTAction::new);
@@ -104,18 +100,16 @@ public class TicTacToeState15x15 implements TicTacToeState {
 	}
 
 	@Override
-	public boolean isTerminal() {
-		return andWithOther(TERMINAL_MASK).equals(TERMINAL_MASK) || won() != null;
-	}
-
-	@Override
-	public GameResult getUtility(Player player) {
-		Player won = won();
-		if (won == null) {
-			return GameResult.DRAW;
+	public Result getResult() {
+		int moves = andWithOther(TERMINAL_MASK).cardinality();
+		if (moves == HOR_SIZE * VER_SIZE) {
+			return new BoardResult();
 		}
-
-		return player == won ? GameResult.WIN : GameResult.LOSE;
+		Player won = won();
+		if (won != null) {
+			return new BoardResult(won(), moves, 2 * WON - 1, 0.001);
+		}
+		return null;
 	}
 
 	@Override

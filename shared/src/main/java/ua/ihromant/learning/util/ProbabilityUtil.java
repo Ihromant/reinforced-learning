@@ -45,10 +45,7 @@ public class ProbabilityUtil {
 		if (result > 0.8) {
 			return 0.8;
 		}
-		if (result < 0.01) {
-			return 0.01;
-		}
-		return result;
+		return Math.max(result, 0.01);
 	}
 
 	public static double calculateExploration(int consSize, int maxMoves) {

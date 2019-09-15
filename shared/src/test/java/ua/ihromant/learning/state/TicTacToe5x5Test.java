@@ -15,6 +15,14 @@ public class TicTacToe5x5Test {
             null, null, null, null, null,
     };
 
+    private static final Player[] DRAW = new Player[]{
+            X,    X,    X,    O,    O,
+            X,    X,    O,    O,    O,
+            O,    O,    X,    X,    O,
+            X,    O,    X,    O,    X,
+            O,    X,    X,    X,    O,
+    };
+
     private static final Player[] HOR_WIN = new Player[]{
             X,    X,    X,    X,    O,
             O,    X,    O,    O,    O,
@@ -59,32 +67,19 @@ public class TicTacToe5x5Test {
     @Test
     public void testActions() {
         Assertions.assertEquals(15, TicTacToeState5x5.from(RAND).getActions().count());
-        Assertions.assertEquals(0, TicTacToeState5x5.from(HOR_WIN).getActions().count());
-        Assertions.assertEquals(0, TicTacToeState5x5.from(VER_WIN).getActions().count());
-        Assertions.assertEquals(0, TicTacToeState5x5.from(NORD_WEST_WIN).getActions().count());
-        Assertions.assertEquals(0, TicTacToeState5x5.from(NORD_EAST_WIN).getActions().count());
     }
 
     @Test
     public void testUtility() {
-        Assertions.assertEquals(GameResult.DRAW, TicTacToeState5x5.from(RAND).getUtility(X));
-        Assertions.assertEquals(GameResult.WIN, TicTacToeState5x5.from(HOR_WIN).getUtility(X));
-        Assertions.assertEquals(GameResult.WIN, TicTacToeState5x5.from(VER_WIN).getUtility(X));
-        Assertions.assertEquals(GameResult.WIN, TicTacToeState5x5.from(NORD_WEST_WIN).getUtility(X));
-        Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x5.from(NORD_EAST_WIN).getUtility(X));
-        Assertions.assertEquals(GameResult.DRAW, TicTacToeState5x5.from(RAND).getUtility(O));
-        Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x5.from(HOR_WIN).getUtility(O));
-        Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x5.from(VER_WIN).getUtility(O));
-        Assertions.assertEquals(GameResult.LOSE, TicTacToeState5x5.from(NORD_WEST_WIN).getUtility(O));
-        Assertions.assertEquals(GameResult.WIN, TicTacToeState5x5.from(NORD_EAST_WIN).getUtility(O));
-    }
-
-    @Test
-    public void testTerminal() {
-        Assertions.assertFalse(TicTacToeState5x5.from(RAND).isTerminal());
-        Assertions.assertTrue(TicTacToeState5x5.from(HOR_WIN).isTerminal());
-        Assertions.assertTrue(TicTacToeState5x5.from(VER_WIN).isTerminal());
-        Assertions.assertTrue(TicTacToeState5x5.from(NORD_WEST_WIN).isTerminal());
-        Assertions.assertTrue(TicTacToeState5x5.from(NORD_EAST_WIN).isTerminal());
+        Assertions.assertNull(TicTacToeState5x5.from(RAND).getResult());
+        Assertions.assertEquals(0.97, TicTacToeState5x5.from(HOR_WIN).getResult().getUtility(X));
+        Assertions.assertEquals(0.94, TicTacToeState5x5.from(VER_WIN).getResult().getUtility(X));
+        Assertions.assertEquals(0.94, TicTacToeState5x5.from(NORD_WEST_WIN).getResult().getUtility(X));
+        Assertions.assertEquals(0.07, TicTacToeState5x5.from(NORD_EAST_WIN).getResult().getUtility(X));
+        Assertions.assertEquals(0.03, TicTacToeState5x5.from(HOR_WIN).getResult().getUtility(O));
+        Assertions.assertEquals(0.06, TicTacToeState5x5.from(VER_WIN).getResult().getUtility(O));
+        Assertions.assertEquals(0.06, TicTacToeState5x5.from(NORD_WEST_WIN).getResult().getUtility(O));
+        Assertions.assertEquals(0.93, TicTacToeState5x5.from(NORD_EAST_WIN).getResult().getUtility(O), 0.000001);
+        Assertions.assertEquals(0.5, TicTacToeState5x5.from(DRAW).getResult().getUtility(X));
     }
 }

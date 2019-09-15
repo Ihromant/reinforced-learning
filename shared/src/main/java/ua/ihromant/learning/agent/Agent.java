@@ -14,7 +14,7 @@ public interface Agent<A> {
 	static <A> List<HistoryItem<A>> play(Map<Player, Agent<A>> players, State<A> baseState) {
 		List<HistoryItem<A>> history = new ArrayList<>();
 		State<A> state = baseState;
-		while (!state.isTerminal()) {
+		while (state.getResult() == null) {
 			Agent<A> currentAgent = players.get(state.getCurrent());
 			Agent.Decision<A> dec = currentAgent.decision(state, history);
 			HistoryItem<A> item = new HistoryItem<>(state, dec.action, state.apply(dec.action), state.getCurrent(), dec.random);
