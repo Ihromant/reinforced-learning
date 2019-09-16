@@ -6,8 +6,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class NimMultipleState implements NimState {
-	private static final int PILES_MAX = 4;
-	private static final int BINARY_NUMBERS = 3;
 	private final int[] piles;
 	private final Player current;
 
@@ -22,10 +20,6 @@ public class NimMultipleState implements NimState {
 
 	@Override
 	public Stream<NimAction> getActions() {
-		if (isTerminal()) {
-			return Stream.empty();
-		}
-
 		return IntStream.rangeClosed(1, Arrays.stream(piles).max().orElse(0))
 				.boxed()
 				.flatMap(red -> {
@@ -67,17 +61,11 @@ public class NimMultipleState implements NimState {
 	}
 
 	@Override
-	public boolean isTerminal() {
-		return Arrays.stream(piles).allMatch(i -> i == 0);
-	}
-
-	@Override
-	public GameResult getUtility(Player player) {
-		if (!isTerminal()) {
-			return GameResult.DRAW;
+	public Result getResult() {
+		if (Arrays.stream(piles).allMatch(i -> i == 0)) {
+			return new BoardResult(this.current);
 		}
-
-		return this.current == player ? GameResult.WIN : GameResult.LOSE;
+		return null;
 	}
 
 	@Override

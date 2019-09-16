@@ -8,9 +8,7 @@ public interface State<A> extends Serializable {
 
     State<A> apply(A action);
 
-    boolean isTerminal();
-
-    GameResult getUtility(Player player);
+    Result getResult();
 
     Player getCurrent();
 

@@ -6,6 +6,7 @@ import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
+import ua.ihromant.learning.state.Result;
 import ua.ihromant.learning.state.State;
 import ua.ihromant.learning.util.ProbabilityUtil;
 import ua.ihromant.learning.util.WriterUtil;
@@ -84,24 +85,12 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     private Map<StateAction<A>, Double> convert(List<HistoryItem<A>> history) {
         Map<StateAction<A>, Double> oldValues = qTable.getMultiple(history.stream().map(HistoryItem::getStateAction));
         int size = history.size();
-        State<A> last = history.get(size - 1).getTo();
-        Player lastMoved = history.get(size - 1).getPlayer();
-        GameResult result = last.getUtility(lastMoved);
+        Result result = history.get(size - 1).getTo().getResult();
         double coeff = 1.0;
         Map<StateAction<A>, Double> converted = new HashMap<>();
         for (int i = history.size() - 1; i >= 0; i--) {
             HistoryItem<A> item = history.get(i);
-            double baseValue;
-            if (result == GameResult.DRAW) {
-                baseValue = 0.5;
-            } else {
-                if (result == GameResult.WIN) {
-                    baseValue = item.getPlayer() == lastMoved ? getWeightedWin(size) : getWeightedLoss(size);
-                }
-                else {
-                    baseValue = item.getPlayer() == lastMoved ? getWeightedLoss(size) : getWeightedWin(size);
-                }
-            }
+            double baseValue = result.getUtility(item.getPlayer());
             double oldValue = oldValues.get(item.getStateAction());
             converted.put(item.getStateAction(), linear(oldValue, baseValue, coeff));
             double newFactor = item.isRandom() ? oldValue > baseValue ? RANDOM_GAMMA : 1.0 : GAMMA;
@@ -114,14 +103,6 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         return oldValue * (1 - coeff) + newValue * coeff;
     }
 
-    private double getWeightedWin(int moves) {
-        return 1.04 - 0.01 * moves;
-    }
-
-    private double getWeightedLoss(int moves) {
-        return -0.04 + 0.01 * moves;
-    }
-
     private Decision<A> algoDecision(State<A> state) {
         List<StateAction<A>> actions = state.getActions().map(a -> new StateAction<>(state, a)).collect(Collectors.toList());
         if (actions.size() == 1) {
@@ -129,6 +110,12 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
         }
 
         Map<StateAction<A>, Double> rewards = qTable.getMultiple(actions.stream());
+        double max = rewards.values().stream().mapToDouble(Double::doubleValue).max().orElseThrow(IllegalStateException::new);
+        if (max < 0.25) {
+            List<StateAction<A>> states = new ArrayList<>(rewards.keySet());
+            double[] weights = states.stream().mapToDouble(st -> Math.pow(rewards.get(st), 4)).toArray();
+            return new Decision<>(states.get(ProbabilityUtil.weightedRandom(weights)).getAction(), true);
+        }
         return new Decision<>(rewards.entrySet().stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
                 .orElseThrow(IllegalStateException::new).getKey().getAction());
@@ -146,7 +133,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             micro = logStats(statistics, micro, stat, history, conservativeWrong, i, episodes);
             history = Agent.play(players, baseState);
             qTable.setMultiple(convert(history));
-            GameResult finalResult = history.get(history.size() - 1).getTo().getUtility(Player.X);
+            GameResult finalResult = history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X);
             statistics.put(finalResult, statistics.get(finalResult) == null ? 1 : statistics.get(finalResult) + 1);
             if (history.stream().noneMatch(HistoryItem::isRandom) && finalResult != history.get(0).getTo().getExpectedResult(Player.X)) {
                 conservativeWrong.add(new ArrayList<>(history));

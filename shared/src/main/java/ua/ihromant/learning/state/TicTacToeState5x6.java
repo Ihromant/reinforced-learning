@@ -19,12 +19,12 @@ public class TicTacToeState5x6 implements TicTacToeState {
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 15), GameResult.WIN);
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 20), GameResult.WIN);
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 21), GameResult.WIN);
-			put(new TicTacToeState5x6(new TicTacToeState5x6(), 7), GameResult.DRAW);
-			put(new TicTacToeState5x6(new TicTacToeState5x6(), 10), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 7), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 10), GameResult.WIN);
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 13), GameResult.DRAW);
 			put(new TicTacToeState5x6(new TicTacToeState5x6(), 16), GameResult.DRAW);
-			put(new TicTacToeState5x6(new TicTacToeState5x6(), 19), GameResult.DRAW);
-			put(new TicTacToeState5x6(new TicTacToeState5x6(), 22), GameResult.DRAW);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 19), GameResult.WIN);
+			put(new TicTacToeState5x6(new TicTacToeState5x6(), 22), GameResult.WIN);
 		}
 	};
 	private long plrz;
@@ -95,10 +95,6 @@ public class TicTacToeState5x6 implements TicTacToeState {
 
 	@Override
 	public Stream<TTTAction> getActions() {
-		if (isTerminal()) {
-			return Stream.empty();
-		}
-
 		return IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.filter(i -> !isAssigned(i))
 				.mapToObj(TTTAction::new);
@@ -119,18 +115,16 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	}
 
 	@Override
-	public boolean isTerminal() {
-		return (plrz & TERMINAL_MASK) == TERMINAL_MASK || won() != null;
-	}
-
-	@Override
-	public GameResult getUtility(Player player) {
-		Player won = won();
-		if (won == null) {
-			return GameResult.DRAW;
+	public Result getResult() {
+		int moves = Long.bitCount(plrz & TERMINAL_MASK);
+		if (moves == HOR_SIZE * VER_SIZE) {
+			return new BoardResult();
 		}
-
-		return player == won ? GameResult.WIN : GameResult.LOSE;
+		Player won = won();
+		if (won != null) {
+			return new BoardResult(won(), moves, 2 * WON - 1);
+		}
+		return null;
 	}
 
 	@Override

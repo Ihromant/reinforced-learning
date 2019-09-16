@@ -30,7 +30,7 @@ public class TicTacToeTest {
 						.filter(i -> {
 							System.out.println(i + " minimax test for player O tictactoe");
 							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+							if (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X) != GameResult.DRAW) {
 								WriterUtil.writeHistory(history, ai.qTable);
 								return false;
 							}
@@ -50,7 +50,7 @@ public class TicTacToeTest {
 						.filter(i -> {
 							System.out.println(i + " minimax test for player X tictactoe");
 							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+							if (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X) != GameResult.DRAW) {
 								WriterUtil.writeHistory(history, ai.qTable);
 								return false;
 							}
@@ -70,7 +70,7 @@ public class TicTacToeTest {
 						.filter(i -> {
 							System.out.println(i + " random test for player O tictactoe");
 							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-							if (history.get(history.size() - 1).getTo().getUtility(Player.X) == GameResult.WIN) {
+							if (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X) == GameResult.WIN) {
 								WriterUtil.writeHistory(history, ai.qTable);
 								return false;
 							}
@@ -90,7 +90,7 @@ public class TicTacToeTest {
 						.filter(i -> {
 							System.out.println(i + " random test for player X tictactoe");
 							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-							if (history.get(history.size() - 1).getTo().getUtility(Player.X) == GameResult.LOSE) {
+							if (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X) == GameResult.LOSE) {
 								WriterUtil.writeHistory(history, ai.qTable);
 								return false;
 							}
@@ -110,7 +110,7 @@ public class TicTacToeTest {
 						.filter(i -> {
 							System.out.println(i + " minimax test for player X tictactoe");
 							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+							if (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X) != GameResult.DRAW) {
 								WriterUtil.writeHistory(history, ai.qTable);
 								return false;
 							}
@@ -130,7 +130,7 @@ public class TicTacToeTest {
 						.filter(i -> {
 							System.out.println(i + " minimax test for player O tictactoe");
 							List<HistoryItem<TTTAction>> history = Agent.play(players, new TicTacToeState3x3());
-							if (history.get(history.size() - 1).getTo().getUtility(Player.X) != GameResult.DRAW) {
+							if (history.get(history.size() - 1).getTo().getResult().getGameResult(Player.X) != GameResult.DRAW) {
 								WriterUtil.writeHistory(history, ai.qTable);
 								return false;
 							}

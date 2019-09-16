@@ -1,7 +1,7 @@
 package ua.ihromant.learning.qtable;
 
-import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
+import ua.ihromant.learning.state.Result;
 import ua.ihromant.learning.state.State;
 
 public class HistoryItem<A> {
@@ -39,7 +39,7 @@ public class HistoryItem<A> {
     	return new StateAction<>(from, action);
     }
 
-    public GameResult getGameResult() {
-        return to.getUtility(player);
+    public Result getResult() {
+        return to.getResult();
     }
 }
