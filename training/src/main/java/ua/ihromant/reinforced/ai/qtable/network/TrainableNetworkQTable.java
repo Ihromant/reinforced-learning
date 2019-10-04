@@ -5,6 +5,8 @@ import ua.ihromant.learning.ai.converter.QValueConverter;
 import ua.ihromant.learning.network.NeuralNetworkAgent;
 import ua.ihromant.learning.qtable.NetworkQTable;
 import ua.ihromant.learning.qtable.StateAction;
+import ua.ihromant.learning.state.GameResult;
+import ua.ihromant.learning.state.Player;
 import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ public class TrainableNetworkQTable<A> extends NetworkQTable<A> implements Train
         // debug
 	    IntStream.range(0, models.size()).forEach(i -> cached.compute(inputConverter.reverse(models.get(i)),
 			    (k, v) -> {List<double[]> l = v == null ? new ArrayList<>() : v;
-				    if (l.size() < 100) {
+				    if (l.size() < 300) {
 					    l.add(values.get(i));
 				    }
 				    return l;
@@ -47,10 +49,13 @@ public class TrainableNetworkQTable<A> extends NetworkQTable<A> implements Train
 	public void serialize(String path) {
 		agent.serialize(path);
 		// debug
-		cached.forEach((k, v) -> System.out.println(k + " -> " +
-				IntStream.range(0, v.size())
+		cached.entrySet().stream()
+				.filter(e -> e.getValue().size() > 200)
+				.filter(e -> e.getKey().getResult().getExpectedResult(Player.X) != GameResult.LOSE)
+				.forEach(e -> System.out.println(e.getKey() + " -> " +
+				IntStream.range(0, e.getValue().size())
 						.mapToObj(i -> Arrays.toString(DoubleStream.concat(DoubleStream.of(i),
-								Arrays.stream(v.get(i))).toArray()))
+								Arrays.stream(e.getValue().get(i))).toArray()))
 						.collect(Collectors.joining(","))));
 	}
 }
