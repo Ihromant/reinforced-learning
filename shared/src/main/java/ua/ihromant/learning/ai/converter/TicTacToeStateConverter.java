@@ -35,6 +35,11 @@ public class TicTacToeStateConverter implements InputConverter<TTTAction> {
 	}
 
 	@Override
+	public StateAction<TTTAction> reverse(double[] from) {
+		return null;
+	}
+
+	@Override
 	public int inputLength() {
 		return size * 3 + 1;
 	}

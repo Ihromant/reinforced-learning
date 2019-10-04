@@ -13,7 +13,7 @@ public class NimLineState implements NimState {
 		this(piles, Player.X);
 	}
 
-	private NimLineState(int[] piles, Player player) {
+	public NimLineState(int[] piles, Player player) {
 		this.piles = Arrays.stream(piles).sorted().filter(i -> i != 0).toArray();
 		this.current = player;
 	}

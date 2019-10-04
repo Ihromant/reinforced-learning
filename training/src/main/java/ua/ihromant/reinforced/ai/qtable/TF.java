@@ -17,13 +17,13 @@ public class TF {
 	public static MultiLayerConfiguration buildGraph(InputConverter inputConverter, QValueConverter converter) {
 		return new NeuralNetConfiguration.Builder()
 				.seed(ThreadLocalRandom.current().nextLong())
-				.weightInit(WeightInit.SIGMOID_UNIFORM)
+				.weightInit(WeightInit.XAVIER)
 				.updater(new Adam())
 				.list()
 				.layer(0, new DenseLayer.Builder()
 						.nIn(inputConverter.inputLength())
 						.nOut(inputConverter.inputLength() * 10)
-						.activation(Activation.SIGMOID)
+						.activation(Activation.RELU)
 						.build())
 				.layer(1, new OutputLayer
 						.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
