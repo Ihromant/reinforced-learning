@@ -44,4 +44,12 @@ public class NimAction implements Serializable {
         result = 31 * result + Arrays.hashCode(coeffs);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "NimAction{" +
+                "coeffs=" + Arrays.toString(coeffs) +
+                ", reduce=" + reduce +
+                '}';
+    }
 }

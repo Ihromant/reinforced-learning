@@ -18,8 +18,8 @@ public class StateAction<A> implements Serializable {
 		return (ST) state.apply(action);
 	}
 
-	public State<A> getState() {
-		return state;
+	public <ST extends State<A>> ST getState() {
+		return (ST) state;
 	}
 
 	public A getAction() {
@@ -42,5 +42,13 @@ public class StateAction<A> implements Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(state, action);
+	}
+
+	@Override
+	public String toString() {
+		return "StateAction{" +
+				"state=" + state +
+				", action=" + action +
+				'}';
 	}
 }
