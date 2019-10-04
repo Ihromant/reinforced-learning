@@ -1,6 +1,8 @@
 package ua.ihromant.reinforced.ai;
 
 //import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import ua.ihromant.learning.state.NimLineState;
 import ua.ihromant.learning.state.NimState;
@@ -12,8 +14,8 @@ import java.io.File;
 
 public class Trainer {
     static {
-        //Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        //root.setLevel(Level.INFO);
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
     }
 
     public static void main(String[] args) {

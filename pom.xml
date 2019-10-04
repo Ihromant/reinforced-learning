@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-ui_2.10</artifactId>
+            <artifactId>deeplearning4j-ui_2.12</artifactId>
             <version>1.0.0-beta5</version>
         </dependency>
         <dependency>

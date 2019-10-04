@@ -6,9 +6,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.datasets.iterator.DoublesDataSetIterator;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -33,16 +37,16 @@ public class NeuralNetworkAgent {
     }
 
     private void listener() {
-//        UIServer uiServer = UIServer.getInstance();
-//
-//        //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
-//        StatsStorage statsStorage = new InMemoryStatsStorage();         //Alternative: new FileStatsStorage(File), for saving and loading later
-//
-//        //Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
-//        uiServer.attach(statsStorage);
-//
-//        //Then add the StatsListener to collect this information from the network, as it trains
-//        this.network.setListeners(new StatsListener(statsStorage));
+        UIServer uiServer = UIServer.getInstance();
+
+        //Configure where the network information (gradients, score vs. time etc) is to be stored. Here: store in memory.
+        StatsStorage statsStorage = new InMemoryStatsStorage();         //Alternative: new FileStatsStorage(File), for saving and loading later
+
+        //Attach the StatsStorage instance to the UI: this allows the contents of the StatsStorage to be visualized
+        uiServer.attach(statsStorage);
+
+        //Then add the StatsListener to collect this information from the network, as it trains
+        this.network.setListeners(new StatsListener(statsStorage));
     }
 
     public double[] get(double[] model, int outputLength) {
