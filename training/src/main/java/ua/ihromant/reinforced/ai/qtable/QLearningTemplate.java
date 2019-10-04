@@ -5,8 +5,6 @@ import ua.ihromant.learning.agent.Agent;
 import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.GameResult;
-import ua.ihromant.learning.state.NimLineState;
-import ua.ihromant.learning.state.NimState;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.Result;
 import ua.ihromant.learning.state.State;
@@ -29,7 +27,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     private static final double GAMMA = 0.8;
     private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
-    private double exploration = 0.0;
+    private double exploration = 0.1;
     private final TrainableQTable<A> qTable;
     private final State<A> baseState;
     private final Map<Player, Agent<A>> players;
@@ -48,7 +46,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     + " ms, statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
             IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> WriterUtil.writeHistory(conservativeWrong.get(j), qTable));
             WriterUtil.writeHistory(history, qTable);
-            this.exploration = ProbabilityUtil.calculateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
+            //this.exploration = ProbabilityUtil.calculateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
 
             stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
                     statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
@@ -76,12 +74,7 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
             return new Decision<>(actions.get(0).getAction());
         }
 
-        Map<StateAction<A>, Double> evals = qTable.getMultiple(actions.stream());
-        double[] weights = actions.stream()
-                .mapToDouble(state -> Arrays.stream(GameResult.values())
-                        .mapToDouble(val -> Math.abs(evals.get(state) - val.toDouble()))
-                        .min().orElseThrow(RuntimeException::new)).toArray();
-        return new Decision<>(actions.get(ProbabilityUtil.weightedRandom(weights)).getAction(), true);
+        return new Decision<>(actions.get(ThreadLocalRandom.current().nextInt(actions.size())).getAction(), true);
     }
 
     private Map<StateAction<A>, Double> convert(List<HistoryItem<A>> history) {

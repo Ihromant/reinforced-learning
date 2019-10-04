@@ -37,7 +37,6 @@ public class TrainerFactory {
         InputConverter<TTTAction> inputConvert = new TicTacToeStateConverter(state.getMaximumMoves());
         QValueConverter qConvert = new WinDrawLoseConverter();
         return new QLearningTemplate<>(state, newNetworkQTable(inputConvert, qConvert));
-        //return new QLearningTemplate<>(state, newMapQTable());
     }
 
     public static TrainingAgent<NimAction> loadNimAgent(Supplier<NimState> supplier, String path) {

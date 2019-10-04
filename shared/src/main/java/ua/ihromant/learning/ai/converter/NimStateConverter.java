@@ -23,7 +23,6 @@ public class NimStateConverter implements InputConverter<NimAction> {
 			throw new IllegalArgumentException(String.valueOf(stateAction));
 		});
 		double[] result = new double[inputLength()];
-		result[result.length - 1] = state.getCurrent() == Player.X ? 1 : 0;
 		for (int i = 0; i < PILES_MAX && i < piles.length; i++) {
 			char[] binary = Integer.toBinaryString(piles[i]).toCharArray();
 			for (int j = 0; j < binary.length && j < BINARY_NUMBERS; j++) {
@@ -54,10 +53,9 @@ public class NimStateConverter implements InputConverter<NimAction> {
 			}
 			piles[i] = Integer.parseInt(builder.length() > 0 ? builder.toString() : "0", 2);
 		}
-		Player pl = from[from.length - 1] > 0 ? Player.X : Player.O;
-		NimState state = new NimLineState(piles, pl);
+		NimState state = new NimLineState(piles, Player.X);
 		StringBuilder builder = new StringBuilder();
-		for (int i = PILES_MAX * BINARY_NUMBERS + PILES_MAX; i < from.length - 1; i++) {
+		for (int i = PILES_MAX * BINARY_NUMBERS + PILES_MAX; i < from.length; i++) {
 			double val = from[i];
 			if (builder.length() > 0 || val > 0) {
 				builder.append(val > 0 ? '1' : '0');
@@ -72,6 +70,6 @@ public class NimStateConverter implements InputConverter<NimAction> {
 
 	@Override
 	public int inputLength() {
-		return PILES_MAX * BINARY_NUMBERS + BINARY_NUMBERS + PILES_MAX + 1;
+		return PILES_MAX * BINARY_NUMBERS + BINARY_NUMBERS + PILES_MAX;
 	}
 }
