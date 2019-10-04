@@ -67,7 +67,8 @@ public class NimLineState implements NimState {
 
 	@Override
 	public GameResult getExpectedResult(Player pl) {
-		return Arrays.stream(piles).reduce((a, b) -> a ^ b).orElse(0) == 0 ^ pl == Player.X ? GameResult.WIN : GameResult.LOSE;
+		return Arrays.stream(piles).reduce((a, b) -> a ^ b).orElse(0) == 0 ^ pl == current ? GameResult.WIN :
+				GameResult.LOSE;
 	}
 
 	@Override

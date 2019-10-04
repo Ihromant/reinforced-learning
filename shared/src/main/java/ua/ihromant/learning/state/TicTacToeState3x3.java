@@ -84,18 +84,24 @@ public class TicTacToeState3x3 implements TicTacToeState {
 
     @Override
     public String toString() {
+        int SIZE = 3;
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                int coef = i * 3 + j;
+        builder.append("-".repeat(SIZE + 2));
+        builder.append('\n');
+        for (int i = 0; i < SIZE; i++) {
+            builder.append('|');
+            for (int j = 0; j < SIZE; j++) {
+                int coef = i * SIZE + j;
                 if (players[coef] != null) {
-                    builder.append(players[coef].toString());
+                    builder.append(getPlayer(coef).toString());
                 } else {
                     builder.append(' ');
                 }
             }
+            builder.append('|');
             builder.append('\n');
         }
+        builder.append("-".repeat(SIZE + 2));
         return builder.toString();
     }
 

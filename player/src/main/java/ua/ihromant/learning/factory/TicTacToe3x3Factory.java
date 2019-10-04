@@ -9,7 +9,7 @@ import ua.ihromant.learning.state.TicTacToeState3x3;
 
 import java.util.function.Supplier;
 
-public class TicTacToeFactory implements Factory<TTTAction> {
+public class TicTacToe3x3Factory implements Factory<TTTAction> {
 	@Override
 	public Supplier<State<TTTAction>> getStateSupplier() {
 		return TicTacToeState3x3::new;
@@ -22,7 +22,7 @@ public class TicTacToeFactory implements Factory<TTTAction> {
 
 	@Override
 	public Agent<TTTAction> createAI(String path) {
-		return AIZoo.miniMax(Player.X);
-		//return AIZoo.networkTTTAI(getStateSupplier().get().getMaximumMoves(), path);
+		//return AIZoo.miniMax(Player.O);
+		return AIZoo.networkTTTAI(getStateSupplier().get().getMaximumMoves(), path);
 	}
 }
