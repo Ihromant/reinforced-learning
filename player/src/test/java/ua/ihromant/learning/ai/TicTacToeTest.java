@@ -22,7 +22,7 @@ public class TicTacToeTest {
 	public void testMinimaxX() {
 		int tries = 1000;
 		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
-				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
+				Objects.requireNonNull(getClass().getClassLoader().getResource("test1000k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
 				Player.O, ai);
 		Assertions.assertEquals(tries,
@@ -42,7 +42,7 @@ public class TicTacToeTest {
 	public void testMinimaxO() {
 		int tries = 1000;
 		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
-				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
+				Objects.requireNonNull(getClass().getClassLoader().getResource("test1000k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
 				Player.O, new MinimaxAI<>(Player.O));
 		Assertions.assertEquals(tries,

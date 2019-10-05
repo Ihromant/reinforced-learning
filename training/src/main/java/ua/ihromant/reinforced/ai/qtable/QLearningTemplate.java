@@ -27,13 +27,15 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     private static final double GAMMA = 0.8;
     private static final double RANDOM_GAMMA = 0.1;
     private static final int STEP = 1000;
-    private double exploration = 0.1;
+    private final double exploration;
     private final TrainableQTable<A> qTable;
     private final State<A> baseState;
     private final Map<Player, Agent<A>> players;
+    private Map<StateAction<A>, Long> prev = new HashMap<>();
 
     public QLearningTemplate(State<A> baseState, TrainableQTable<A> qTable) {
         this.baseState = baseState;
+        this.exploration = 1.0 / baseState.getMaximumMoves();
         this.qTable = qTable;
         this.players = Arrays.stream(Player.values()).collect(Collectors.toMap(Function.identity(), p -> this));
     }
@@ -46,12 +48,12 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     + " ms, statistics for player X: " + statistics + ", conservative wrong size: " + conservativeWrong.size());
             IntStream.range(0, Math.min(conservativeWrong.size(), 3)).forEach(j -> WriterUtil.writeHistory(conservativeWrong.get(j), qTable));
             WriterUtil.writeHistory(history, qTable);
-            //this.exploration = ProbabilityUtil.calculateExploration(conservativeWrong.size(), baseState.getMaximumMoves());
 
             stat.add(new int[] {i + 1, statistics.getOrDefault(GameResult.WIN, 0), statistics.getOrDefault(GameResult.DRAW, 0),
                     statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
 
             statistics.clear();
+            prev = conservativeWrong.stream().collect(Collectors.groupingBy(l -> l.get(0).getStateAction(), Collectors.counting()));
             conservativeWrong.clear();
             return res;
         }
@@ -62,7 +64,9 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
     public Decision<A> decision(State<A> from, List<HistoryItem<A>> history) {
         if (history.isEmpty()) {
             List<A> actions = from.getActions().collect(Collectors.toList());
-            return new Decision<>(actions.get(ThreadLocalRandom.current().nextInt(actions.size())));
+            double[] weights = actions.stream()
+                    .mapToDouble(a -> prev.getOrDefault(new StateAction<>(from, a), 1L)).toArray();
+            return new Decision<>(actions.get(ProbabilityUtil.weightedRandom(weights)));
         }
         boolean random = ThreadLocalRandom.current().nextDouble() < exploration;
         return random ? randomAction(from) : algoDecision(from);
