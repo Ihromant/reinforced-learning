@@ -57,6 +57,10 @@ public class NeuralNetworkAgent {
     }
 
     public List<double[]> getMultiple(List<double[]> models, int outputLength) {
+        if (models.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         DataSetIterator iter = new DoublesDataSetIterator(
                 models.stream().map(mod -> new Pair<>(mod,
                         new double[outputLength])).collect(Collectors.toList()),
