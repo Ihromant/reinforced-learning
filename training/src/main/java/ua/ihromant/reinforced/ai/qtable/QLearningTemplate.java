@@ -53,6 +53,8 @@ public class QLearningTemplate<A> implements TrainingAgent<A> {
                     statistics.getOrDefault(GameResult.LOSE, 0), conservativeWrong.size()});
 
             statistics.clear();
+            prev.forEach((k, v) -> System.out.print(k.getAction() + " -> " +  v + " "));
+            System.out.println("Size: " + prev.size());
             prev = conservativeWrong.stream().collect(Collectors.groupingBy(l -> l.get(0).getStateAction(), Collectors.counting()));
             conservativeWrong.clear();
             return res;

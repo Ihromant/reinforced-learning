@@ -30,4 +30,11 @@ public class TTTAction implements Serializable {
     public int hashCode() {
         return Objects.hash(coordinate);
     }
+
+    @Override
+    public String toString() {
+        return "TTTAction{" +
+                "coordinate=" + coordinate +
+                '}';
+    }
 }
