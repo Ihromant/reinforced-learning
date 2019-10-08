@@ -97,7 +97,7 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	public Stream<TTTAction> getActions() {
 		return IntStream.range(0, HOR_SIZE * VER_SIZE)
 				.filter(i -> !isAssigned(i))
-				.mapToObj(TTTAction::new);
+				.mapToObj(TTTAction::of);
 	}
 
 	@Override
