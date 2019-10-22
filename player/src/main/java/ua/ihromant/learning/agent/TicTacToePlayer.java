@@ -16,6 +16,6 @@ public class TicTacToePlayer extends ConsolePlayer<TTTAction> {
 	@Override
 	protected TTTAction getAction(Scanner scan) {
 		int next = Integer.parseInt(scan.nextLine()) - 1;
-		return new TTTAction(next);
+		return TTTAction.of(next);
 	}
 }

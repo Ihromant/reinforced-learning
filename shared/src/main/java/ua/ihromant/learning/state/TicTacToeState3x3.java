@@ -55,7 +55,7 @@ public class TicTacToeState3x3 implements TicTacToeState {
     public Stream<TTTAction> getActions() {
         return IntStream.range(0, players.length)
                 .filter(i -> players[i] == null)
-                .mapToObj(TTTAction::new);
+                .mapToObj(TTTAction::of);
     }
 
     @Override
