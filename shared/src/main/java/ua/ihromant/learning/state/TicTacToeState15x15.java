@@ -102,12 +102,12 @@ public class TicTacToeState15x15 implements TicTacToeState {
 	@Override
 	public Result getResult() {
 		int moves = andWithOther(TERMINAL_MASK).cardinality();
-		if (moves == HOR_SIZE * VER_SIZE) {
-			return new BoardResult();
-		}
 		Player won = won();
 		if (won != null) {
 			return new BoardResult(won(), moves, 2 * WON - 1, 0.001);
+		}
+		if (moves == HOR_SIZE * VER_SIZE) {
+			return new BoardResult();
 		}
 		return null;
 	}

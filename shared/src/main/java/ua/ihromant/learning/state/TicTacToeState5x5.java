@@ -104,12 +104,12 @@ public class TicTacToeState5x5 implements TicTacToeState {
 	@Override
 	public Result getResult() {
 		int moves = Long.bitCount(plrz & TERMINAL_MASK);
-		if (moves == SIZE * SIZE) {
-			return new BoardResult();
-		}
 		Player won = won();
 		if (won != null) {
 			return new BoardResult(won(), moves, 2 * WON - 1);
+		}
+		if (moves == SIZE * SIZE) {
+			return new BoardResult();
 		}
 		return null;
 	}

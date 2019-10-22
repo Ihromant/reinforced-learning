@@ -72,12 +72,12 @@ public class TicTacToeState3x3 implements TicTacToeState {
     @Override
     public Result getResult() {
         long moves = Arrays.stream(players).filter(Objects::nonNull).count();
-        if (moves == players.length) {
-            return new BoardResult();
-        }
         Player won = won();
         if (won != null) {
             return new BoardResult(won, (int) moves, 5);
+        }
+        if (moves == players.length) {
+            return new BoardResult();
         }
         return null;
     }
