@@ -84,6 +84,21 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	}
 
 	@Override
+	public int winLength() {
+		return WON;
+	}
+
+	@Override
+	public int horSize() {
+		return HOR_SIZE;
+	}
+
+	@Override
+	public int verSize() {
+		return VER_SIZE;
+	}
+
+	@Override
 	public Player getCurrent() {
 		return Long.bitCount(plrz & TERMINAL_MASK) % 2 == 0 ? Player.X : Player.O;
 	}

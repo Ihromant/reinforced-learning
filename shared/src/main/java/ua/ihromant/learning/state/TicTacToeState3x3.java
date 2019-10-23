@@ -40,6 +40,21 @@ public class TicTacToeState3x3 implements TicTacToeState {
     }
 
     @Override
+    public int winLength() {
+        return 3;
+    }
+
+    @Override
+    public int horSize() {
+        return 3;
+    }
+
+    @Override
+    public int verSize() {
+        return 3;
+    }
+
+    @Override
     public Player getCurrent() {
         return IntStream.range(0, 9)
                 .filter(i -> players[i] == null)

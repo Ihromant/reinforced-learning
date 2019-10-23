@@ -62,6 +62,21 @@ public class TicTacToeState15x15 implements TicTacToeState {
 		return plrz.get(position * 2 + 1) ? Player.X : Player.O;
 	}
 
+	@Override
+	public int winLength() {
+		return WON;
+	}
+
+	@Override
+	public int horSize() {
+		return HOR_SIZE;
+	}
+
+	@Override
+	public int verSize() {
+		return VER_SIZE;
+	}
+
 	private BitSet andWithOther(BitSet other) {
 		BitSet toTest = ((BitSet) plrz.clone());
 		toTest.and(other);
