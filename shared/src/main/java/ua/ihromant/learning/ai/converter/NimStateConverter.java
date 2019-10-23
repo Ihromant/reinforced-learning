@@ -1,8 +1,18 @@
 package ua.ihromant.learning.ai.converter;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+import org.deeplearning4j.nn.conf.GradientNormalization;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.learning.config.Adam;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.NimLineState;
@@ -41,31 +51,27 @@ public class NimStateConverter implements InputConverter<NimAction> {
 	}
 
 	@Override
-	public StateAction<NimAction> reverse(double[] from) {
-		int[] piles = new int[PILES_MAX];
-		for (int i = 0; i < PILES_MAX; i++) {
-			StringBuilder builder = new StringBuilder();
-			for (int j = 0; j < BINARY_NUMBERS; j++) {
-				double val = from[i * BINARY_NUMBERS + j];
-				if (builder.length() > 0 || val > 0) {
-					builder.append(val > 0 ? '1' : '0');
-				}
-			}
-			piles[i] = Integer.parseInt(builder.length() > 0 ? builder.toString() : "0", 2);
-		}
-		NimState state = new NimLineState(piles, Player.X);
-		StringBuilder builder = new StringBuilder();
-		for (int i = PILES_MAX * BINARY_NUMBERS + PILES_MAX; i < from.length; i++) {
-			double val = from[i];
-			if (builder.length() > 0 || val > 0) {
-				builder.append(val > 0 ? '1' : '0');
-			}
-		}
-		NimAction act = new NimAction(
-				IntStream.range(PILES_MAX * BINARY_NUMBERS, PILES_MAX * BINARY_NUMBERS + PILES_MAX)
-				.filter(i -> from[i] > 0).map(i -> i - PILES_MAX * BINARY_NUMBERS).findFirst().orElseThrow(IllegalStateException::new),
-				Integer.parseInt(builder.toString(), 2));
-		return new StateAction<>(state, act);
+	public MultiLayerConfiguration buildConfig(int outputLength) {
+		return new NeuralNetConfiguration.Builder()
+				.seed(ThreadLocalRandom.current().nextLong())
+				.weightInit(WeightInit.XAVIER)
+				.updater(new Adam())
+				.list()
+				.layer(0, new DenseLayer.Builder()
+						.nIn(inputLength())
+						.nOut(inputLength() * 10)
+						.activation(Activation.RELU)
+						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+						.gradientNormalizationThreshold(5)
+						.build())
+				.layer(1, new OutputLayer
+						.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
+						.activation(Activation.SOFTMAX)
+						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+						.gradientNormalizationThreshold(5)
+						.nIn(inputLength() * 10)
+						.nOut(outputLength).build())
+				.build();
 	}
 
 	@Override

@@ -12,7 +12,6 @@ import ua.ihromant.learning.state.NimState;
 import ua.ihromant.learning.state.TTTAction;
 import ua.ihromant.learning.state.TicTacToeState;
 import ua.ihromant.reinforced.ai.qtable.QLearningTemplate;
-import ua.ihromant.reinforced.ai.qtable.TF;
 import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 import ua.ihromant.reinforced.ai.qtable.TrainingAgent;
 import ua.ihromant.reinforced.ai.qtable.map.TrainableMapQTable;
@@ -55,8 +54,8 @@ public class TrainerFactory {
         return new TrainableMapQTable<>(0.3);
     }
 
-    private static <A> TrainableQTable<A> newNetworkQTable(InputConverter<A> inputConverter,QValueConverter qValueConverter) {
+    private static <A> TrainableQTable<A> newNetworkQTable(InputConverter<A> inputConverter, QValueConverter qValueConverter) {
         return new TrainableNetworkQTable<>(inputConverter, qValueConverter,
-                new NeuralNetworkAgent(TF.buildGraph(inputConverter, qValueConverter)));
+                new NeuralNetworkAgent(inputConverter.buildConfig(qValueConverter.outputLength())));
     }
 }

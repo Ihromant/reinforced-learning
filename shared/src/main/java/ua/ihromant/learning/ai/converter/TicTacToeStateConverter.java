@@ -1,7 +1,17 @@
 package ua.ihromant.learning.ai.converter;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
+import org.deeplearning4j.nn.conf.GradientNormalization;
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.layers.DenseLayer;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.weights.WeightInit;
+import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.learning.config.Adam;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.TTTAction;
@@ -35,8 +45,27 @@ public class TicTacToeStateConverter implements InputConverter<TTTAction> {
 	}
 
 	@Override
-	public StateAction<TTTAction> reverse(double[] from) {
-		return null;
+	public MultiLayerConfiguration buildConfig(int outputLength) {
+		return new NeuralNetConfiguration.Builder()
+				.seed(ThreadLocalRandom.current().nextLong())
+				.weightInit(WeightInit.XAVIER)
+				.updater(new Adam())
+				.list()
+				.layer(0, new DenseLayer.Builder()
+						.nIn(inputLength())
+						.nOut(inputLength() * 10)
+						.activation(Activation.RELU)
+						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+						.gradientNormalizationThreshold(5)
+						.build())
+				.layer(1, new OutputLayer
+						.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
+						.activation(Activation.SOFTMAX)
+						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+						.gradientNormalizationThreshold(5)
+						.nIn(inputLength() * 10)
+						.nOut(outputLength).build())
+				.build();
 	}
 
 	@Override

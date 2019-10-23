@@ -1,11 +1,12 @@
 package ua.ihromant.learning.ai.converter;
 
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import ua.ihromant.learning.qtable.StateAction;
 
 public interface InputConverter<A> {
 	double[] convert(StateAction<A> stateAction);
 
-	StateAction<A> reverse(double[] from); // for debug purposes only, use it when you know what are you doing
+	MultiLayerConfiguration buildConfig(int outputLength);
 
 	int inputLength();
 }
