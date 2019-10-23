@@ -2,6 +2,7 @@ package ua.ihromant.reinforced.ai.qtable;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
@@ -24,10 +25,14 @@ public class TF {
 						.nIn(inputConverter.inputLength())
 						.nOut(inputConverter.inputLength() * 10)
 						.activation(Activation.RELU)
+						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+						.gradientNormalizationThreshold(5)
 						.build())
 				.layer(1, new OutputLayer
 						.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
 						.activation(Activation.SOFTMAX)
+						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
+						.gradientNormalizationThreshold(5)
 						.nIn(inputConverter.inputLength() * 10)
 						.nOut(converter.outputLength()).build())
 				.build();
