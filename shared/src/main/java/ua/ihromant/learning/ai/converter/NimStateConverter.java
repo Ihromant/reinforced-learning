@@ -74,8 +74,7 @@ public class NimStateConverter implements InputConverter<NimAction> {
 				.build();
 	}
 
-	@Override
-	public int inputLength() {
+	private int inputLength() {
 		return PILES_MAX * BINARY_NUMBERS + BINARY_NUMBERS + PILES_MAX;
 	}
 }

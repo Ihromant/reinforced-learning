@@ -1,9 +1,12 @@
 package ua.ihromant.learning.qtable;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import ua.ihromant.learning.ai.converter.InputConverter;
 import ua.ihromant.learning.ai.converter.QValueConverter;
 import ua.ihromant.learning.network.NeuralNetworkAgent;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,17 +26,17 @@ public class NetworkQTable<A> implements QTable<A> {
 
 	@Override
 	public double get(StateAction<A> stateAction) {
-		return qConverter.convertToQValue(agent.get(inputConverter.convert(stateAction), qConverter.outputLength()));
+		INDArray input = inputConverter.convert(Collections.singletonList(stateAction));
+		return qConverter.convertToQValues(agent.get(input)).get(0);
 	}
 
 	@Override
 	public Map<StateAction<A>, Double> getMultiple(Stream<StateAction<A>> stream) {
-		List<StateAction<A>> pairs = stream.collect(Collectors.toList());
-		List<double[]> evals = agent.getMultiple(
-				pairs.stream().map(inputConverter::convert).collect(Collectors.toList()), qConverter.outputLength());
-		return IntStream.range(0, pairs.size()).boxed()
-				.collect(Collectors.toMap(pairs::get,
-						i -> qConverter.convertToQValue(evals.get(i)),
-						(u, v) -> u));
+		List<StateAction<A>> stateActions = stream.collect(Collectors.toList());
+		INDArray input = inputConverter.convert(stateActions);
+		List<Double> evals = qConverter.convertToQValues(input);
+		return IntStream.range(0, stateActions.size()).boxed()
+				.collect(Collectors.toMap(stateActions::get,
+						evals::get));
 	}
 }

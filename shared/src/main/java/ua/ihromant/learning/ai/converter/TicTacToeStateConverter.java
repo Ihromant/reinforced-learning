@@ -68,8 +68,7 @@ public class TicTacToeStateConverter implements InputConverter<TTTAction> {
 				.build();
 	}
 
-	@Override
-	public int inputLength() {
+	private int inputLength() {
 		return size * 3 + 1;
 	}
 }
