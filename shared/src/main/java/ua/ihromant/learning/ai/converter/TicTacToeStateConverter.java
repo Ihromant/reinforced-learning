@@ -1,5 +1,6 @@
 package ua.ihromant.learning.ai.converter;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
@@ -10,6 +11,8 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import ua.ihromant.learning.qtable.StateAction;
@@ -23,8 +26,7 @@ public class TicTacToeStateConverter implements InputConverter<TTTAction> {
 		this.size = size;
 	}
 
-	@Override
-	public double[] convert(StateAction<TTTAction> stateAction) {
+	private double[] convert(StateAction<TTTAction> stateAction) {
 		TicTacToeState state = stateAction.getResult();
 		double[] res = new double[inputLength()];
 		IntStream.range(0, size)
@@ -42,6 +44,15 @@ public class TicTacToeStateConverter implements InputConverter<TTTAction> {
 				});
 		res[res.length - 1] = state.getCurrent().ordinal();
 		return res;
+	}
+
+	@Override
+	public INDArray convert(List<StateAction<TTTAction>> stateActions) {
+		double[][] result = new double[stateActions.size()][];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = convert(stateActions.get(i));
+		}
+		return Nd4j.create(result);
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package ua.ihromant.learning.ai.converter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 
 import org.deeplearning4j.nn.conf.GradientNormalization;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -11,20 +11,19 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import ua.ihromant.learning.qtable.StateAction;
 import ua.ihromant.learning.state.NimAction;
-import ua.ihromant.learning.state.NimLineState;
 import ua.ihromant.learning.state.NimState;
-import ua.ihromant.learning.state.Player;
 
 public class NimStateConverter implements InputConverter<NimAction> {
 	private static final int PILES_MAX = 4;
 	private static final int BINARY_NUMBERS = 3;
 
-	@Override
-	public double[] convert(StateAction<NimAction> stateAction) {
+	private double[] convert(StateAction<NimAction> stateAction) {
 		NimState state = stateAction.getState();
 		int[] piles = state.getPiles();
 		NimAction action = stateAction.getAction();
@@ -48,6 +47,15 @@ public class NimStateConverter implements InputConverter<NimAction> {
 					binary[binary.length - 1 - i] - '0';
 		}
 		return result;
+	}
+
+	@Override
+	public INDArray convert(List<StateAction<NimAction>> stateActions) {
+		double[][] result = new double[stateActions.size()][];
+		for (int i = 0; i < result.length; i++) {
+			result[i] = convert(stateActions.get(i));
+		}
+		return Nd4j.create(result);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class NetworkQTable<A> implements QTable<A> {
 	public Map<StateAction<A>, Double> getMultiple(Stream<StateAction<A>> stream) {
 		List<StateAction<A>> stateActions = stream.collect(Collectors.toList());
 		INDArray input = inputConverter.convert(stateActions);
-		List<Double> evals = qConverter.convertToQValues(input);
+		List<Double> evals = qConverter.convertToQValues(agent.get(input));
 		return IntStream.range(0, stateActions.size()).boxed()
 				.collect(Collectors.toMap(stateActions::get,
 						evals::get));
