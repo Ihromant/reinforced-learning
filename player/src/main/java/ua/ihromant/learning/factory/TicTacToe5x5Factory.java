@@ -21,6 +21,6 @@ public class TicTacToe5x5Factory implements Factory<TTTAction> {
 
 	@Override
 	public Agent<TTTAction> createAI(String path) {
-		return AIZoo.networkTTTAI(getStateSupplier().get().getMaximumMoves(), path);
+		return AIZoo.networkTTTAI(new TicTacToeState5x5(), path);
 	}
 }

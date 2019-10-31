@@ -13,6 +13,7 @@ import ua.ihromant.learning.qtable.NetworkQTable;
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.TTTAction;
+import ua.ihromant.learning.state.TicTacToeState;
 
 public class AIZoo {
     private AIZoo() throws IllegalAccessException {
@@ -23,8 +24,8 @@ public class AIZoo {
         return new MinimaxAI<>(pl);
     }
 
-    public static QLearningAI<TTTAction> networkTTTAI(int size, String model) {
-        return new QLearningAI<>(new NetworkQTable<>(new TicTacToeStateConverter(size),
+    public static QLearningAI<TTTAction> networkTTTAI(TicTacToeState state, String model) {
+        return new QLearningAI<>(new NetworkQTable<>(new TicTacToeStateConverter(state),
                 new WinDrawLoseConverter(),
                 new NeuralNetworkAgent(model)));
     }

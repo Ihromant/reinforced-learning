@@ -27,13 +27,13 @@ public class TrainerFactory {
     public static TrainingAgent<TTTAction> loadTicTacToeAgent(Supplier<TicTacToeState> supplier, String path) {
         TicTacToeState state = supplier.get();
         return new QLearningTemplate<>(state,
-                new TrainableNetworkQTable<>(new TicTacToeStateConverter(state.getMaximumMoves()),
+                new TrainableNetworkQTable<>(new TicTacToeStateConverter(state),
                         new WinDrawLoseConverter(), new NeuralNetworkAgent(path)));
     }
 
     public static TrainingAgent<TTTAction> newTicTacToeAgent(Supplier<TicTacToeState> supplier) {
         TicTacToeState state = supplier.get();
-        InputConverter<TTTAction> inputConvert = new TicTacToeStateConverter(state.getMaximumMoves());
+        InputConverter<TTTAction> inputConvert = new TicTacToeStateConverter(state);
         QValueConverter qConvert = new WinDrawLoseConverter();
         return new QLearningTemplate<>(state, newNetworkQTable(inputConvert, qConvert));
     }

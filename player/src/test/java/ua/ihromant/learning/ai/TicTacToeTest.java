@@ -14,6 +14,7 @@ import ua.ihromant.learning.qtable.HistoryItem;
 import ua.ihromant.learning.state.GameResult;
 import ua.ihromant.learning.state.Player;
 import ua.ihromant.learning.state.TTTAction;
+import ua.ihromant.learning.state.TicTacToeState;
 import ua.ihromant.learning.state.TicTacToeState3x3;
 import ua.ihromant.learning.util.WriterUtil;
 
@@ -21,7 +22,7 @@ public class TicTacToeTest {
 	@Test
 	public void testMinimaxX() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1000k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
 				Player.O, ai);
@@ -41,7 +42,7 @@ public class TicTacToeTest {
 	@Test
 	public void testMinimaxO() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1000k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
 				Player.O, new MinimaxAI<>(Player.O));
@@ -61,7 +62,7 @@ public class TicTacToeTest {
 	@Test
 	public void testRandomX() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new RandomAgent<>(),
 				Player.O, ai);
@@ -81,7 +82,7 @@ public class TicTacToeTest {
 	@Test
 	public void testRandomO() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
 				Player.O, new RandomAgent<>());

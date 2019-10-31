@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import ua.ihromant.learning.state.NimLineState;
 import ua.ihromant.learning.state.TicTacToeState3x3;
+import ua.ihromant.learning.state.TicTacToeState5x5;
 import ua.ihromant.learning.state.TicTacToeState5x6;
 import ua.ihromant.reinforced.ai.factory.TrainerFactory;
 
@@ -18,6 +19,6 @@ public class Trainer {
 
     public static void main(String[] args) {
         String path = System.getProperty("java.io.tmpdir") + File.separator + "nim.ai";
-        TrainerFactory.newNimAgent(() -> new NimLineState(new int[]{1, 3, 5, 7})).train(100_000, path);
+        TrainerFactory.newTicTacToeAgent(TicTacToeState5x5::new).train(200_000, path);
     }
 }

@@ -23,6 +23,6 @@ public class TicTacToe3x3Factory implements Factory<TTTAction> {
 	@Override
 	public Agent<TTTAction> createAI(String path) {
 		//return AIZoo.miniMax(Player.O);
-		return AIZoo.networkTTTAI(getStateSupplier().get().getMaximumMoves(), path);
+		return AIZoo.networkTTTAI(new TicTacToeState3x3(), path);
 	}
 }
