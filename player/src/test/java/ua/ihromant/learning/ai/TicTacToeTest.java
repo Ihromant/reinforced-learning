@@ -22,7 +22,7 @@ public class TicTacToeTest {
 	@Test
 	public void testMinimaxX() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1000k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new MinimaxAI<>(Player.X),
 				Player.O, ai);
@@ -42,7 +42,7 @@ public class TicTacToeTest {
 	@Test
 	public void testMinimaxO() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1000k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
 				Player.O, new MinimaxAI<>(Player.O));
@@ -62,7 +62,7 @@ public class TicTacToeTest {
 	@Test
 	public void testRandomX() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, new RandomAgent<>(),
 				Player.O, ai);
@@ -82,7 +82,7 @@ public class TicTacToeTest {
 	@Test
 	public void testRandomO() {
 		int tries = 1000;
-		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(new TicTacToeState3x3(),
+		QLearningAI<TTTAction> ai = AIZoo.networkTTTAI(9,
 				Objects.requireNonNull(getClass().getClassLoader().getResource("test1500k.ai")).getFile());
 		Map<Player, Agent<TTTAction>> players = Map.of(Player.X, ai,
 				Player.O, new RandomAgent<>());

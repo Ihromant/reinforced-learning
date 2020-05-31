@@ -23,30 +23,29 @@ public class NimStateConverter implements InputConverter<NimAction> {
 	private static final int PILES_MAX = 4;
 	private static final int BINARY_NUMBERS = 3;
 
+	private static int[] toBinary(int from, int bitCount) {
+		int[] result = new int[bitCount];
+		for (int i = 0; i < bitCount; i++) {
+			result[bitCount - i - 1] = (from >> i) & 1;
+		}
+		return result;
+	}
+
 	private double[] convert(StateAction<NimAction> stateAction) {
 		NimState state = stateAction.getState();
-		int[] piles = state.getPiles();
+		int[] piles = Arrays.copyOf(state.getPiles(), state.getPiles().length);
 		NimAction action = stateAction.getAction();
 		Arrays.stream(action.getCoeffs()).filter(i -> piles[i] < action.getReduce())
 				.findAny().ifPresent(i -> {
 			throw new IllegalArgumentException(String.valueOf(stateAction));
 		});
-		double[] result = new double[inputLength()];
-		for (int i = 0; i < PILES_MAX && i < piles.length; i++) {
-			char[] binary = Integer.toBinaryString(piles[i]).toCharArray();
-			for (int j = 0; j < binary.length && j < BINARY_NUMBERS; j++) {
-				result[i * BINARY_NUMBERS + BINARY_NUMBERS - 1 - j] = binary[binary.length - 1 - j] - '0';
-			}
+		for (int coeff : action.getCoeffs()) {
+			piles[coeff] -= action.getReduce();
 		}
-		for (int i : action.getCoeffs()) {
-			result[PILES_MAX * BINARY_NUMBERS + i] = 1;
-		}
-		char[] binary = Integer.toBinaryString(action.getReduce()).toCharArray();
-		for (int i = 0; i < binary.length; i++) {
-			result[PILES_MAX * BINARY_NUMBERS + PILES_MAX + BINARY_NUMBERS - 1 - i] =
-					binary[binary.length - 1 - i] - '0';
-		}
-		return result;
+		return Arrays.stream(piles)
+				.flatMap(i -> Arrays.stream(toBinary(i, BINARY_NUMBERS)))
+				.mapToDouble(i -> (double) i)
+				.toArray();
 	}
 
 	@Override
@@ -66,23 +65,19 @@ public class NimStateConverter implements InputConverter<NimAction> {
 				.updater(new Adam())
 				.list()
 				.layer(0, new DenseLayer.Builder()
+						.activation(Activation.RELU)
 						.nIn(inputLength())
 						.nOut(inputLength() * 10)
-						.activation(Activation.RELU)
-						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-						.gradientNormalizationThreshold(5)
 						.build())
 				.layer(1, new OutputLayer
 						.Builder(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY)
 						.activation(Activation.SOFTMAX)
-						.gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
-						.gradientNormalizationThreshold(5)
 						.nIn(inputLength() * 10)
 						.nOut(outputLength).build())
 				.build();
 	}
 
 	private int inputLength() {
-		return PILES_MAX * BINARY_NUMBERS + BINARY_NUMBERS + PILES_MAX;
+		return PILES_MAX * BINARY_NUMBERS;
 	}
 }

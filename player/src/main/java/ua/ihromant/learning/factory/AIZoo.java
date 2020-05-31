@@ -24,8 +24,8 @@ public class AIZoo {
         return new MinimaxAI<>(pl);
     }
 
-    public static QLearningAI<TTTAction> networkTTTAI(TicTacToeState state, String model) {
-        return new QLearningAI<>(new NetworkQTable<>(new TicTacToeStateConverter(state),
+    public static QLearningAI<TTTAction> networkTTTAI(int size, String model) {
+        return new QLearningAI<>(new NetworkQTable<>(new TicTacToeStateConverter(size),
                 new WinDrawLoseConverter(),
                 new NeuralNetworkAgent(model)));
     }

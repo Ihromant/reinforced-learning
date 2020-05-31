@@ -84,11 +84,6 @@ public class TicTacToeState5x6 implements TicTacToeState {
 	}
 
 	@Override
-	public int winLength() {
-		return WON;
-	}
-
-	@Override
 	public int horSize() {
 		return HOR_SIZE;
 	}

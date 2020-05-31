@@ -71,11 +71,6 @@ public class TicTacToeState5x5 implements TicTacToeState {
 	}
 
 	@Override
-	public int winLength() {
-		return WON;
-	}
-
-	@Override
 	public int horSize() {
 		return SIZE;
 	}
@@ -137,8 +132,6 @@ public class TicTacToeState5x5 implements TicTacToeState {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("-".repeat(SIZE + 2));
-		builder.append('\n');
 		for (int i = 0; i < SIZE; i++) {
 			builder.append('|');
 			for (int j = 0; j < SIZE; j++) {
@@ -152,8 +145,7 @@ public class TicTacToeState5x5 implements TicTacToeState {
 			builder.append('|');
 			builder.append('\n');
 		}
-		builder.append("-".repeat(SIZE + 2));
-		return builder.toString();
+		return builder.substring(0, builder.length() - 1);
 	}
 
 	@Override

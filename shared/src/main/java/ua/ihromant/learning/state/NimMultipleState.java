@@ -14,7 +14,7 @@ public class NimMultipleState implements NimState {
 	}
 
 	private NimMultipleState(int[] piles, Player player) {
-		this.piles = Arrays.stream(piles).sorted().filter(i -> i != 0).toArray();
+		this.piles = Arrays.copyOf(piles, piles.length);
 		this.current = player;
 	}
 

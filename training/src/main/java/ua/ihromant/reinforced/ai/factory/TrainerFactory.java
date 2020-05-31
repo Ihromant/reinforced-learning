@@ -10,7 +10,6 @@ import ua.ihromant.learning.network.NeuralNetworkAgent;
 import ua.ihromant.learning.state.NimAction;
 import ua.ihromant.learning.state.NimState;
 import ua.ihromant.learning.state.TTTAction;
-import ua.ihromant.learning.state.TicTacToeState;
 import ua.ihromant.reinforced.ai.qtable.QLearningTemplate;
 import ua.ihromant.reinforced.ai.qtable.TrainableQTable;
 import ua.ihromant.reinforced.ai.qtable.TrainingAgent;
@@ -24,30 +23,25 @@ public class TrainerFactory {
         throw new IllegalAccessException();
     }
 
-    public static TrainingAgent<TTTAction> loadTicTacToeAgent(Supplier<TicTacToeState> supplier, String path) {
-        TicTacToeState state = supplier.get();
-        return new QLearningTemplate<>(state,
-                new TrainableNetworkQTable<>(new TicTacToeStateConverter(state),
+    public static TrainingAgent<TTTAction> loadTicTacToeAgent(int size, String path) {
+        return new QLearningTemplate<>(new TrainableNetworkQTable<>(new TicTacToeStateConverter(size),
                         new WinDrawLoseConverter(), new NeuralNetworkAgent(path)));
     }
 
-    public static TrainingAgent<TTTAction> newTicTacToeAgent(Supplier<TicTacToeState> supplier) {
-        TicTacToeState state = supplier.get();
-        InputConverter<TTTAction> inputConvert = new TicTacToeStateConverter(state);
+    public static TrainingAgent<TTTAction> newTicTacToeAgent(int size) {
         QValueConverter qConvert = new WinDrawLoseConverter();
-        return new QLearningTemplate<>(state, newNetworkQTable(inputConvert, qConvert));
+        return new QLearningTemplate<>(newNetworkQTable(new TicTacToeStateConverter(size), qConvert));
     }
 
     public static TrainingAgent<NimAction> loadNimAgent(Supplier<NimState> supplier, String path) {
-        return new QLearningTemplate<>(supplier.get(),
-                new TrainableNetworkQTable<>(new NimStateConverter(),
+        return new QLearningTemplate<>(new TrainableNetworkQTable<>(new NimStateConverter(),
                         new WinLoseConverter(), new NeuralNetworkAgent(path)));
     }
 
-    public static TrainingAgent<NimAction> newNimAgent(Supplier<NimState> supplier) {
+    public static TrainingAgent<NimAction> newNimAgent() {
         InputConverter<NimAction> inputConvert = new NimStateConverter();
         QValueConverter qConvert = new WinLoseConverter();
-        return new QLearningTemplate<>(supplier.get(), newNetworkQTable(inputConvert, qConvert));
+        return new QLearningTemplate<>(newNetworkQTable(inputConvert, qConvert));
     }
 
     private static <A> TrainableQTable<A> newMapQTable() {

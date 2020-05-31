@@ -18,7 +18,9 @@ public class Trainer {
     }
 
     public static void main(String[] args) {
-        String path = System.getProperty("java.io.tmpdir") + File.separator + "nim.ai";
-        TrainerFactory.newTicTacToeAgent(TicTacToeState5x5::new).train(200_000, path);
+        String pathPrev = System.getProperty("java.io.tmpdir") + File.separator + "ttt.ai";
+        String path = System.getProperty("java.io.tmpdir") + File.separator + "ttt1.ai";
+        TrainerFactory.newTicTacToeAgent(25).train(new TicTacToeState5x5(), 1_000_000, pathPrev);
+        //TrainerFactory.loadTicTacToeAgent(9, pathPrev).train(new TicTacToeState3x3(), 100_000, path);
     }
 }
