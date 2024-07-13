@@ -3,7 +3,7 @@ package ua.ihromant.learning.assumptions;
 import org.deeplearning4j.datasets.iterator.DoublesDataSetIterator;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.primitives.Pair;
+import org.nd4j.common.primitives.Pair;
 import ua.ihromant.learning.assumptions.TF1;
 
 import java.util.ArrayList;

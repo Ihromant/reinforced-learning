@@ -14,26 +14,33 @@
         <module>player</module>
     </modules>
 
+    <properties>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <dl4j.version>1.0.0-M2</dl4j.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.deeplearning4j</groupId>
             <artifactId>deeplearning4j-core</artifactId>
-            <version>1.0.0-beta5</version>
+            <version>${dl4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.deeplearning4j</groupId>
             <artifactId>deeplearning4j-nn</artifactId>
-            <version>1.0.0-beta5</version>
+            <version>${dl4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-ui_2.12</artifactId>
-            <version>1.0.0-beta5</version>
+            <artifactId>deeplearning4j-ui</artifactId>
+            <version>${dl4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nd4j</groupId>
             <artifactId>nd4j-native-platform</artifactId>
-            <version>1.0.0-beta5</version>
+            <version>${dl4j.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -43,18 +50,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
